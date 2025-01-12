@@ -34,6 +34,50 @@ public class ChessPosition {
         return col;
     }
 
+    /**
+     * @return the top right diagonal square to the current position if
+     * within the board, otherwise return null
+     */
+    public ChessPosition getTopRight() {
+        if (row < 8 && col < 8) {
+            return new ChessPosition(row + 1, col + 1);
+        }
+        return null;
+    }
+
+    /**
+     * @return the top left diagonal square to the current position if
+     * within the board, otherwise return null
+     */
+    public ChessPosition getTopLeft() {
+        if (row < 8 && col > 1) {
+            return new ChessPosition(row + 1, col - 1);
+        }
+        return null;
+    }
+
+    /**
+     * @return the bottom right diagonal square to the current position if
+     * within the board, otherwise return null
+     */
+    public ChessPosition getBottomRight() {
+        if (row > 1 && col < 8) {
+            return new ChessPosition(row - 1, col + 1);
+        }
+        return null;
+    }
+
+    /**
+     * @return the bottom left diagonal square to the current position if
+     * within the board, otherwise return null
+     */
+    public ChessPosition getBottomLeft() {
+        if (row > 1 && col > 1) {
+            return new ChessPosition(row - 1, col - 1);
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
