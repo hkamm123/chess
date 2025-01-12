@@ -22,15 +22,9 @@ public class PieceMovesCalculator {
         throw new IllegalArgumentException("Unknown piece type: " + currentPiece.getPieceType());
     }
 
-    public static Collection<ChessMove> pawn(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
-    }
-    public static Collection<ChessMove> rook(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
-    }
-    public static Collection<ChessMove> bishop(ChessBoard board, ChessPosition position) {
-        System.out.println("calculating moves for bishop at position: " + position);
+    // --------------------- DIRECTIONAL HELPER FUNCTIONS FOR CHECKING SQUARES
 
+    private static Collection<ChessMove> getMovesToTopRight(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece currentPiece = board.getPiece(position);
 
@@ -46,6 +40,12 @@ public class PieceMovesCalculator {
             moves.add(new ChessMove(position, topRight, null));
             topRight = topRight.getTopRight();
         }
+        return moves;
+    }
+
+    private static Collection<ChessMove> getMovesToTopLeft(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
 
         ChessPosition topLeft = position.getTopLeft();
         while (topLeft != null) {
@@ -59,6 +59,12 @@ public class PieceMovesCalculator {
             moves.add(new ChessMove(position, topLeft, null));
             topLeft = topLeft.getTopLeft();
         }
+        return moves;
+    }
+
+    private static Collection<ChessMove> getMovesToBottomRight(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
 
         ChessPosition bottomRight = position.getBottomRight();
         while (bottomRight != null) {
@@ -72,6 +78,12 @@ public class PieceMovesCalculator {
             moves.add(new ChessMove(position, bottomRight, null));
             bottomRight = bottomRight.getBottomRight();
         }
+        return moves;
+    }
+
+    private static Collection<ChessMove> getMovesToBottomLeft(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
 
         ChessPosition bottomLeft = position.getBottomLeft();
         while (bottomLeft != null) {
@@ -85,6 +97,31 @@ public class PieceMovesCalculator {
             moves.add(new ChessMove(position, bottomLeft, null));
             bottomLeft = bottomLeft.getBottomLeft();
         }
+        return moves;
+    }
+
+    // ----------------------- PIECE FUNCTIONS FOR CALCULATING MOVES
+    public static Collection<ChessMove> pawn(ChessBoard board, ChessPosition position) {
+        throw new RuntimeException("Not Implemented");
+    }
+    public static Collection<ChessMove> rook(ChessBoard board, ChessPosition position) {
+        throw new RuntimeException("Not Implemented");
+    }
+    public static Collection<ChessMove> bishop(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
+
+        Collection<ChessMove> topRightMoves = getMovesToTopRight(board, position);
+        moves.addAll(topRightMoves);
+
+        Collection<ChessMove> topLeftMoves = getMovesToTopLeft(board, position);
+        moves.addAll(topLeftMoves);
+
+        Collection<ChessMove> bottomRightMoves = getMovesToBottomRight(board, position);
+        moves.addAll(bottomRightMoves);
+
+        Collection<ChessMove> bottomLeftMoves = getMovesToBottomLeft(board, position);
+        moves.addAll(bottomLeftMoves);
 
         return moves;
     }
