@@ -100,16 +100,97 @@ public class PieceMovesCalculator {
         return moves;
     }
 
+    private static Collection<ChessMove> getMovesToTop(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
+
+        ChessPosition top = position.getTop();
+        while (top != null) {
+            if (board.getPiece(top) != null) {
+                ChessPiece obstructionPiece = board.getPiece(top);
+                if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()) {
+                    moves.add(new ChessMove(position, top, null));
+                }
+                break;
+            }
+            moves.add(new ChessMove(position, top, null));
+            top = top.getTop();
+        }
+        return moves;
+    }
+
+    private static Collection<ChessMove> getMovesToBottom(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
+        ChessPosition bottom = position.getBottom();
+        while (bottom != null) {
+            if (board.getPiece(bottom) != null) {
+                ChessPiece obstructionPiece = board.getPiece(bottom);
+                if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()) {
+                    moves.add(new ChessMove(position, bottom, null));
+                }
+                break;
+            }
+            moves.add(new ChessMove(position, bottom, null));
+            bottom = bottom.getBottom();
+        }
+        return moves;
+    }
+
+    public static Collection<ChessMove> getMovesToRight(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
+        ChessPosition right = position.getRight();
+        while (right != null) {
+            if (board.getPiece(right) != null) {
+                ChessPiece obstructionPiece = board.getPiece(right);
+                if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()) {
+                    moves.add(new ChessMove(position, right, null));
+                }
+                break;
+            }
+            moves.add(new ChessMove(position, right, null));
+            right = right.getRight();
+        }
+        return moves;
+    }
+
+    public static Collection<ChessMove> getMovesToLeft(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
+        ChessPosition left = position.getLeft();
+        while (left != null) {
+            if (board.getPiece(left) != null) {
+                ChessPiece obstructionPiece = board.getPiece(left);
+                if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()) {
+                    moves.add(new ChessMove(position, left, null));
+                }
+                break;
+            }
+            moves.add(new ChessMove(position, left, null));
+            left = left.getLeft();
+        }
+        return moves;
+    }
+
     // ----------------------- PIECE FUNCTIONS FOR CALCULATING MOVES
     public static Collection<ChessMove> pawn(ChessBoard board, ChessPosition position) {
         throw new RuntimeException("Not Implemented");
     }
     public static Collection<ChessMove> rook(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
+        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> topMoves = getMovesToTop(board, position);
+        moves.addAll(topMoves);
+        Collection<ChessMove> bottomMoves = getMovesToBottom(board, position);
+        moves.addAll(bottomMoves);
+        Collection<ChessMove> leftMoves = getMovesToLeft(board, position);
+        moves.addAll(leftMoves);
+        Collection<ChessMove> rightMoves = getMovesToRight(board, position);
+        moves.addAll(rightMoves);
+        return moves;
     }
     public static Collection<ChessMove> bishop(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
-        ChessPiece currentPiece = board.getPiece(position);
 
         Collection<ChessMove> topRightMoves = getMovesToTopRight(board, position);
         moves.addAll(topRightMoves);

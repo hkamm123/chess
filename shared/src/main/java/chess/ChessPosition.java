@@ -34,6 +34,8 @@ public class ChessPosition {
         return col;
     }
 
+
+    // --------------------- DIRECTIONAL FUNCTIONS FOR ADJACENT SQUARES
     /**
      * @return the top right diagonal square to the current position if
      * within the board, otherwise return null
@@ -74,6 +76,50 @@ public class ChessPosition {
     public ChessPosition getBottomLeft() {
         if (row > 1 && col > 1) {
             return new ChessPosition(row - 1, col - 1);
+        }
+        return null;
+    }
+
+    /**
+     * @return the square directly above this one if it exists,
+     * otherwise return null
+     */
+    public ChessPosition getTop() {
+        if (row < 8) {
+            return new ChessPosition(row + 1, col);
+        }
+        return null;
+    }
+
+    /**
+     * @return the square directly below this one if it exists,
+     * otherwise return null
+     */
+    public ChessPosition getBottom() {
+        if (row > 1) {
+            return new ChessPosition(row - 1, col);
+        }
+        return null;
+    }
+
+    /**
+     * @return the square directly left of this one if it exists,
+     * otherwise return null
+     */
+    public ChessPosition getLeft() {
+        if (col < 8) {
+            return new ChessPosition(row, col + 1);
+        }
+        return null;
+    }
+
+    /**
+     * @return the square directly right of this one if it exists,
+     * otherwise return null
+     */
+    public ChessPosition getRight() {
+        if (col > 1) {
+            return new ChessPosition(row, col - 1);
         }
         return null;
     }
