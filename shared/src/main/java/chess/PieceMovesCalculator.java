@@ -211,7 +211,25 @@ public class PieceMovesCalculator {
         throw new RuntimeException("Not Implemented");
     }
     public static Collection<ChessMove> queen(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
+        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> topMoves = getMovesToTop(board, position);
+        Collection<ChessMove> bottomMoves = getMovesToBottom(board, position);
+        Collection<ChessMove> leftMoves = getMovesToLeft(board, position);
+        Collection<ChessMove> rightMoves = getMovesToRight(board, position);
+        Collection<ChessMove> topRightMoves = getMovesToTopRight(board, position);
+        Collection<ChessMove> topLeftMoves = getMovesToTopLeft(board, position);
+        Collection<ChessMove> bottomRightMoves = getMovesToBottomRight(board, position);
+        Collection<ChessMove> bottomLeftMoves = getMovesToBottomLeft(board, position);
+
+        moves.addAll(topMoves);
+        moves.addAll(bottomMoves);
+        moves.addAll(leftMoves);
+        moves.addAll(rightMoves);
+        moves.addAll(topRightMoves);
+        moves.addAll(topLeftMoves);
+        moves.addAll(bottomRightMoves);
+        moves.addAll(bottomLeftMoves);
+        return moves;
     }
     public static Collection<ChessMove> knight(ChessBoard board, ChessPosition position) {
         throw new RuntimeException("Not Implemented");
