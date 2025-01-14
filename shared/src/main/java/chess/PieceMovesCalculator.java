@@ -28,6 +28,9 @@ public class PieceMovesCalculator {
     private static ChessMove checkSquare(ChessBoard board, ChessPosition position, ChessPosition squareToCheck) {
         ChessPiece currentPiece = board.getPiece(position);
         Collection<ChessMove> moves = new ArrayList<>();
+        if (squareToCheck == null) {
+            return null;
+        }
         if (board.getPiece(squareToCheck) != null) {
             ChessPiece obstructionPiece = board.getPiece(squareToCheck);
             if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()){
@@ -226,7 +229,27 @@ public class PieceMovesCalculator {
     }
 
     public static Collection<ChessMove> king(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition[] squaresToCheck;
+        squaresToCheck = new ChessPosition[]{
+                position.getTop(),
+                position.getTopRight(),
+                position.getTopLeft(),
+                position.getBottom(),
+                position.getBottomRight(),
+                position.getBottomLeft(),
+                position.getLeft(),
+                position.getRight()
+        };
+
+        for (ChessPosition square : squaresToCheck) {
+            ChessMove move = checkSquare(board, position, square);
+            if (move != null) {
+                moves.add(move);
+            }
+        }
+
+        return moves;
     }
     public static Collection<ChessMove> queen(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
