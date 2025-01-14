@@ -25,6 +25,14 @@ public class PieceMovesCalculator {
     // --------------------- HELPER METHOD FOR CHECKING ONE SQUARE
     // NOTE: this does not take piece type movement rules into account.
     // It simply checks whether there is a same-color piece in the square being checked.
+
+    /**
+     *
+     * @param board: the current board
+     * @param position: the position of the current piece
+     * @param squareToCheck: the position to which the piece wants to move
+     * @return a ChessMove if the move is valid, null otherwise
+     */
     private static ChessMove checkSquare(ChessBoard board, ChessPosition position, ChessPosition squareToCheck) {
         ChessPiece currentPiece = board.getPiece(position);
         Collection<ChessMove> moves = new ArrayList<>();
@@ -196,7 +204,131 @@ public class PieceMovesCalculator {
 
     // ----------------------- PIECE FUNCTIONS FOR CALCULATING MOVES
     public static Collection<ChessMove> pawn(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece currentPiece = board.getPiece(position);
+        int row = position.getRow();
+
+        // dealing with a white pawn = moving and capturing upward
+        if (currentPiece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            if (position.getRow() == 7) {
+                // check for promotion
+                ChessPosition top = position.getTop();
+                // if upper space is empty, add all promotion pieces to possible moves
+                if (board.getPiece(top) == null) {
+                    moves.add(new ChessMove(position, top, ChessPiece.PieceType.QUEEN));
+                    moves.add(new ChessMove(position, top, ChessPiece.PieceType.ROOK));
+                    moves.add(new ChessMove(position, top, ChessPiece.PieceType.KNIGHT));
+                    moves.add(new ChessMove(position, top, ChessPiece.PieceType.BISHOP));
+                }
+                ChessPosition topRight = position.getTopRight();
+                // if top right space contains a different-colored piece, capture and promote
+                if (topRight != null && board.getPiece(topRight) != null) {
+                    if (board.getPiece(topRight).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, topRight, ChessPiece.PieceType.QUEEN));
+                        moves.add(new ChessMove(position, topRight, ChessPiece.PieceType.ROOK));
+                        moves.add(new ChessMove(position, topRight, ChessPiece.PieceType.KNIGHT));
+                        moves.add(new ChessMove(position, topRight, ChessPiece.PieceType.BISHOP));
+                    }
+                }
+                ChessPosition topLeft = position.getTopLeft();
+                // if top left space contains a different-colored piece, capture and promote
+                if (topLeft != null && board.getPiece(topLeft) != null) {
+                    if (board.getPiece(topLeft).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, topLeft, ChessPiece.PieceType.QUEEN));
+                        moves.add(new ChessMove(position, topLeft, ChessPiece.PieceType.ROOK));
+                        moves.add(new ChessMove(position, topLeft, ChessPiece.PieceType.KNIGHT));
+                        moves.add(new ChessMove(position, topLeft, ChessPiece.PieceType.BISHOP));
+                    }
+                }
+            } else {
+                // move upward, capture upward diagonally, or option to move forward twice if on row 2
+                ChessPosition topRight = position.getTopRight();
+                // if top right space contains a different-colored piece, capture
+                if (topRight != null && board.getPiece(topRight) != null) {
+                    if (board.getPiece(topRight).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, topRight, null));
+                    }
+                }
+
+                ChessPosition topLeft = position.getTopLeft();
+                // if top left space contains a different-colored piece, capture
+                if (topLeft != null && board.getPiece(topLeft) != null) {
+                    if (board.getPiece(topLeft).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, topLeft, null));
+                    }
+                }
+
+                ChessPosition top = position.getTop();
+                // if upper space is null, move up (and option to move up two spaces if on row 2)
+                if (board.getPiece(top) == null) {
+                    moves.add(new ChessMove(position, top, null));
+                    if (row == 2) {
+                        ChessPosition upTwo = position.getSquareByOffset(2, 0);
+                        if (board.getPiece(upTwo) == null) {
+                            moves.add(new ChessMove(position, upTwo, null));
+                        }
+                    }
+                }
+            }
+        }
+
+        // dealing with a black pawn = moving and capturing downward
+        if (currentPiece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+            if (row == 2) {
+                // check for promotion
+                ChessPosition bottomRight = position.getBottomRight();
+                if (bottomRight != null && board.getPiece(bottomRight) != null) {
+                    if (board.getPiece(bottomRight).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, bottomRight, ChessPiece.PieceType.QUEEN));
+                        moves.add(new ChessMove(position, bottomRight, ChessPiece.PieceType.ROOK));
+                        moves.add(new ChessMove(position, bottomRight, ChessPiece.PieceType.KNIGHT));
+                        moves.add(new ChessMove(position, bottomRight, ChessPiece.PieceType.BISHOP));
+                    }
+                }
+                ChessPosition bottomLeft = position.getBottomLeft();
+                if (bottomLeft != null && board.getPiece(bottomLeft) != null) {
+                    if (board.getPiece(bottomLeft).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, bottomLeft, ChessPiece.PieceType.QUEEN));
+                        moves.add(new ChessMove(position, bottomLeft, ChessPiece.PieceType.ROOK));
+                        moves.add(new ChessMove(position, bottomLeft, ChessPiece.PieceType.KNIGHT));
+                        moves.add(new ChessMove(position, bottomLeft, ChessPiece.PieceType.BISHOP));
+                    }
+                }
+                ChessPosition bottom = position.getBottom();
+                if (board.getPiece(bottom) == null) {
+                    moves.add(new ChessMove(position, bottom, ChessPiece.PieceType.QUEEN));
+                    moves.add(new ChessMove(position, bottom, ChessPiece.PieceType.ROOK));
+                    moves.add(new ChessMove(position, bottom, ChessPiece.PieceType.KNIGHT));
+                    moves.add(new ChessMove(position, bottom, ChessPiece.PieceType.BISHOP));
+                }
+            } else {
+                // move normally or capture downward; option to move down 2 spaces if on row 7
+                ChessPosition bottomRight = position.getBottomRight();
+                if (bottomRight != null && board.getPiece(bottomRight) != null) {
+                    if (board.getPiece(bottomRight).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, bottomRight, null));
+                    }
+                }
+                ChessPosition bottomLeft = position.getBottomLeft();
+                if (bottomLeft != null && board.getPiece(bottomLeft) != null) {
+                    if (board.getPiece(bottomLeft).getTeamColor() != currentPiece.getTeamColor()) {
+                        moves.add(new ChessMove(position, bottomLeft, null));
+                    }
+                }
+                ChessPosition bottom = position.getBottom();
+                if (board.getPiece(bottom) == null) {
+                    moves.add(new ChessMove(position, bottom, null));
+                    if (row == 7) {
+                        ChessPosition downTwo = position.getSquareByOffset(-2, 0);
+                        if (board.getPiece(downTwo) == null) {
+                            moves.add(new ChessMove(position, downTwo, null));
+                        }
+                    }
+                }
+            }
+        }
+
+        return moves;
     }
     public static Collection<ChessMove> rook(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
