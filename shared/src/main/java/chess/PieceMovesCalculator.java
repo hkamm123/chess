@@ -22,6 +22,24 @@ public class PieceMovesCalculator {
         throw new IllegalArgumentException("Unknown piece type: " + currentPiece.getPieceType());
     }
 
+    // --------------------- HELPER METHOD FOR CHECKING ONE SQUARE
+    // NOTE: this does not take piece type movement rules into account.
+    // It simply checks whether there is a same-color piece in the square being checked.
+    private static ChessMove checkSquare(ChessBoard board, ChessPosition position, ChessPosition squareToCheck) {
+        ChessPiece currentPiece = board.getPiece(position);
+        Collection<ChessMove> moves = new ArrayList<>();
+        if (board.getPiece(squareToCheck) != null) {
+            ChessPiece obstructionPiece = board.getPiece(squareToCheck);
+            if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()){
+                return new ChessMove(position, squareToCheck, null);
+            } else {
+                return null;
+            }
+        }
+
+        return new ChessMove(position, squareToCheck, null);
+    }
+
     // --------------------- DIRECTIONAL HELPER FUNCTIONS FOR CHECKING SQUARES
 
     private static Collection<ChessMove> getMovesToTopRight(ChessBoard board, ChessPosition position) {
@@ -175,7 +193,7 @@ public class PieceMovesCalculator {
 
     // ----------------------- PIECE FUNCTIONS FOR CALCULATING MOVES
     public static Collection<ChessMove> pawn(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
+        throw new RuntimeException("Not implemented");
     }
     public static Collection<ChessMove> rook(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
@@ -232,6 +250,30 @@ public class PieceMovesCalculator {
         return moves;
     }
     public static Collection<ChessMove> knight(ChessBoard board, ChessPosition position) {
-        throw new RuntimeException("Not Implemented");
+        ChessPosition squareToCheck;
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPosition[] squaresToCheck;
+        squaresToCheck = new ChessPosition[]{
+                position.getSquareByOffset(2, 1),
+                position.getSquareByOffset(2, -1),
+                position.getSquareByOffset(1, 2),
+                position.getSquareByOffset(1, -2),
+                position.getSquareByOffset(-2, 1),
+                position.getSquareByOffset(-2, -1),
+                position.getSquareByOffset(-1, 2),
+                position.getSquareByOffset(-1, -2),
+        };
+
+        for (int i = 0; i < 8; i++) {
+            squareToCheck = squaresToCheck[i];
+            if (squareToCheck != null) {
+                ChessMove move = checkSquare(board, position, squareToCheck);
+                if (move != null) {
+                    moves.add(move);
+                }
+            }
+        }
+
+        return moves;
     }
 }

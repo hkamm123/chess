@@ -124,6 +124,20 @@ public class ChessPosition {
         return null;
     }
 
+    /**
+     * @param rowOffset: the integer for the offset from the current row (between -7 and 7)
+     * @param colOffset: the integer for the offset from the current column (between -7 and 7)
+     * @return the ChessPosition that is offset from this position by the specified number of rows and columns.
+     */
+    public ChessPosition getSquareByOffset(int rowOffset, int colOffset) {
+        int newRow = row + rowOffset;
+        int newCol = col + colOffset;
+        if (newRow > 0 && newRow < 9 && newCol > 0 && newCol < 9) {
+            return new ChessPosition(newRow, newCol);
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
