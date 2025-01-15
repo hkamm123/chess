@@ -79,8 +79,21 @@ public class ChessPiece {
         } else if (this.type == PieceType.QUEEN) {
             QueenMoveCalculator calc = new QueenMoveCalculator();
             return calc.pieceMoves(board, myPosition);
+        } else if (this.type == PieceType.BISHOP) {
+            BishopMoveCalculator calc = new BishopMoveCalculator();
+            return calc.pieceMoves(board, myPosition);
+        } else if (this.type == PieceType.KNIGHT) {
+            KnightMoveCalculator calc = new KnightMoveCalculator();
+            return calc.pieceMoves(board, myPosition);
+        } else if (this.type == PieceType.ROOK) {
+            RookMoveCalculator calc = new RookMoveCalculator();
+            return calc.pieceMoves(board, myPosition);
+        } else if (this.type == PieceType.PAWN) {
+            PawnMoveCalculator calc = new PawnMoveCalculator();
+            return calc.pieceMoves(board, myPosition);
         }
-        return PieceMovesCalculator.calculate(board, myPosition);
+
+        throw new IllegalArgumentException("Unrecognized piece type");
     }
 }
 
