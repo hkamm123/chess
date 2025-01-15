@@ -2,7 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
+// -------------------- !!! THIS CLASS IS OBSOLETE !!! -----------------------------------------------
 public class PieceMovesCalculator {
     public static Collection<ChessMove> calculate(ChessBoard board, ChessPosition position) {
         ChessPiece currentPiece = board.getPiece(position);
