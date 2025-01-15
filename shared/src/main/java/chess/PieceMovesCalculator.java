@@ -35,7 +35,6 @@ public class PieceMovesCalculator {
      */
     private static ChessMove checkSquare(ChessBoard board, ChessPosition position, ChessPosition squareToCheck) {
         ChessPiece currentPiece = board.getPiece(position);
-        Collection<ChessMove> moves = new ArrayList<>();
         if (squareToCheck == null) {
             return null;
         }
