@@ -36,6 +36,7 @@ public class ChessPosition {
 
 
     // --------------------- DIRECTIONAL FUNCTIONS FOR ADJACENT SQUARES
+    // TODO: make these methods return Optional<ChessPosition> to avoid possible nullPointerExeptions
     /**
      * @return the top right diagonal square to the current position if
      * within the board, otherwise return null
@@ -137,6 +138,8 @@ public class ChessPosition {
         }
         return null;
     }
+
+    // --------------------------- OVERRIDES
 
     @Override
     public boolean equals(Object o) {

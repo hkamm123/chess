@@ -6,6 +6,43 @@ import java.util.Collection;
 public interface MoveCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 
+
+    // TODO: after fixing methods in ChessPosition, use Optionals here instead of null checks.
+
+    default ChessMove checkSquare(ChessBoard board, ChessPosition position, ChessPosition squareToCheck) {
+        ChessPiece currentPiece = board.getPiece(position);
+        if (squareToCheck == null) {
+            return null;
+        }
+        if (board.getPiece(squareToCheck) != null) {
+            ChessPiece obstructionPiece = board.getPiece(squareToCheck);
+            if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()){
+                return new ChessMove(position, squareToCheck, null);
+            } else {
+                return null;
+            }
+        }
+
+        return new ChessMove(position, squareToCheck, null);
+    }
+
+    default Boolean isEmpty(ChessBoard board, ChessPosition squareToCheck) {
+        return board.getPiece(squareToCheck) == null;
+    }
+
+    default Boolean isEnemy(ChessBoard board, ChessPosition currentSquare, ChessPosition squareToCheck) {
+        if (currentSquare == null || squareToCheck == null) {
+            return false;
+        }
+        ChessPiece currentPiece = board.getPiece(currentSquare);
+        ChessPiece obstructionPiece = board.getPiece(squareToCheck);
+
+        if (!isEmpty(board, squareToCheck)) {
+            return currentPiece.getTeamColor() != obstructionPiece.getTeamColor();
+        }
+        return false;
+    }
+
     default Collection<ChessMove> getMovesToTopRight(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
         ChessPiece currentPiece = board.getPiece(position);
@@ -23,23 +60,6 @@ public interface MoveCalculator {
             topRight = topRight.getTopRight();
         }
         return moves;
-    }
-
-    default ChessMove checkSquare(ChessBoard board, ChessPosition position, ChessPosition squareToCheck) {
-        ChessPiece currentPiece = board.getPiece(position);
-        if (squareToCheck == null) {
-            return null;
-        }
-        if (board.getPiece(squareToCheck) != null) {
-            ChessPiece obstructionPiece = board.getPiece(squareToCheck);
-            if (obstructionPiece.getTeamColor() != currentPiece.getTeamColor()){
-                return new ChessMove(position, squareToCheck, null);
-            } else {
-                return null;
-            }
-        }
-
-        return new ChessMove(position, squareToCheck, null);
     }
 
     default Collection<ChessMove> getMovesToTopLeft(ChessBoard board, ChessPosition position) {

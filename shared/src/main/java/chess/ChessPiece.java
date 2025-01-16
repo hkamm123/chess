@@ -73,6 +73,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        // TODO: change this to a switch statement
         if (this.type == PieceType.KING) {
             KingMoveCalculator calc = new KingMoveCalculator();
             return calc.pieceMoves(board, myPosition);
