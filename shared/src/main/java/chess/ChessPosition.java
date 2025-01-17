@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Represents a single square position on a chess board
@@ -36,93 +37,60 @@ public class ChessPosition {
 
 
     // --------------------- DIRECTIONAL FUNCTIONS FOR ADJACENT SQUARES
-    // TODO: make these methods return Optional<ChessPosition> to avoid possible nullPointerExeptions
     /**
-     * @return the top right diagonal square to the current position if
-     * within the board, otherwise return null
+     * @return an optional which will contain the square to the top right of this one (if it exists)
      */
-    public ChessPosition getTopRight() {
-        if (row < 8 && col < 8) {
-            return new ChessPosition(row + 1, col + 1);
-        }
-        return null;
+    public Optional<ChessPosition> getTopRight() {
+        return getSquareByOffset(1, 1);
     }
 
     /**
-     * @return the top left diagonal square to the current position if
-     * within the board, otherwise return null
+     * @return an optional which will contain the square to the top left of this one (if it exists)
      */
-    public ChessPosition getTopLeft() {
-        if (row < 8 && col > 1) {
-            return new ChessPosition(row + 1, col - 1);
-        }
-        return null;
+    public Optional<ChessPosition> getTopLeft() {
+        return getSquareByOffset(1, -1);
     }
 
     /**
-     * @return the bottom right diagonal square to the current position if
-     * within the board, otherwise return null
+     * @return an optional which will contain the square to the bottom right of this one (if it exists)
      */
-    public ChessPosition getBottomRight() {
-        if (row > 1 && col < 8) {
-            return new ChessPosition(row - 1, col + 1);
-        }
-        return null;
+    public Optional<ChessPosition> getBottomRight() {
+        return getSquareByOffset(-1, 1);
     }
 
     /**
-     * @return the bottom left diagonal square to the current position if
-     * within the board, otherwise return null
+     * @return an optional which will contain the square to the bottom left of this one (if it exists)
      */
-    public ChessPosition getBottomLeft() {
-        if (row > 1 && col > 1) {
-            return new ChessPosition(row - 1, col - 1);
-        }
-        return null;
+    public Optional<ChessPosition> getBottomLeft() {
+        return getSquareByOffset(-1, -1);
     }
 
     /**
-     * @return the square directly above this one if it exists,
-     * otherwise return null
+     * @return an optional which will contain the square to the top of this one (if it exists)
      */
-    public ChessPosition getTop() {
-        if (row < 8) {
-            return new ChessPosition(row + 1, col);
-        }
-        return null;
+    public Optional<ChessPosition> getTop() {
+        return getSquareByOffset(1, 0);
     }
 
     /**
-     * @return the square directly below this one if it exists,
-     * otherwise return null
+     * @return an optional which will contain the square to the bottom of this one (if it exists)
      */
-    public ChessPosition getBottom() {
-        if (row > 1) {
-            return new ChessPosition(row - 1, col);
-        }
-        return null;
+    public Optional<ChessPosition> getBottom() {
+        return getSquareByOffset(-1, 0);
     }
 
     /**
-     * @return the square directly left of this one if it exists,
-     * otherwise return null
+     * @return an optional which will contain the square to the left of this one (if it exists)
      */
-    public ChessPosition getLeft() {
-        if (col < 8) {
-            return new ChessPosition(row, col + 1);
-        }
-        return null;
+    public Optional<ChessPosition> getLeft() {
+        return getSquareByOffset(0, -1);
     }
 
     /**
-     * @return the square directly right of this one if it exists,
-     * otherwise return null
+     * @return an optional which will contain the square to the right of this one (if it exists)
      */
-    public ChessPosition getRight() {
-        if (col > 1) {
-            return new ChessPosition(row, col - 1);
-        }
-        return null;
+    public Optional<ChessPosition> getRight() {
+        return getSquareByOffset(0, 1);
     }
 
     /**
@@ -130,13 +98,13 @@ public class ChessPosition {
      * @param colOffset: the integer for the offset from the current column (between -7 and 7)
      * @return the ChessPosition that is offset from this position by the specified number of rows and columns.
      */
-    public ChessPosition getSquareByOffset(int rowOffset, int colOffset) {
+    public Optional<ChessPosition> getSquareByOffset(int rowOffset, int colOffset) {
         int newRow = row + rowOffset;
         int newCol = col + colOffset;
         if (newRow > 0 && newRow < 9 && newCol > 0 && newCol < 9) {
-            return new ChessPosition(newRow, newCol);
+            return Optional.of(new ChessPosition(newRow, newCol));
         }
-        return null;
+        return Optional.empty();
     }
 
     // --------------------------- OVERRIDES

@@ -2,13 +2,14 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 public class KnightMoveCalculator implements MoveCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        ChessPosition[] squaresToCheck;
-        squaresToCheck = new ChessPosition[]{
+        Optional<ChessPosition>[] squaresToCheck;
+        squaresToCheck = new Optional[]{
                 myPosition.getSquareByOffset(2, 1),
                 myPosition.getSquareByOffset(2, -1),
                 myPosition.getSquareByOffset(1, 2),
@@ -19,12 +20,10 @@ public class KnightMoveCalculator implements MoveCalculator {
                 myPosition.getSquareByOffset(-1, -2),
         };
 
-        for (ChessPosition squareToCheck : squaresToCheck) {
-            if (squareToCheck != null) {
-                ChessMove move = checkSquare(board, myPosition, squareToCheck);
-                if (move != null) {
-                    moves.add(move);
-                }
+        for (Optional<ChessPosition> optionalSquare : squaresToCheck) {
+            if (optionalSquare.isPresent()) {
+                Optional<ChessMove> optionalMove = checkSquare(board, myPosition, optionalSquare.get());
+                optionalMove.ifPresent(moves::add);
             }
         }
 
