@@ -73,25 +73,20 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        // TODO: change this to a switch statement
-        if (this.type == PieceType.KING) {
-            KingMoveCalculator calc = new KingMoveCalculator();
-            return calc.pieceMoves(board, myPosition);
-        } else if (this.type == PieceType.QUEEN) {
-            QueenMoveCalculator calc = new QueenMoveCalculator();
-            return calc.pieceMoves(board, myPosition);
-        } else if (this.type == PieceType.BISHOP) {
-            BishopMoveCalculator calc = new BishopMoveCalculator();
-            return calc.pieceMoves(board, myPosition);
-        } else if (this.type == PieceType.KNIGHT) {
-            KnightMoveCalculator calc = new KnightMoveCalculator();
-            return calc.pieceMoves(board, myPosition);
-        } else if (this.type == PieceType.ROOK) {
-            RookMoveCalculator calc = new RookMoveCalculator();
-            return calc.pieceMoves(board, myPosition);
-        } else if (this.type == PieceType.PAWN) {
-            PawnMoveCalculator calc = new PawnMoveCalculator();
-            return calc.pieceMoves(board, myPosition);
+
+        switch (this.type) {
+            case KING:
+                return new KingMoveCalculator().pieceMoves(board, myPosition);
+            case QUEEN:
+                return new QueenMoveCalculator().pieceMoves(board, myPosition);
+            case BISHOP:
+                return new BishopMoveCalculator().pieceMoves(board, myPosition);
+            case KNIGHT:
+                return new KnightMoveCalculator().pieceMoves(board, myPosition);
+            case ROOK:
+                return new RookMoveCalculator().pieceMoves(board, myPosition);
+            case PAWN:
+                return new PawnMoveCalculator().pieceMoves(board, myPosition);
         }
 
         throw new IllegalArgumentException("Unrecognized piece type");
