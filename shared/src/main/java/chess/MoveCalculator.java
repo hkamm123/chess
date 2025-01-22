@@ -7,9 +7,6 @@ import java.util.Optional;
 public interface MoveCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 
-
-    // TODO: after fixing methods in ChessPosition, use Optionals here instead of null checks.
-
     /**
      * If the square checked contains an enemy piece or no piece, return
      * a ChessMove from the current square to the checked square. Does not take piece type

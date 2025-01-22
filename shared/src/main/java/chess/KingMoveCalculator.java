@@ -8,8 +8,7 @@ public class KingMoveCalculator implements MoveCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        Optional<ChessPosition>[] squaresToCheck;
-        squaresToCheck = new Optional[]{
+        Optional<ChessPosition>[] squaresToCheck = new Optional[]{
                 myPosition.getTop(),
                 myPosition.getTopRight(),
                 myPosition.getTopLeft(),

@@ -8,8 +8,7 @@ public class KnightMoveCalculator implements MoveCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        Optional<ChessPosition>[] squaresToCheck;
-        squaresToCheck = new Optional[]{
+        Optional<ChessPosition>[] squaresToCheck = new Optional[]{
                 myPosition.getSquareByOffset(2, 1),
                 myPosition.getSquareByOffset(2, -1),
                 myPosition.getSquareByOffset(1, 2),

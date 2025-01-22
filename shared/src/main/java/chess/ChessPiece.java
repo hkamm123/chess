@@ -74,22 +74,15 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-        switch (this.type) {
-            case KING:
-                return new KingMoveCalculator().pieceMoves(board, myPosition);
-            case QUEEN:
-                return new QueenMoveCalculator().pieceMoves(board, myPosition);
-            case BISHOP:
-                return new BishopMoveCalculator().pieceMoves(board, myPosition);
-            case KNIGHT:
-                return new KnightMoveCalculator().pieceMoves(board, myPosition);
-            case ROOK:
-                return new RookMoveCalculator().pieceMoves(board, myPosition);
-            case PAWN:
-                return new PawnMoveCalculator().pieceMoves(board, myPosition);
-        }
+        return switch (this.type) {
+            case KING -> new KingMoveCalculator().pieceMoves(board, myPosition);
+            case QUEEN -> new QueenMoveCalculator().pieceMoves(board, myPosition);
+            case BISHOP -> new BishopMoveCalculator().pieceMoves(board, myPosition);
+            case KNIGHT -> new KnightMoveCalculator().pieceMoves(board, myPosition);
+            case ROOK -> new RookMoveCalculator().pieceMoves(board, myPosition);
+            case PAWN -> new PawnMoveCalculator().pieceMoves(board, myPosition);
+        };
 
-        throw new IllegalArgumentException("Unrecognized piece type");
     }
 }
 
