@@ -9,16 +9,16 @@ public class BishopMoveCalculator implements MoveCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        Collection<ChessMove> topRightMoves = getMovesToTopRight(board, myPosition);
+        Collection<ChessMove> topRightMoves = getMovesByOffset(board, myPosition, 1, 1);
         moves.addAll(topRightMoves);
 
-        Collection<ChessMove> topLeftMoves = getMovesToTopLeft(board, myPosition);
+        Collection<ChessMove> topLeftMoves = getMovesByOffset(board, myPosition, 1, -1);
         moves.addAll(topLeftMoves);
 
-        Collection<ChessMove> bottomRightMoves = getMovesToBottomRight(board, myPosition);
+        Collection<ChessMove> bottomRightMoves = getMovesByOffset(board, myPosition, -1, 1);
         moves.addAll(bottomRightMoves);
 
-        Collection<ChessMove> bottomLeftMoves = getMovesToBottomLeft(board, myPosition);
+        Collection<ChessMove> bottomLeftMoves = getMovesByOffset(board, myPosition, -1, -1);
         moves.addAll(bottomLeftMoves);
 
         return moves;

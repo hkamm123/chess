@@ -7,13 +7,13 @@ public class RookMoveCalculator implements MoveCalculator {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
-        Collection<ChessMove> topMoves = getMovesToTop(board, myPosition);
+        Collection<ChessMove> topMoves = getMovesByOffset(board, myPosition, 1, 0);
         moves.addAll(topMoves);
-        Collection<ChessMove> bottomMoves = getMovesToBottom(board, myPosition);
+        Collection<ChessMove> bottomMoves = getMovesByOffset(board, myPosition, -1, 0);
         moves.addAll(bottomMoves);
-        Collection<ChessMove> leftMoves = getMovesToLeft(board, myPosition);
+        Collection<ChessMove> leftMoves = getMovesByOffset(board, myPosition, 0, -1);
         moves.addAll(leftMoves);
-        Collection<ChessMove> rightMoves = getMovesToRight(board, myPosition);
+        Collection<ChessMove> rightMoves = getMovesByOffset(board, myPosition, 0, 1);
         moves.addAll(rightMoves);
         return moves;
     }
