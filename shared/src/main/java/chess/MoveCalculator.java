@@ -40,7 +40,7 @@ public interface MoveCalculator {
      * @param squareToCheck the square being checked
      * @return true if empty, false otherwise.
      */
-    default Boolean isEmpty(ChessBoard board, ChessPosition squareToCheck) {
+    default boolean isEmpty(ChessBoard board, ChessPosition squareToCheck) {
         return board.getPiece(squareToCheck) == null;
     }
 
@@ -51,7 +51,7 @@ public interface MoveCalculator {
      * @param squareToCheck the square which may/may not contain an enemy piece
      * @return true if squareToCheck contains a different-colored piece, false otherwise.
      */
-    default Boolean isEnemy(ChessBoard board, ChessPosition currentSquare, ChessPosition squareToCheck) {
+    default boolean isEnemy(ChessBoard board, ChessPosition currentSquare, ChessPosition squareToCheck) {
         if (currentSquare == null || squareToCheck == null) {
             return false;
         }
@@ -65,7 +65,7 @@ public interface MoveCalculator {
     }
 
     default Collection<ChessMove> getMovesByOffset(ChessBoard board, ChessPosition position, int rowOffset, int colOffset) {
-        Collection<ChessMove> moves = new ArrayList();
+        Collection<ChessMove> moves = new ArrayList<>();
 
         Optional<ChessPosition> opSquare = position.getSquareByOffset(rowOffset, colOffset);
         while (opSquare.isPresent()) {
