@@ -19,6 +19,7 @@ public class ChessGame {
         this.board.resetBoard();
     }
 
+//    copy constructor
     private ChessGame(ChessGame game) {
         this.board = game.board.clone();
         this.teamTurn = game.teamTurn;
@@ -77,6 +78,12 @@ public class ChessGame {
         return possibleMoves;
     }
 
+    /**
+     * Method for making a 'hypothetical' move to determine how it will affect the board state.
+     * Should ONLY be used after checking if the move is valid, or on a cloned board when determining board state impact.
+     *
+     * @param move the 'hypothetical' move
+     */
     private void makeMoveWithoutChecking(ChessMove move) {
         ChessPiece movingPiece = board.getPiece(move.getStartPosition());
         if (move.getPromotionPiece() != null) {
@@ -105,7 +112,11 @@ public class ChessGame {
         }
     }
 
+    /**
+     * A quick way to change the teamTurn after making moves.
+     */
     private void toggleTeam() {
+        // TODO: consider making this a switch statement
         if (teamTurn == TeamColor.BLACK) {
             setTeamTurn(TeamColor.WHITE);
         } else if (teamTurn == TeamColor.WHITE) {
@@ -138,6 +149,13 @@ public class ChessGame {
         return false;
     }
 
+    /**
+     * Gets the ChessPosition that contains the king of the given color.
+     *
+     * @param color the TeamColor of the king being sought out
+     * @return ChessPosition of the king
+     * @throws RuntimeException if there is no king of the given color on the board
+     */
     private ChessPosition getKingPosition(TeamColor color) {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
@@ -151,6 +169,12 @@ public class ChessGame {
         throw new RuntimeException("King position could not be found for team: " + color);
     }
 
+    /**
+     * Finds all ChessPositions on the board that contain a piece of the given color.
+     *
+     * @param color the TeamColor being sought
+     * @return a Collection containing all ChessPositions found.
+     */
     private Collection<ChessPosition> getAllPositionsOfTeam(TeamColor color) {
         Collection<ChessPosition> positions = new ArrayList<>();
         for (int i = 1; i <= 8; i++) {
