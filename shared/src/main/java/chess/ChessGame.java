@@ -116,11 +116,9 @@ public class ChessGame {
      * A quick way to change the teamTurn after making moves.
      */
     private void toggleTeam() {
-        // TODO: consider making this a switch statement
-        if (teamTurn == TeamColor.BLACK) {
-            setTeamTurn(TeamColor.WHITE);
-        } else if (teamTurn == TeamColor.WHITE) {
-            setTeamTurn(TeamColor.BLACK);
+        switch (teamTurn) {
+            case WHITE -> teamTurn = TeamColor.BLACK;
+            case BLACK -> teamTurn = TeamColor.WHITE;
         }
     }
 
