@@ -14,6 +14,8 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board = new ChessBoard();
     private TeamColor teamTurn = TeamColor.WHITE;
+    private ChessPosition whiteKingPosition = new ChessPosition(1, 5);
+    private ChessPosition blackKingPosition = new ChessPosition(8, 5);
 
     public ChessGame() {
         this.board.resetBoard();
@@ -84,6 +86,7 @@ public class ChessGame {
         } else {
             board.addPiece(move.getEndPosition(), movingPiece);
         }
+        updateKingPosition(move, movingPiece);
         board.removePiece(move.getStartPosition());
         toggleTeam();
 
@@ -106,6 +109,15 @@ public class ChessGame {
             makeMoveWithoutChecking(move);
         } else {
             throw new InvalidMoveException("Invalid move: " + move);
+        }
+    }
+
+    private void updateKingPosition(ChessMove lastMove, ChessPiece lastPieceToMove) {
+        if (lastPieceToMove.getPieceType() == ChessPiece.PieceType.KING) {
+            switch (lastPieceToMove.getTeamColor()) {
+                case WHITE: whiteKingPosition = lastMove.getEndPosition(); break;
+                case BLACK: blackKingPosition = lastMove.getEndPosition(); break;
+            }
         }
     }
 
@@ -143,16 +155,10 @@ public class ChessGame {
     }
 
     private ChessPosition getKingPosition(TeamColor color) {
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(i, j));
-                if (piece != null &&
-                        piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color) {
-                    return new ChessPosition(i, j);
-                }
-            }
-        }
-        throw new RuntimeException("King position could not be found for team: " + color);
+        return switch (color) {
+            case WHITE -> whiteKingPosition;
+            case BLACK -> blackKingPosition;
+        };
     }
 
     private Collection<ChessPosition> getAllPositionsOfTeam(TeamColor color) {
