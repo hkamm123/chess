@@ -86,10 +86,6 @@ public class ChessGame {
         }
         board.removePiece(move.getStartPosition());
         toggleTeam();
-
-        System.out.println("Move: " + move);
-        System.out.println("Current startPosition: " + board.getPiece(move.getStartPosition()));
-        System.out.println("Current endPosition: " + board.getPiece(move.getEndPosition()));
     }
 
     /**
