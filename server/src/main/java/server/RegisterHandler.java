@@ -1,8 +1,11 @@
 package server;
 
+import dataaccess.UserDao;
 import service.UserService;
 import spark.Response;
 import spark.Route;
+
+import java.util.Objects;
 
 public class RegisterHandler extends Handler implements Route {
     private UserService service = new UserService();
@@ -16,6 +19,11 @@ public class RegisterHandler extends Handler implements Route {
     @Override
     public Object handle(spark.Request request, Response response) throws Exception {
         RegisterRequest regReq = (RegisterRequest) parse(request.body());
-        return service.register(regReq);
+        RegisterResult result = service.register(regReq);
+        if (result.message() == null) {
+            response.status(200);
+            response.body(serialize(result));
+        }
+        return response.body();
     }
 }

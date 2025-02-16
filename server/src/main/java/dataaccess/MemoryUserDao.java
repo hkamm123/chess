@@ -20,8 +20,12 @@ public class MemoryUserDao implements UserDao{
     }
 
     @Override
-    public void createUser(UserData userData) {
-        users.add(userData);
+    public void createUser(UserData userData) throws DataAccessException {
+        if (getUser(userData.username()) == null) {
+            users.add(userData);
+        } else {
+            throw new DataAccessException(USER_TAKEN_ERR_MSG);
+        }
     }
 
     @Override
