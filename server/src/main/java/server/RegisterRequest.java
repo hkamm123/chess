@@ -1,6 +1,6 @@
 package server;
 
-public class RegisterRequest extends Request {
+public class RegisterRequest implements Request {
     private String username;
     private String password;
     private String email;

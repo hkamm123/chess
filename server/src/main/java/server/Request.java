@@ -1,3 +1,3 @@
 package server;
 
-public abstract class Request {}
+public interface Request {}
