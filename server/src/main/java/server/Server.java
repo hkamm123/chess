@@ -1,7 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import org.eclipse.jetty.server.Authentication;
 import service.UserService;
 import spark.*;
@@ -11,10 +11,6 @@ import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 
 public class Server {
-//    TODO: get rid of handler classes and instead implement handlers as functions in this class
-//    TODO: get rid of ClearService and instead implement clear() in other services
-//    TODO: initialize an instance of each service in this class, which will store their respective dao instances
-
     private Gson serializer = new Gson();
     private String serialize(Object result) {
         return serializer.toJson(result);
@@ -36,7 +32,9 @@ public class Server {
         return Spark.port();
     }
 
-    private UserService userService = new UserService();
+    private UserDao userDao = new MemoryUserDao();
+    private AuthDao authDao = new MemoryAuthDao();
+    private UserService userService = new UserService(userDao, authDao);
 
     private Object clear(Request request, Response response) {
         userService.clear();

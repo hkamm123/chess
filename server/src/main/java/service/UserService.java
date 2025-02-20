@@ -13,8 +13,14 @@ import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 
 
 public class UserService {
-    private UserDao userDao = new MemoryUserDao();
-    private AuthDao authDao = new MemoryAuthDao();
+    private UserDao userDao;
+    private AuthDao authDao;
+
+    public UserService(UserDao userDao, AuthDao authDao) {
+        this.userDao = userDao;
+        this.authDao = authDao;
+    }
+
     public RegisterResult register(RegisterRequest req) throws DataAccessException {
         if (req.getUsername() == null || req.getPassword() == null || req.getEmail() == null) {
             return new RegisterResult(null, null, BAD_REQUEST_ERR_MSG);
