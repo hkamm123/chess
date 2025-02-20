@@ -14,7 +14,6 @@ public class Server {
 //    TODO: get rid of handler classes and instead implement handlers as functions in this class
 //    TODO: get rid of ClearService and instead implement clear() in other services
 //    TODO: initialize an instance of each service in this class, which will store their respective dao instances
-    private ClearHandler clearHandler = new ClearHandler();
 
     private Gson serializer = new Gson();
     private String serialize(Object result) {
@@ -28,7 +27,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::register);
-        Spark.delete("/db", clearHandler);
+        Spark.delete("/db", this::clear);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
@@ -38,6 +37,14 @@ public class Server {
     }
 
     private UserService userService = new UserService();
+
+    private Object clear(Request request, Response response) {
+        userService.clear();
+//        gameService.clear();
+        response.status(200);
+        response.body("{}");
+        return response.body();
+    }
 
     private Object register(Request request, Response response) throws DataAccessException {
         RegisterRequest regReq = (RegisterRequest) serializer.fromJson(request.body(), RegisterRequest.class);

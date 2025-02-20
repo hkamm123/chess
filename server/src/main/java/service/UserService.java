@@ -32,4 +32,9 @@ public class UserService {
             return new RegisterResult(null, null, "Error: " + ex.getMessage());
         }
     }
+
+    public void clear() {
+        userDao.clear();
+        authDao.clear();
+    }
 }

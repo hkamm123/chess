@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class MemoryUserDao implements UserDao{
     private ArrayList<UserData> users = new ArrayList<UserData>();
-    private ArrayList<AuthData> auths = new ArrayList<AuthData>();
 
     @Override
     public UserData getUser(String username) {
@@ -27,5 +26,10 @@ public class MemoryUserDao implements UserDao{
         } else {
             throw new DataAccessException(USER_TAKEN_ERR_MSG);
         }
+    }
+
+    @Override
+    public void clear() {
+        this.users = new ArrayList<>();
     }
 }
