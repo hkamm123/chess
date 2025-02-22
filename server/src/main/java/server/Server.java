@@ -24,6 +24,7 @@ public class Server {
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", this::register);
         Spark.delete("/db", this::clear);
+        Spark.post("/session", this::login);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
@@ -55,6 +56,16 @@ public class Server {
             case BAD_REQUEST_ERR_MSG: response.status(400);
             break;
             default: response.status(500);
+        }
+        response.body(serialize(result));
+        return response.body();
+    }
+
+    private Object login(Request request, Response response) {
+        LoginRequest loginReq = (LoginRequest) serializer.fromJson(request.body(), LoginRequest.class);
+        RegisterResult result = userService.login(loginReq);
+        if (result.message() == null) {
+            response.status(200);
         }
         response.body(serialize(result));
         return response.body();

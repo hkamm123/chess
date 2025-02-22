@@ -12,5 +12,7 @@ public interface UserDao {
 
     void createUser(UserData userData) throws DataAccessException;
 
+    boolean isValidCredentials(String username, String password);
+
     void clear();
 }

@@ -3,6 +3,8 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import server.LoginRequest;
+import server.LoginResult;
 import server.RegisterRequest;
 import server.RegisterResult;
 
@@ -22,18 +24,27 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest req) throws DataAccessException {
-        if (req.getUsername() == null || req.getPassword() == null || req.getEmail() == null) {
+        if (req.username() == null || req.password() == null || req.email() == null) {
             return new RegisterResult(null, null, BAD_REQUEST_ERR_MSG);
         }
-        UserData userData = new UserData(req.getUsername(), req.getPassword(), req.getEmail());
+        UserData userData = new UserData(req.username(), req.password(), req.email());
         try {
             userDao.createUser(userData);
-            String authToken = UUID.randomUUID().toString();
-            AuthData authData = new AuthData(authToken, userData.username());
-            authDao.createAuth(authData);
-            return new RegisterResult(userData.username(), authToken, null);
+            return login(new LoginRequest(userData.username(), userData.password()));
         } catch (DataAccessException ex) {
             return new RegisterResult(null, null, ex.getMessage());
+        } catch (Exception ex) {
+            return new RegisterResult(null, null, "Error: " + ex.getMessage());
+        }
+    }
+
+    public RegisterResult login(LoginRequest req) {
+        if (!userDao.isValidCredentials(req.username(), req.password())) {
+            return new RegisterResult(null, null, "Error: unauthorized");
+        }
+        try {
+            AuthData authData = authDao.createAuth(req.username());
+            return new RegisterResult(authData.username(), authData.authToken(), null);
         } catch (Exception ex) {
             return new RegisterResult(null, null, "Error: " + ex.getMessage());
         }

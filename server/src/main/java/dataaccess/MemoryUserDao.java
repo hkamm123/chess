@@ -29,6 +29,18 @@ public class MemoryUserDao implements UserDao{
     }
 
     @Override
+    public boolean isValidCredentials(String username, String password) {
+        boolean output = false;
+        for (UserData user : users) {
+            if (user.username().equals(username) && user.password().equals(password)) {
+                output = true;
+                break;
+            }
+        }
+        return output;
+    }
+
+    @Override
     public void clear() {
         this.users = new ArrayList<>();
     }

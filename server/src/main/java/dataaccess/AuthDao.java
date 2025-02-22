@@ -4,7 +4,7 @@ import model.AuthData;
 import server.ClearResult;
 
 public interface AuthDao {
-    void createAuth(AuthData authData);
+    AuthData createAuth(String username);
 
     String getAuthToken(String username);
 
