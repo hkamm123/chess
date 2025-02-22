@@ -4,12 +4,8 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import server.LoginRequest;
-import server.LoginResult;
 import server.RegisterRequest;
 import server.RegisterResult;
-
-import javax.xml.crypto.Data;
-import java.util.UUID;
 
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 
