@@ -12,6 +12,7 @@ import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 
 public class Server {
     private Gson serializer = new Gson();
+
     private String serialize(Object result) {
         return serializer.toJson(result);
     }
@@ -49,13 +50,17 @@ public class Server {
         RegisterRequest regReq = (RegisterRequest) serializer.fromJson(request.body(), RegisterRequest.class);
         RegisterResult result = userService.register(regReq);
         switch (result.message()) {
-            case null: response.status(200);
-            break;
-            case USER_TAKEN_ERR_MSG: response.status(403);
-            break;
-            case BAD_REQUEST_ERR_MSG: response.status(400);
-            break;
-            default: response.status(500);
+            case null:
+                response.status(200);
+                break;
+            case USER_TAKEN_ERR_MSG:
+                response.status(403);
+                break;
+            case BAD_REQUEST_ERR_MSG:
+                response.status(400);
+                break;
+            default:
+                response.status(500);
         }
         response.body(serialize(result));
         return response.body();

@@ -6,7 +6,7 @@ import model.UserData;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class MemoryUserDao implements UserDao{
+public class MemoryUserDao implements UserDao {
     private ArrayList<UserData> users = new ArrayList<UserData>();
 
     @Override

@@ -37,6 +37,7 @@ public class ChessPosition {
 
 
     // --------------------- DIRECTIONAL FUNCTIONS FOR ADJACENT SQUARES
+
     /**
      * @return an optional which will contain the square to the top right of this one (if it exists)
      */

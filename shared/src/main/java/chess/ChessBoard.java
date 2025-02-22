@@ -11,8 +11,9 @@ import java.util.Objects;
  */
 public class ChessBoard implements Cloneable {
     private ChessPiece[][] boardState = new ChessPiece[8][8];
+
     public ChessBoard() {
-        
+
     }
 
     /**

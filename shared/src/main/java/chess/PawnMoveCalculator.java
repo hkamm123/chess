@@ -10,9 +10,10 @@ import static chess.ChessPiece.PieceType.*;
 public class PawnMoveCalculator implements MoveCalculator {
     /**
      * Returns a collection containing either 4 moves or 1 move, based on whether/not the pawn should be promoted.
+     *
      * @param startPosition the starting position of the pawn
-     * @param endPosition the position to which the pawn will move
-     * @param promotionRow the "end row" of the pawn (should be 8 if white, 1 if black)
+     * @param endPosition   the position to which the pawn will move
+     * @param promotionRow  the "end row" of the pawn (should be 8 if white, 1 if black)
      * @return collection of move(s)
      */
     private Collection<ChessMove> pawnAdd(ChessPosition startPosition, ChessPosition endPosition, int promotionRow) {

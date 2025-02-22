@@ -19,7 +19,7 @@ public class ChessGame {
         this.board.resetBoard();
     }
 
-//    copy constructor
+    //    copy constructor
     private ChessGame(ChessGame game) {
         this.board = game.board.clone();
         this.teamTurn = game.teamTurn;
@@ -42,7 +42,6 @@ public class ChessGame {
     }
 
 
-
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -50,6 +49,7 @@ public class ChessGame {
         WHITE,
         BLACK;
     }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -59,7 +59,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece currentPiece = board.getPiece(startPosition);
-        if (currentPiece == null) { return null; }
+        if (currentPiece == null) {
+            return null;
+        }
         Collection<ChessMove> possibleMoves = currentPiece.pieceMoves(board, startPosition);
 
         ChessGame clonedGame;
@@ -193,7 +195,9 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) { return false; }
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
         Collection<ChessPosition> teamPositions = getAllPositionsOfTeam(teamColor);
         for (ChessPosition pos : teamPositions) {
             Collection<ChessMove> validMoves = validMoves(pos);
