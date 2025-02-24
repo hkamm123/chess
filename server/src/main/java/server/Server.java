@@ -2,7 +2,6 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import org.eclipse.jetty.server.Authentication;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -13,7 +12,7 @@ import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 import static service.UserService.UNAUTHORIZED_ERR_MSG;
 
 public class Server {
-    private Gson serializer = new Gson();
+    private final Gson serializer = new Gson();
 
     private String serialize(Object result) {
         return serializer.toJson(result);
@@ -38,11 +37,11 @@ public class Server {
         return Spark.port();
     }
 
-    private UserDao userDao = new MemoryUserDao();
-    private AuthDao authDao = new MemoryAuthDao();
-    private GameDao gameDao = new MemoryGameDao();
-    private UserService userService = new UserService(userDao, authDao);
-    private GameService gameService = new GameService(gameDao, authDao);
+    private final UserDao userDao = new MemoryUserDao();
+    private final AuthDao authDao = new MemoryAuthDao();
+    private final GameDao gameDao = new MemoryGameDao();
+    private final UserService userService = new UserService(userDao, authDao);
+    private final GameService gameService = new GameService(gameDao, authDao);
 
     private Object clear(Request request, Response response) {
         userService.clear();
@@ -52,7 +51,7 @@ public class Server {
         return response.body();
     }
 
-    private int setStatus(String message) {
+    private int getStatus(String message) {
         return switch (message) {
             case null -> 200;
             case USER_TAKEN_ERR_MSG -> 403;
@@ -65,7 +64,7 @@ public class Server {
     private Object register(Request request, Response response) throws DataAccessException {
         RegisterRequest regReq = (RegisterRequest) serializer.fromJson(request.body(), RegisterRequest.class);
         RegisterResult result = userService.register(regReq);
-        response.status(setStatus(result.message()));
+        response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
@@ -73,7 +72,7 @@ public class Server {
     private Object login(Request request, Response response) {
         LoginRequest loginReq = (LoginRequest) serializer.fromJson(request.body(), LoginRequest.class);
         RegisterResult result = userService.login(loginReq);
-        response.status(setStatus(result.message()));
+        response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
@@ -81,7 +80,7 @@ public class Server {
     private Object logout(Request request, Response response) {
         AuthRequest logoutReq = new AuthRequest(request.headers("Authorization"));
         LogoutResult result = userService.logout(logoutReq);
-        response.status(setStatus(result.message()));
+        response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
@@ -89,7 +88,7 @@ public class Server {
     private Object listGames(Request request, Response response) {
         AuthRequest listReq = new AuthRequest(request.headers("Authorization"));
         ListResult result = gameService.listGames(listReq);
-        response.status(setStatus(result.message()));
+        response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
