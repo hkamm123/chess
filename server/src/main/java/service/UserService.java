@@ -3,9 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import server.LoginRequest;
-import server.RegisterRequest;
-import server.RegisterResult;
+import server.*;
 
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 
@@ -43,6 +41,20 @@ public class UserService {
             return new RegisterResult(authData.username(), authData.authToken(), null);
         } catch (Exception ex) {
             return new RegisterResult(null, null, "Error: " + ex.getMessage());
+        }
+    }
+
+    public LogoutResult logout(LogoutRequest req) {
+        boolean authDeleted = false;
+        try {
+            authDeleted = authDao.deleteAuth(req.authToken());
+        } catch (Exception ex) {
+            return new LogoutResult("Error: " + ex.getMessage());
+        }
+        if (authDeleted) {
+            return new LogoutResult(null);
+        } else {
+            return new LogoutResult("Error: unauthorized");
         }
     }
 
