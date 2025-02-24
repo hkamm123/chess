@@ -7,10 +7,10 @@ import server.*;
 
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 
-
 public class UserService {
     private UserDao userDao;
     private AuthDao authDao;
+    public static final String UNAUTHORIZED_ERR_MSG = "Error: unauthorized";
 
     public UserService(UserDao userDao, AuthDao authDao) {
         this.userDao = userDao;
@@ -34,7 +34,7 @@ public class UserService {
 
     public RegisterResult login(LoginRequest req) {
         if (!userDao.isValidCredentials(req.username(), req.password())) {
-            return new RegisterResult(null, null, "Error: unauthorized");
+            return new RegisterResult(null, null, UNAUTHORIZED_ERR_MSG);
         }
         try {
             AuthData authData = authDao.createAuth(req.username());
@@ -54,7 +54,7 @@ public class UserService {
         if (authDeleted) {
             return new LogoutResult(null);
         } else {
-            return new LogoutResult("Error: unauthorized");
+            return new LogoutResult(UNAUTHORIZED_ERR_MSG);
         }
     }
 

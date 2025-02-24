@@ -9,6 +9,7 @@ import spark.Request;
 
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
+import static service.UserService.UNAUTHORIZED_ERR_MSG;
 
 public class Server {
     private Gson serializer = new Gson();
@@ -70,8 +71,15 @@ public class Server {
     private Object login(Request request, Response response) {
         LoginRequest loginReq = (LoginRequest) serializer.fromJson(request.body(), LoginRequest.class);
         RegisterResult result = userService.login(loginReq);
-        if (result.message() == null) {
-            response.status(200);
+        switch (result.message()) {
+            case null:
+                response.status(200);
+                break;
+            case UNAUTHORIZED_ERR_MSG:
+                response.status(401);
+                break;
+            default:
+                response.status(500);
         }
         response.body(serialize(result));
         return response.body();
@@ -80,12 +88,15 @@ public class Server {
     private Object logout(Request request, Response response) {
         LogoutRequest logoutReq = new LogoutRequest(request.headers("Authorization"));
         LogoutResult result = userService.logout(logoutReq);
-        if (result.message() == null) {
-            response.status(200);
-        } else if (result.message().equals("Error: unauthorized")) {
-            response.status(401);
-        } else {
-            response.status(500);
+        switch (result.message()) {
+            case null:
+                response.status(200);
+                break;
+            case UNAUTHORIZED_ERR_MSG:
+                response.status(401);
+                break;
+            default:
+                response.status(500);
         }
         response.body(serialize(result));
         return response.body();
