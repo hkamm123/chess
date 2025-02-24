@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import org.eclipse.jetty.server.Authentication;
+import service.GameService;
 import service.UserService;
 import spark.*;
 import spark.Request;
@@ -28,6 +29,7 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.get("/game", this::listGames);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
@@ -38,14 +40,26 @@ public class Server {
 
     private UserDao userDao = new MemoryUserDao();
     private AuthDao authDao = new MemoryAuthDao();
+    private GameDao gameDao = new MemoryGameDao();
     private UserService userService = new UserService(userDao, authDao);
+    private GameService gameService = new GameService(gameDao, authDao);
 
     private Object clear(Request request, Response response) {
         userService.clear();
-//        gameService.clear();
+        gameService.clear();
         response.status(200);
         response.body("{}");
         return response.body();
+    }
+
+    private int setStatus(String message) {
+        return switch (message) {
+            case null -> 200;
+            case USER_TAKEN_ERR_MSG -> 403;
+            case BAD_REQUEST_ERR_MSG -> 400;
+            case UNAUTHORIZED_ERR_MSG -> 401;
+            default -> 500;
+        };
     }
 
     private Object register(Request request, Response response) throws DataAccessException {
@@ -86,8 +100,25 @@ public class Server {
     }
 
     private Object logout(Request request, Response response) {
-        LogoutRequest logoutReq = new LogoutRequest(request.headers("Authorization"));
+        AuthRequest logoutReq = new AuthRequest(request.headers("Authorization"));
         LogoutResult result = userService.logout(logoutReq);
+        switch (result.message()) {
+            case null:
+                response.status(200);
+                break;
+            case UNAUTHORIZED_ERR_MSG:
+                response.status(401);
+                break;
+            default:
+                response.status(500);
+        }
+        response.body(serialize(result));
+        return response.body();
+    }
+
+    private Object listGames(Request request, Response response) {
+        AuthRequest listReq = new AuthRequest(request.headers("Authorization"));
+        ListResult result = gameService.listGames(listReq);
         switch (result.message()) {
             case null:
                 response.status(200);

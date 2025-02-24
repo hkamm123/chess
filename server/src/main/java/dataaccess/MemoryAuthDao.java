@@ -24,8 +24,13 @@ public class MemoryAuthDao implements AuthDao {
     }
 
     @Override
+    public boolean contains(String authToken) {
+        return auths.containsValue(authToken);
+    }
+
+    @Override
     public boolean deleteAuth(String authToken) {
-        if (auths.containsValue(authToken)) {
+        if (this.contains(authToken)) {
             // removes the key value pair from the map by only passing in the value
             auths.values().remove(authToken);
             return true;

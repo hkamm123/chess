@@ -44,7 +44,7 @@ public class UserService {
         }
     }
 
-    public LogoutResult logout(LogoutRequest req) {
+    public LogoutResult logout(AuthRequest req) {
         boolean authDeleted = false;
         try {
             authDeleted = authDao.deleteAuth(req.authToken());
