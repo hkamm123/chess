@@ -10,7 +10,7 @@ public interface AuthDao {
 
     boolean deleteAuth(String authToken);
 
-    boolean contains(String authToken);
+    boolean containsToken(String authToken);
 
     void clear();
 }

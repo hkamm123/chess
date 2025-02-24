@@ -29,6 +29,7 @@ public class Server {
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
+        Spark.post("/game", this::createGame);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
@@ -62,7 +63,7 @@ public class Server {
     }
 
     private Object register(Request request, Response response) throws DataAccessException {
-        RegisterRequest regReq = (RegisterRequest) serializer.fromJson(request.body(), RegisterRequest.class);
+        RegisterRequest regReq = serializer.fromJson(request.body(), RegisterRequest.class);
         RegisterResult result = userService.register(regReq);
         response.status(getStatus(result.message()));
         response.body(serialize(result));
@@ -70,7 +71,7 @@ public class Server {
     }
 
     private Object login(Request request, Response response) {
-        LoginRequest loginReq = (LoginRequest) serializer.fromJson(request.body(), LoginRequest.class);
+        LoginRequest loginReq = serializer.fromJson(request.body(), LoginRequest.class);
         RegisterResult result = userService.login(loginReq);
         response.status(getStatus(result.message()));
         response.body(serialize(result));
@@ -88,6 +89,15 @@ public class Server {
     private Object listGames(Request request, Response response) {
         AuthRequest listReq = new AuthRequest(request.headers("Authorization"));
         ListResult result = gameService.listGames(listReq);
+        response.status(getStatus(result.message()));
+        response.body(serialize(result));
+        return response.body();
+    }
+
+    private Object createGame(Request request, Response response) {
+        CreateRequest createReq = serializer.fromJson(request.body(), CreateRequest.class);
+        String authToken = request.headers("Authorization");
+        CreateResult result = gameService.createGame(createReq, authToken);
         response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
