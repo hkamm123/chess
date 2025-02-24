@@ -65,19 +65,7 @@ public class Server {
     private Object register(Request request, Response response) throws DataAccessException {
         RegisterRequest regReq = (RegisterRequest) serializer.fromJson(request.body(), RegisterRequest.class);
         RegisterResult result = userService.register(regReq);
-        switch (result.message()) {
-            case null:
-                response.status(200);
-                break;
-            case USER_TAKEN_ERR_MSG:
-                response.status(403);
-                break;
-            case BAD_REQUEST_ERR_MSG:
-                response.status(400);
-                break;
-            default:
-                response.status(500);
-        }
+        response.status(setStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
@@ -85,16 +73,7 @@ public class Server {
     private Object login(Request request, Response response) {
         LoginRequest loginReq = (LoginRequest) serializer.fromJson(request.body(), LoginRequest.class);
         RegisterResult result = userService.login(loginReq);
-        switch (result.message()) {
-            case null:
-                response.status(200);
-                break;
-            case UNAUTHORIZED_ERR_MSG:
-                response.status(401);
-                break;
-            default:
-                response.status(500);
-        }
+        response.status(setStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
@@ -102,16 +81,7 @@ public class Server {
     private Object logout(Request request, Response response) {
         AuthRequest logoutReq = new AuthRequest(request.headers("Authorization"));
         LogoutResult result = userService.logout(logoutReq);
-        switch (result.message()) {
-            case null:
-                response.status(200);
-                break;
-            case UNAUTHORIZED_ERR_MSG:
-                response.status(401);
-                break;
-            default:
-                response.status(500);
-        }
+        response.status(setStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
@@ -119,16 +89,7 @@ public class Server {
     private Object listGames(Request request, Response response) {
         AuthRequest listReq = new AuthRequest(request.headers("Authorization"));
         ListResult result = gameService.listGames(listReq);
-        switch (result.message()) {
-            case null:
-                response.status(200);
-                break;
-            case UNAUTHORIZED_ERR_MSG:
-                response.status(401);
-                break;
-            default:
-                response.status(500);
-        }
+        response.status(setStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
