@@ -6,7 +6,7 @@ import server.ClearResult;
 import java.util.*;
 
 public class MemoryAuthDao implements AuthDao {
-//    private HashMap<String, String> auths = new HashMap<>();
+    //    private HashMap<String, String> auths = new HashMap<>();
     private Collection<AuthData> auths = new ArrayList<>();
 
     @Override

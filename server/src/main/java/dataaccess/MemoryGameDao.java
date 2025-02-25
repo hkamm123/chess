@@ -51,20 +51,20 @@ public class MemoryGameDao implements GameDao {
                     throw new DataAccessException("bad request: color already taken");
                 }
                 games.add(new GameData(gameToUpdate.gameID(),
-                    gameToUpdate.whiteUsername(),
-                    username,
-                    gameToUpdate.gameName(),
-                    gameToUpdate.game()));
-            break;
+                        gameToUpdate.whiteUsername(),
+                        username,
+                        gameToUpdate.gameName(),
+                        gameToUpdate.game()));
+                break;
             case WHITE:
                 if (gameToUpdate.whiteUsername() != null) {
                     throw new DataAccessException("bad request: color already taken");
                 }
                 games.add(new GameData(gameToUpdate.gameID(),
-                    username,
-                    gameToUpdate.blackUsername(),
-                    gameToUpdate.gameName(),
-                    gameToUpdate.game()));
+                        username,
+                        gameToUpdate.blackUsername(),
+                        gameToUpdate.gameName(),
+                        gameToUpdate.game()));
         }
     }
 
