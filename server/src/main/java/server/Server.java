@@ -30,6 +30,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
@@ -98,6 +99,15 @@ public class Server {
         CreateRequest createReq = serializer.fromJson(request.body(), CreateRequest.class);
         String authToken = request.headers("Authorization");
         CreateResult result = gameService.createGame(createReq, authToken);
+        response.status(getStatus(result.message()));
+        response.body(serialize(result));
+        return response.body();
+    }
+
+    private Object joinGame(Request request, Response response) {
+        String authToken = request.headers("Authorization");
+        JoinRequest joinReq = serializer.fromJson(request.body(), JoinRequest.class);
+        JoinResult result = gameService.joinGame(joinReq, authToken);
         response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
