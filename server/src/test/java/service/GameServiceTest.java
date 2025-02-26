@@ -50,7 +50,8 @@ public class GameServiceTest {
         AuthData auth = testAuthDao.createAuth("username");
         CreateResult testResult = testGameService.createGame(
                 new CreateRequest("a new game"),
-                auth.authToken());
+                auth.authToken()
+        );
         assertNull(testResult.message(), "result message not null");
         assertNotNull(testResult.gameID(), "result did not include game ID");
         int resultID = testResult.gameID();
@@ -59,7 +60,10 @@ public class GameServiceTest {
 
     @Test
     public void createGameFailWhenBadAuthGiven() {
-        CreateResult testResult = testGameService.createGame(new CreateRequest("gameName"), "bad auth token");
+        CreateResult testResult = testGameService.createGame(
+                new CreateRequest("gameName"),
+                "bad auth token"
+        );
         assertNull(testResult.gameID(), "result returned a gameID when a bad auth was given");
         assertNotNull(testResult.message(), "result did not return a message");
     }

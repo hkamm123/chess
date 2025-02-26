@@ -27,12 +27,16 @@ public class UserServiceTest {
 
         try {
             RegisterResult actualResult = testUserService.register(testRegReq);
-            assertEquals("username", actualResult.username(),
-                    "registration did not return the given username");
+            assertEquals(
+                    "username", actualResult.username(),
+                    "registration did not return the given username"
+            );
             assertNull(actualResult.message(), "result message is not null");
             assertNotNull(actualResult.authToken(), "result did not return an authToken");
-            assertTrue(testAuthDao.containsToken(actualResult.authToken()),
-                    "auth DAO did not receive the auth token from the registration");
+            assertTrue(
+                    testAuthDao.containsToken(actualResult.authToken()),
+                    "auth DAO did not receive the auth token from the registration"
+            );
         } catch (Exception ex) {
             throw new AssertionError("exception thrown when not expected: " + ex.getMessage());
         }
@@ -44,8 +48,10 @@ public class UserServiceTest {
 
         try {
             RegisterResult actualResult = testUserService.register(testRegReq);
-            assertEquals("Error: bad request", actualResult.message(),
-                    "message in result was not the bad request message");
+            assertEquals(
+                    "Error: bad request", actualResult.message(),
+                    "message in result was not the bad request message"
+            );
             assertNull(actualResult.username(), "result username is not null");
             assertNull(actualResult.authToken(), "result auth token is not null");
         } catch (Exception ex) {
@@ -58,13 +64,21 @@ public class UserServiceTest {
         try {
             testUserDao.createUser(new UserData("username", "password", "email"));
             RegisterResult actualResult = testUserService.login(
-                    new LoginRequest("username", "password"));
-            assertEquals("username", actualResult.username(),
-                    "registration did not return the given username");
-            assertNull(actualResult.message(), "result message is not null");
+                    new LoginRequest("username", "password")
+            );
+            assertEquals(
+                    "username", actualResult.username(),
+                    "registration did not return the given username"
+            );
+            assertNull(
+                    actualResult.message(),
+                    "result message is not null"
+            );
             assertNotNull(actualResult.authToken(), "result did not return an authToken");
-            assertTrue(testAuthDao.containsToken(actualResult.authToken()),
-                    "auth DAO did not receive the auth token from the registration");
+            assertTrue(
+                    testAuthDao.containsToken(actualResult.authToken()),
+                    "auth DAO did not receive the auth token from the registration"
+            );
         } catch (Exception ex) {
             throw new AssertionError("exception thrown when not expected: " + ex.getMessage());
         }
