@@ -1,12 +1,11 @@
 package service;
 
 import dataaccess.*;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.LoginRequest;
-import server.RegisterRequest;
-import server.RegisterResult;
+import server.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -78,5 +77,29 @@ public class UserServiceTest {
         assertNull(actualResult.username(), "result contained a non-null username");
         assertNull(actualResult.authToken(), "result contained a non-null auth token");
         assertNotNull(actualResult.message(), "result did not contain an error message");
+    }
+
+    @Test
+    public void successLogout() {
+        try {
+            testUserDao.createUser(new UserData("username", "password", "email"));
+            AuthData auth = testAuthDao.createAuth("username");
+            LogoutResult actualResult = testUserService.logout(new AuthRequest(auth.authToken()));
+            assertNull(actualResult.message(), "result message was not null");
+            assertFalse(testAuthDao.containsToken(auth.authToken()));
+        } catch (Exception ex) {
+            throw new AssertionError("exception thrown when not expected");
+        }
+    }
+
+    @Test
+    public void logoutFailWhenGivenBadAuthToken() {
+        try {
+            testUserDao.createUser(new UserData("username", "password", "email"));
+            LogoutResult actualResult = testUserService.logout(new AuthRequest("badAuthToken"));
+            assertNotNull(actualResult.message());
+        } catch (Exception ex) {
+            throw new AssertionError("exception thrown when not expected");
+        }
     }
 }
