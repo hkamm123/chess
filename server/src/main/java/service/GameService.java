@@ -55,5 +55,6 @@ public class GameService {
 
     public void clear() {
         gameDao.clear();
+        authDao.clear();
     }
 }

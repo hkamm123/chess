@@ -102,4 +102,20 @@ public class UserServiceTest {
             throw new AssertionError("exception thrown when not expected");
         }
     }
+
+    @Test
+    public void successClear() {
+        try {
+            testUserDao.createUser(new UserData("username", "password", "email"));
+            AuthData auth = testAuthDao.createAuth("username");
+            testUserService.clear();
+            assertFalse(testAuthDao.containsToken(auth.authToken()),
+                    "authDao contains a token, should be empty");
+            assertFalse(testUserDao.isValidCredentials("username", "password"),
+                    "userDao contains credentials, should be empty");
+        } catch (Exception ex) {
+            throw new AssertionError("exception thrown when not expected");
+        }
+
+    }
 }
