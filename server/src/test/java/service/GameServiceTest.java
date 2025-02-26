@@ -7,6 +7,8 @@ import dataaccess.MemoryGameDao;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.CreateRequest;
+import server.CreateResult;
 import server.ListResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,6 +44,25 @@ public class GameServiceTest {
         ListResult testResult = testGameService.listGames("a bad auth token");
         assertNull(testResult.games(), "result games is not null");
         assertNotNull(testResult.message(), "result message is null");
+    }
+
+    @Test
+    public void successCreateGame() {
+        AuthData auth = testAuthDao.createAuth("username");
+        CreateResult testResult = testGameService.createGame(
+                new CreateRequest("a new game"),
+                auth.authToken());
+        assertNull(testResult.message(), "result message not null");
+        assertNotNull(testResult.gameID(), "result did not include game ID");
+        int resultID = testResult.gameID();
+        assertTrue(testGameDao.containsID(resultID), "game not created in db");
+    }
+
+    @Test
+    public void createGameFailWhenBadAuthGiven() {
+        CreateResult testResult = testGameService.createGame(new CreateRequest("gameName"), "bad auth token");
+        assertNull(testResult.gameID(), "result returned a gameID when a bad auth was given");
+        assertNotNull(testResult.message(), "result did not return a message");
     }
 
     @Test
