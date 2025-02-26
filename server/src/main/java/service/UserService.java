@@ -44,10 +44,10 @@ public class UserService {
         }
     }
 
-    public LogoutResult logout(AuthRequest req) {
+    public LogoutResult logout(String authToken) {
         boolean authDeleted = false;
         try {
-            authDeleted = authDao.deleteAuth(req.authToken());
+            authDeleted = authDao.deleteAuth(authToken);
         } catch (Exception ex) {
             return new LogoutResult("Error: " + ex.getMessage());
         }

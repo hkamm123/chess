@@ -84,7 +84,7 @@ public class UserServiceTest {
         try {
             testUserDao.createUser(new UserData("username", "password", "email"));
             AuthData auth = testAuthDao.createAuth("username");
-            LogoutResult actualResult = testUserService.logout(new AuthRequest(auth.authToken()));
+            LogoutResult actualResult = testUserService.logout(auth.authToken());
             assertNull(actualResult.message(), "result message was not null");
             assertFalse(testAuthDao.containsToken(auth.authToken()));
         } catch (Exception ex) {
@@ -96,7 +96,7 @@ public class UserServiceTest {
     public void logoutFailWhenGivenBadAuthToken() {
         try {
             testUserDao.createUser(new UserData("username", "password", "email"));
-            LogoutResult actualResult = testUserService.logout(new AuthRequest("badAuthToken"));
+            LogoutResult actualResult = testUserService.logout("badAuthToken");
             assertNotNull(actualResult.message());
         } catch (Exception ex) {
             throw new AssertionError("exception thrown when not expected");

@@ -20,8 +20,8 @@ public class GameService {
         this.authDao = authDao;
     }
 
-    public ListResult listGames(AuthRequest req) {
-        if (!authDao.containsToken(req.authToken())) {
+    public ListResult listGames(String authToken) {
+        if (!authDao.containsToken(authToken)) {
             return new ListResult(null, UNAUTHORIZED_ERR_MSG);
         }
         return new ListResult(gameDao.getGames(), null);

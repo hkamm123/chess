@@ -80,16 +80,16 @@ public class Server {
     }
 
     private Object logout(Request request, Response response) {
-        AuthRequest logoutReq = new AuthRequest(request.headers("Authorization"));
-        LogoutResult result = userService.logout(logoutReq);
+        String authToken = request.headers("Authorization");
+        LogoutResult result = userService.logout(authToken);
         response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
     }
 
     private Object listGames(Request request, Response response) {
-        AuthRequest listReq = new AuthRequest(request.headers("Authorization"));
-        ListResult result = gameService.listGames(listReq);
+        String authToken = request.headers("Authorization");
+        ListResult result = gameService.listGames(authToken);
         response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
