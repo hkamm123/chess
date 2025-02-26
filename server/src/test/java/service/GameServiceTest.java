@@ -7,10 +7,9 @@ import dataaccess.MemoryGameDao;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import server.CreateRequest;
-import server.CreateResult;
-import server.ListResult;
+import server.*;
 
+import static chess.ChessGame.TeamColor.WHITE;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
@@ -63,6 +62,27 @@ public class GameServiceTest {
         CreateResult testResult = testGameService.createGame(new CreateRequest("gameName"), "bad auth token");
         assertNull(testResult.gameID(), "result returned a gameID when a bad auth was given");
         assertNotNull(testResult.message(), "result did not return a message");
+    }
+
+    @Test
+    public void successJoinGame() {
+        int gameID = testGameDao.createGame("new game");
+        AuthData auth = testAuthDao.createAuth("username");
+        JoinResult testResult = testGameService.joinGame(
+                new JoinRequest(WHITE, gameID),
+                auth.authToken()
+        );
+        assertNull(testResult.message(), "result returned a message");
+    }
+
+    @Test
+    public void joinGameFailWhenBadAuthGiven() {
+        int gameID = testGameDao.createGame("new game");
+        JoinResult testResult = testGameService.joinGame(
+                new JoinRequest(WHITE, gameID),
+                "bad auth token"
+        );
+        assertNotNull(testResult.message(), "test result did not return a message");
     }
 
     @Test
