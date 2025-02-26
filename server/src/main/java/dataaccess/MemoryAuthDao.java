@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import server.ClearResult;
 
 import java.util.*;
 
