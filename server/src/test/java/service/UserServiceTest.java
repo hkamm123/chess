@@ -22,7 +22,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void SuccessRegister() {
+    public void successRegister() {
         RegisterRequest testRegReq = new RegisterRequest("username", "password", "email");
 
         try {
@@ -43,7 +43,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void RegisterFailWhenNoUsernameGiven() {
+    public void registerFailWhenNoUsernameGiven() {
         RegisterRequest testRegReq = new RegisterRequest(null, "password", "email");
 
         try {
