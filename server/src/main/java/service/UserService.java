@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
@@ -21,7 +22,8 @@ public class UserService {
         if (req.username() == null || req.password() == null || req.email() == null) {
             return new RegisterResult(null, null, BAD_REQUEST_ERR_MSG);
         }
-        UserData userData = new UserData(req.username(), req.password(), req.email());
+        String hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt()); // hash the given password for storage
+        UserData userData = new UserData(req.username(), hashedPassword, req.email());
         try {
             userDao.createUser(userData);
             return login(new LoginRequest(userData.username(), userData.password()));
