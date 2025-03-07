@@ -35,8 +35,8 @@ public class DatabaseManager {
 
     private static final String[] createStatements = {
         """
-        CREATE TABLE IF NOT EXISTS users (
-          userID int NOT NULL AUTO_INCREMENT,
+        CREATE TABLE IF NOT EXISTS `chess`.`users` (
+          userID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           username varchar(256) NOT NULL,
           passwordHash varchar(512) NOT NULL,
           email varchar(256) NOT NULL
@@ -44,22 +44,25 @@ public class DatabaseManager {
         """,
 
         """
-        CREATE TABLE IF NOT EXISTS sessions (
-          sessionID int NOT NULL AUTO_INCREMENT,
-          userID int NOT NULL FOREIGN KEY REFERENCES users(userID),
+        CREATE TABLE IF NOT EXISTS `chess`.`sessions` (
+          sessionID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+          userID int NOT NULL,
           authToken varchar(512) NOT NULL,
-          INDEX (authToken)
-          PRIMARY KEY (`sessionID`)
+          INDEX (authToken),
+          FOREIGN KEY (userID) REFERENCES users(userID)
         )
         """,
 
         """
-        CREATE TABLE IF NOT EXISTS games (
-          gameID int NOT NULL AUTO_INCREMENT,
-          whiteUserID int FOREIGN KEY REFERENCES users(userID),
-          blackUserID int FOREIGN KEY REFERENCES users(userID),
+        CREATE TABLE IF NOT EXISTS `chess`.`games` (
+          gameID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+          whiteUserID int,
+          blackUserID int,
           gameName varchar(256) NOT NULL,
-          chessGameJson varchar(1024) NOT NULL
+          chessGameJson varchar(1024) NOT NULL,
+          FOREIGN KEY (whiteUserID) REFERENCES users(userID),
+          FOREIGN KEY (blackUserID) REFERENCES users(userID)
+        )
         """
     };
 

@@ -35,7 +35,13 @@ public class UserService {
     }
 
     public RegisterResult login(LoginRequest req) {
-        if (!userDao.isValidCredentials(req.username(), req.password())) {
+        boolean authorized = false;
+        try {
+            authorized = userDao.isValidCredentials(req.username(), req.password());
+        } catch (DataAccessException ex) {
+            return new RegisterResult(null, null, ex.getMessage());
+        }
+        if (!authorized) {
             return new RegisterResult(null, null, UNAUTHORIZED_ERR_MSG);
         }
         try {
