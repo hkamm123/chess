@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.AuthDao;
-import dataaccess.GameDao;
-import dataaccess.MemoryAuthDao;
-import dataaccess.MemoryGameDao;
+import dataaccess.*;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,10 +22,15 @@ public class GameServiceTest {
     }
 
     @Test
-    public void successListGames() {
+    public void successListGames() throws DataAccessException {
         testGameDao.createGame("sample game");
         testGameDao.createGame("second sample game");
-        AuthData auth = testAuthDao.createAuth("username");
+        AuthData auth;
+        try {
+            auth = testAuthDao.createAuth("username");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         assertTrue(testAuthDao.containsToken(auth.authToken()), "auth token not created in auth dao");
 
         ListResult testResult = testGameService.listGames(auth.authToken());
@@ -46,8 +48,13 @@ public class GameServiceTest {
     }
 
     @Test
-    public void successCreateGame() {
-        AuthData auth = testAuthDao.createAuth("username");
+    public void successCreateGame() throws DataAccessException {
+        AuthData auth;
+        try {
+            auth = testAuthDao.createAuth("username");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         CreateResult testResult = testGameService.createGame(
                 new CreateRequest("a new game"),
                 auth.authToken()
@@ -71,7 +78,12 @@ public class GameServiceTest {
     @Test
     public void successJoinGame() {
         int gameID = testGameDao.createGame("new game");
-        AuthData auth = testAuthDao.createAuth("username");
+        AuthData auth;
+        try {
+            auth = testAuthDao.createAuth("username");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         JoinResult testResult = testGameService.joinGame(
                 new JoinRequest(WHITE, gameID),
                 auth.authToken()
@@ -92,7 +104,12 @@ public class GameServiceTest {
     @Test
     public void successClear() {
         int resultGameID = testGameDao.createGame("newGame");
-        AuthData auth = testAuthDao.createAuth("username");
+        AuthData auth;
+        try {
+            auth = testAuthDao.createAuth("username");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         testGameService.clear();
         assertFalse(testAuthDao.containsToken(auth.authToken()), "auth dao had token, should be empty");
         assertFalse(testGameDao.containsID(resultGameID), "game dao had and ID, should be empty");

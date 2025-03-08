@@ -3,9 +3,7 @@ package dataaccess;
 import model.AuthData;
 
 public interface AuthDao {
-    AuthData createAuth(String username);
-
-    String getAuthToken(String username);
+    AuthData createAuth(String username) throws DataAccessException;
 
     String getUsername(String authToken);
 

@@ -107,15 +107,4 @@ public class DatabaseManager {
             throw new DataAccessException(e.getMessage());
         }
     }
-
-    static ResultSet executeQuery(String statement) throws DataAccessException {
-        try {
-            var conn = getConnection();
-            try(var preparedStatement = conn.prepareStatement(statement)) {
-                return preparedStatement.executeQuery();
-            }
-        } catch (Exception ex) {
-            throw new DataAccessException(ex.getMessage());
-        }
-    }
 }
