@@ -44,12 +44,21 @@ public class MySQLUserDao implements UserDao {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-//        try {
-//            String statement = """
-//                    INSERT INTO `chess`.`users` (username, passwordHash, email)
-//                    VALUES (?, ?, ?)
-//                    """;
-//        }
+        try {
+            String statement = """
+                    INSERT INTO `chess`.`users` (username, passwordHash, email)
+                    VALUES (?, ?, ?)
+                    """;
+            var conn = DatabaseManager.getConnection();
+            try(var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, userData.username());
+                preparedStatement.setString(2, userData.password()); // service should've hashed it already
+                preparedStatement.setString(3, userData.email());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 
     @Override

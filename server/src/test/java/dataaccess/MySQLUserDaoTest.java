@@ -97,6 +97,20 @@ public class MySQLUserDaoTest {
         assertEquals("newUser", resultUsername);
     }
 
+    @Test
+    public void createUserFailsWhenNullUsername() {
+        UserData userToCreate = new UserData(
+                null,
+                "somePassword",
+                "someEmail"
+        );
+
+        assertThrows(
+                DataAccessException.class,
+                () -> sqlUserDao.createUser(userToCreate)
+        );
+    }
+
     @AfterEach
     public void cleanup() {
         try {
