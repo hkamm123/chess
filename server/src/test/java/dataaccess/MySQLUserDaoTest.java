@@ -40,8 +40,13 @@ public class MySQLUserDaoTest {
 
     @Test
     public void successGetUser() {
-        UserData expected = new UserData("testUsername", "testPassword", "testEmail");
-        UserData actual = sqlUserDao.getUser("testUsername");
+        UserData expected = new UserData("testUser", "testHash", "testEmail");
+        UserData actual = null;
+        try{
+            actual = sqlUserDao.getUser("testUser");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         Assertions.assertEquals(expected, actual);
     }
 

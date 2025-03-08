@@ -8,7 +8,7 @@ public interface UserDao {
 
     public static final String BAD_REQUEST_ERR_MSG = "Error: bad request";
 
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
 
     void createUser(UserData userData) throws DataAccessException;
 

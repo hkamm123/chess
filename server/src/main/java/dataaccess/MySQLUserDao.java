@@ -1,10 +1,10 @@
 package dataaccess;
 
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
+import static dataaccess.DatabaseManager.getConnection;
 import static org.mindrot.jbcrypt.BCrypt.checkpw;
 
 public class MySQLUserDao implements UserDao {
@@ -13,13 +13,41 @@ public class MySQLUserDao implements UserDao {
     }
 
     @Override
-    public UserData getUser(String username) {
-        return null;
+    public UserData getUser(String username) throws DataAccessException {
+        UserData output = null;
+
+        try {
+            String statement = """
+                    SELECT username, passwordHash, email FROM `chess`.`users`
+                    WHERE username = ?
+                    """;
+
+            var conn = getConnection();
+
+            try(var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, username);
+                var resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    output = new UserData(
+                            resultSet.getString("username"),
+                            resultSet.getString("passwordHash"),
+                            resultSet.getString("email")
+                    );
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
+
+        if (output == null) {
+            throw new DataAccessException("Error: user not found");
+        }
+        return output;
     }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-
+        throw new DataAccessException("not implemented");
     }
 
     @Override
@@ -27,7 +55,7 @@ public class MySQLUserDao implements UserDao {
         String hashedPassword;
         try {
             var statement = "SELECT passwordHash from users WHERE username = ?";
-            var conn = DatabaseManager.getConnection();
+            var conn = getConnection();
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
@@ -38,7 +66,7 @@ public class MySQLUserDao implements UserDao {
             throw new DataAccessException(ex.getMessage());
         }
 
-        return BCrypt.checkpw(plainTextPassword, hashedPassword);
+        return checkpw(plainTextPassword, hashedPassword);
     }
 
     @Override
