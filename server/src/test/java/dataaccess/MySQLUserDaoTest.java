@@ -50,6 +50,14 @@ public class MySQLUserDaoTest {
         Assertions.assertEquals(expected, actual);
     }
 
+    @Test
+    public void getUserFailsWhenUserNotExists() {
+        Assertions.assertThrows(
+                DataAccessException.class,
+                () -> sqlUserDao.getUser("fakeUser")
+        );
+    }
+
     @AfterEach
     public void cleanup() {
         try {
