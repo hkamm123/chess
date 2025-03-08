@@ -70,8 +70,12 @@ public class UserService {
         }
     }
 
-    public void clear() {
-        userDao.clear();
+    public void clear() throws DataAccessException {
+        try {
+            userDao.clear();
+        } catch (DataAccessException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
         authDao.clear();
     }
 }

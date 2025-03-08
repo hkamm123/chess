@@ -14,5 +14,5 @@ public interface UserDao {
 
     boolean isValidCredentials(String username, String password) throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 }

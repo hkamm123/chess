@@ -39,14 +39,21 @@ public class Server {
         return Spark.port();
     }
 
+    // change these to sql daos when ready
     private final UserDao userDao = new MemoryUserDao();
     private final AuthDao authDao = new MemoryAuthDao();
     private final GameDao gameDao = new MemoryGameDao();
+
     private final UserService userService = new UserService(userDao, authDao);
     private final GameService gameService = new GameService(gameDao, authDao);
 
     private Object clear(Request request, Response response) {
-        userService.clear();
+        try {
+            userService.clear();
+        } catch (DataAccessException ex) {
+            response.status(500);
+            response.body(serialize(new LogoutResult(ex.getMessage())));
+        }
         gameService.clear();
         response.status(200);
         response.body("{}");

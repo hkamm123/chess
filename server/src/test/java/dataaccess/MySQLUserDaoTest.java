@@ -146,6 +146,60 @@ public class MySQLUserDaoTest {
                 );
     }
 
+    @Test
+    public void successClear() {
+        java.sql.Connection conn;
+
+        // get the connection
+        try {
+            conn = DatabaseManager.getConnection();
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+
+        // begin a transaction
+        try {
+            var beginTransactionStatement = "START TRANSACTION;";
+            try (var preparedStatement = conn.prepareStatement(beginTransactionStatement)) {
+                preparedStatement.execute();
+            }
+        } catch (Exception ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+
+        try {
+            // clear db, assert no users
+            sqlUserDao.clear();
+
+            var statement = """
+                    SELECT * from `chess`.`users`
+                    """;
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                var resultSet = preparedStatement.executeQuery();
+                assertFalse(resultSet.next());
+            }
+        } catch (Exception ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+
+        // rollback transaction
+        try {
+            var beginTransactionStatement = "ROLLBACK;";
+            try (var preparedStatement = conn.prepareStatement(beginTransactionStatement)) {
+                preparedStatement.execute();
+            }
+        } catch (Exception ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+
+        //close the connection
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
     @AfterEach
     public void cleanup() {
         try {

@@ -81,7 +81,19 @@ public class MySQLUserDao implements UserDao {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
+        try {
+            var statement = """
+                    DELETE FROM users
+                    """;
+            var conn = getConnection();
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.execute();
+            }
 
+            conn.close();
+        } catch (Exception ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 }
