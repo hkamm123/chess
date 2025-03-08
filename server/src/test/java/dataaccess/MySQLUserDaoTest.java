@@ -1,11 +1,10 @@
 package dataaccess;
 
 import model.UserData;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import service.UserService;
+
+import java.sql.SQLException;
 
 public class MySQLUserDaoTest {
     private static UserDao memUserDao;
@@ -21,6 +20,24 @@ public class MySQLUserDaoTest {
         }
     }
 
+    @BeforeEach
+    public void setup() {
+        try {
+            var conn = DatabaseManager.getConnection();
+            var statement = """
+            INSERT INTO `chess`.`users` (username, passwordHash, email) 
+            VALUES ('testUser', 'testHash', 'testEmail')
+            """;
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception ex) {
+            throw new AssertionError(
+                    "EXCEPTION DURING SETUP: " + ex.getMessage()
+            );
+        }
+    }
+
     @Test
     public void successGetUser() {
         UserData expected = new UserData("testUsername", "testPassword", "testEmail");
@@ -30,6 +47,18 @@ public class MySQLUserDaoTest {
 
     @AfterEach
     public void cleanup() {
-
+        try {
+            var conn = DatabaseManager.getConnection();
+            var statement = """
+            DELETE FROM `chess`.`users` WHERE username = 'testUser'
+            """;
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception ex) {
+            throw new AssertionError(
+                    "EXCEPTION DURING CLEANUP: " + ex.getMessage()
+            );
+        }
     }
 }
