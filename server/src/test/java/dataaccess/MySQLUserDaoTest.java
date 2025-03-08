@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.UserData;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 import service.UserService;
 
 import java.sql.SQLException;
@@ -9,12 +10,12 @@ import java.sql.SQLException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLUserDaoTest {
-    private static UserDao memUserDao;
     private static UserDao sqlUserDao;
+
+    private String hashedpw = BCrypt.hashpw("testPassword", BCrypt.gensalt());
 
     @BeforeAll
     public static void configure() throws DataAccessException {
-        memUserDao = new MemoryUserDao();
         try {
             sqlUserDao = new MySQLUserDao();
         } catch (DataAccessException ex) {
@@ -28,9 +29,10 @@ public class MySQLUserDaoTest {
             var conn = DatabaseManager.getConnection();
             var statement = """
             INSERT INTO `chess`.`users` (username, passwordHash, email) 
-            VALUES ('testUser', 'testHash', 'testEmail')
+            VALUES ('testUser', ?, 'testEmail')
             """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, hashedpw);
                 preparedStatement.executeUpdate();
             }
         } catch (Exception ex) {
@@ -42,7 +44,7 @@ public class MySQLUserDaoTest {
 
     @Test
     public void successGetUser() {
-        UserData expected = new UserData("testUser", "testHash", "testEmail");
+        UserData expected = new UserData("testUser", hashedpw, "testEmail");
         UserData actual = null;
         try{
             actual = sqlUserDao.getUser("testUser");
@@ -109,6 +111,31 @@ public class MySQLUserDaoTest {
                 DataAccessException.class,
                 () -> sqlUserDao.createUser(userToCreate)
         );
+    }
+
+    @Test
+    public void successIsValidCredentials() {
+        boolean actual = false;
+        try {
+            actual = sqlUserDao.isValidCredentials(
+                    "testUser",
+                    "testPassword"
+            );
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+        assertTrue(actual);
+
+        boolean actual2 = true;
+        try {
+            actual2 = sqlUserDao.isValidCredentials(
+                    "testUser",
+                    "wrongPassword"
+            );
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+        assertFalse(actual2);
     }
 
     @AfterEach
