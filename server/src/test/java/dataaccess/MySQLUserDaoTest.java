@@ -6,6 +6,9 @@ import service.UserService;
 
 import java.sql.SQLException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class MySQLUserDaoTest {
     private static UserDao memUserDao;
     private static UserDao sqlUserDao;
@@ -47,7 +50,7 @@ public class MySQLUserDaoTest {
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
-        Assertions.assertEquals(expected, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -58,12 +61,46 @@ public class MySQLUserDaoTest {
         );
     }
 
+    @Test
+    public void successCreateUser() { // TODO: write this test
+        UserData userToCreate = new UserData(
+                "newUser", "newHash", "testEmail"
+        );
+        // same email as the user that was made in setup,
+        // so this user will be deleted in cleanup
+
+        // try to create the new user
+        try {
+            sqlUserDao.createUser(userToCreate);
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+
+        // assert that the user is in the database
+        String resultUsername = "";
+        try {
+            var conn = DatabaseManager.getConnection();
+            var statement = """
+                    SELECT username FROM `chess`.`users` WHERE username = 'newUser'
+                    """;
+            try(var preparedStatement = conn.prepareStatement(statement)) {
+                var resultSet = preparedStatement.executeQuery();
+                while(resultSet.next()) {
+                    resultUsername = resultSet.getString("username");
+                }
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+        assertEquals("newUser", resultUsername);
+    }
+
     @AfterEach
     public void cleanup() {
         try {
             var conn = DatabaseManager.getConnection();
             var statement = """
-            DELETE FROM `chess`.`users` WHERE username = 'testUser'
+            DELETE FROM `chess`.`users` WHERE email = 'testEmail'
             """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
