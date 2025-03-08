@@ -39,15 +39,17 @@ public class MySQLUserDao implements UserDao {
             throw new DataAccessException("Error: " + ex.getMessage());
         }
 
-        if (output == null) {
-            throw new DataAccessException("Error: user not found");
-        }
-        return output;
+        return output; // returns null if user does not exist
     }
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        throw new DataAccessException("not implemented");
+//        try {
+//            String statement = """
+//                    INSERT INTO `chess`.`users` (username, passwordHash, email)
+//                    VALUES (?, ?, ?)
+//                    """;
+//        }
     }
 
     @Override

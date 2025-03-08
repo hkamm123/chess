@@ -6,8 +6,7 @@ import service.UserService;
 
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLUserDaoTest {
     private static UserDao memUserDao;
@@ -54,11 +53,14 @@ public class MySQLUserDaoTest {
     }
 
     @Test
-    public void getUserFailsWhenUserNotExists() {
-        Assertions.assertThrows(
-                DataAccessException.class,
-                () -> sqlUserDao.getUser("fakeUser")
-        );
+    public void getUserReturnsNullWhenUserNotExists() {
+        UserData received;
+        try {
+            received = sqlUserDao.getUser("fakeUser");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+        assertNull(received);
     }
 
     @Test

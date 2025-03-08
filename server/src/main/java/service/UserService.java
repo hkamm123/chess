@@ -7,6 +7,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
+import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 
 public class UserService {
     private UserDao userDao;
@@ -21,6 +22,9 @@ public class UserService {
     public RegisterResult register(RegisterRequest req) throws DataAccessException {
         if (req.username() == null || req.password() == null || req.email() == null) {
             return new RegisterResult(null, null, BAD_REQUEST_ERR_MSG);
+        }
+        if (userDao.getUser(req.username()) != null) { // if user already exists
+            return new RegisterResult(null, null, USER_TAKEN_ERR_MSG);
         }
         String hashedPassword = BCrypt.hashpw(req.password(), BCrypt.gensalt()); // hash the given password for storage
         UserData userData = new UserData(req.username(), hashedPassword, req.email());
