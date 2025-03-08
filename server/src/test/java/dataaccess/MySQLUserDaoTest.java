@@ -138,6 +138,14 @@ public class MySQLUserDaoTest {
         assertFalse(actual2);
     }
 
+    @Test
+    public void isValidCredentialsThrowsExceptionWhenNullUsername() {
+        assertThrows(
+                DataAccessException.class,
+                () -> sqlUserDao.isValidCredentials(null, "testPassword")
+                );
+    }
+
     @AfterEach
     public void cleanup() {
         try {
