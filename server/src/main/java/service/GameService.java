@@ -42,8 +42,8 @@ public class GameService {
         if (req.gameID() == null || !gameDao.containsID(req.gameID())) {    // handles no id or bad id
             return new JoinResult(BAD_REQUEST_ERR_MSG);
         }
-        String username = authDao.getUsername(authToken);
         try {   // normal working case
+            String username = authDao.getUsername(authToken);
             gameDao.setPlayerColor(req.gameID(), req.playerColor(), username);
         } catch (DataAccessException ex) {  // handles case where color is taken by another user
             return new JoinResult(USER_TAKEN_ERR_MSG);

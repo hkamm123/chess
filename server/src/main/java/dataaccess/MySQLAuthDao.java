@@ -13,7 +13,7 @@ public class MySQLAuthDao implements AuthDao {
         DatabaseManager.configureDatabase();
     }
 
-    private int getUserID(String username) throws DataAccessException {
+    private int getUserIDFromUsername(String username) throws DataAccessException {
         int userID;
         try {
             var conn = getConnection();
@@ -38,7 +38,7 @@ public class MySQLAuthDao implements AuthDao {
         String authToken = UUID.randomUUID().toString();
         try {
             var conn = getConnection();
-            int userID = getUserID(username);
+            int userID = getUserIDFromUsername(username);
             var createAuthStatement = """
                     INSERT INTO sessions (userID, authToken) VALUES (?, ?)
                     """;
@@ -54,9 +54,41 @@ public class MySQLAuthDao implements AuthDao {
         }
     }
 
+    private int getUserIDFromAuthToken(String authToken) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String userIDStatement = """
+                    SELECT (userID) FROM sessions WHERE authToken = ?
+                    """;
+            try (var preparedStatement = conn.prepareStatement(userIDStatement)) {
+                preparedStatement.setString(1, authToken);
+                var resultSet = preparedStatement.executeQuery();
+                resultSet.next();
+                return resultSet.getInt("userID");
+            }
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
     @Override
-    public String getUsername(String authToken) {
-        throw new RuntimeException("not implemented");
+    public String getUsername(String authToken) throws DataAccessException {
+        try (var conn = getConnection()) {
+            // get the userID using the authToken
+            int userID = getUserIDFromAuthToken(authToken);
+
+            // get the username using the userID
+            String usernameStatement = """
+                    SELECT (username) FROM users WHERE userID = ?
+                    """;
+            try (var preparedStatement = conn.prepareStatement(usernameStatement)) {
+                preparedStatement.setInt(1, userID);
+                var usernameResultSet = preparedStatement.executeQuery();
+                usernameResultSet.next();
+                return usernameResultSet.getString("username");
+            }
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 
     @Override

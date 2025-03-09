@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import static dataaccess.DatabaseManager.getConnection;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MySQLAuthDaoTest {
@@ -37,6 +38,24 @@ public class MySQLAuthDaoTest {
         }
     }
 
+    private int getUserID(String username) throws DataAccessException {
+        int userID;
+        var getUserIDStatement = """
+                SELECT (userID) FROM users WHERE username = ?
+                """;
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(getUserIDStatement)) {
+                preparedStatement.setString(1, "testUser");
+                var resultSet = preparedStatement.executeQuery();
+                resultSet.next();
+                userID = resultSet.getInt("userID");
+            }
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+        return userID;
+    }
+
     @Test
     public void successCreateAuth() {
         AuthData actual = null;
@@ -48,18 +67,9 @@ public class MySQLAuthDaoTest {
                     "testUser"
             );
 
-            Assertions.assertEquals(expected.username(), actual.username());
+            assertEquals(expected.username(), actual.username());
 
-            int userID;
-            var getUserIDStatement = """
-                SELECT (userID) FROM users WHERE username = ?
-                """;
-            try (var preparedStatement = conn.prepareStatement(getUserIDStatement)) {
-                preparedStatement.setString(1, "testUser");
-                var resultSet = preparedStatement.executeQuery();
-                resultSet.next();
-                userID = resultSet.getInt("userID");
-            }
+            int userID = getUserID("testUser");
 
             String deleteStatement = """
                 DELETE FROM sessions WHERE userID = ?
@@ -76,6 +86,42 @@ public class MySQLAuthDaoTest {
     @Test
     public void createAuthFailsWhenUserNotExists() {
         assertThrows(DataAccessException.class, () -> sqlAuthDao.createAuth("fakeUser"));
+    }
+
+    @Test
+    public void successGetUsername() {
+        String expectedUsername = "testUser";
+        String manualToken = "someAuthToken";
+        // manually insert an auth token
+        try (var conn = getConnection()) {
+            int userID = getUserID(expectedUsername);
+            var insertStatement = """
+                    INSERT INTO `chess`.`sessions` (userID, authToken) VALUES (?, ?)
+                    """;
+            try (var preparedStatement = conn.prepareStatement(insertStatement)) {
+                preparedStatement.setInt(1, userID);
+                preparedStatement.setString(2, manualToken);
+                preparedStatement.executeUpdate();
+            }
+
+            String actual = sqlAuthDao.getUsername(manualToken);
+            assertEquals(expectedUsername, actual);
+
+            var cleanupStatement = """
+                    DELETE FROM sessions WHERE authToken = ?
+                    """;
+            try (var preparedStatement = conn.prepareStatement(cleanupStatement)) {
+                preparedStatement.setString(1, manualToken);
+                preparedStatement.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void getUsernameFailsWhenUserNotExists() {
+        assertThrows(DataAccessException.class, () -> sqlAuthDao.getUsername("fakeAuthToken"));
     }
 
     @AfterEach
