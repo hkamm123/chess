@@ -131,7 +131,13 @@ public class MySQLAuthDao implements AuthDao {
     }
 
     @Override
-    public void clear() {
-        throw new RuntimeException("not implemented");
+    public void clear() throws DataAccessException {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM sessions")) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 }

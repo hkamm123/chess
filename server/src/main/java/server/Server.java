@@ -50,11 +50,11 @@ public class Server {
     private Object clear(Request request, Response response) {
         try {
             userService.clear();
+            gameService.clear();
         } catch (DataAccessException ex) {
             response.status(500);
             response.body(serialize(new LogoutResult(ex.getMessage())));
         }
-        gameService.clear();
         response.status(200);
         response.body("{}");
         return response.body();

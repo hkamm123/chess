@@ -191,6 +191,46 @@ public class MySQLAuthDaoTest {
         }
     }
 
+    @Test
+    public void successClear() {
+        // manually add data
+        String testToken = "testAuthToken";
+        try {
+            int userID = getUserID("testUser");
+            manuallyAddAuthData(userID, testToken);
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+
+        try (var conn = getConnection()) { // get the connection
+            // start transaction
+            try (var preparedStatement = conn.prepareStatement("START TRANSACTION;")) {
+                preparedStatement.execute();
+            }
+
+            sqlAuthDao.clear(); // clear db
+
+            // assert no sessions
+            String queryStatement = """
+                    SELECT * FROM sessions
+                    """;
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                assertFalse(resultSet.next());
+            }
+
+            // rollback
+            try (var preparedStatement = conn.prepareStatement("ROLLBACK")) {
+                preparedStatement.execute();
+            }
+
+            // cleanup manually added data
+            manuallyCleanupAuthData(testToken);
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
     @AfterEach
     public void cleanup() {
         try {

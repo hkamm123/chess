@@ -11,5 +11,5 @@ public interface AuthDao {
 
     boolean containsToken(String authToken) throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 }

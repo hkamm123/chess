@@ -65,8 +65,12 @@ public class GameService {
         return new JoinResult(null);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         gameDao.clear();
-        authDao.clear();
+        try {
+            authDao.clear();
+        } catch (DataAccessException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 }

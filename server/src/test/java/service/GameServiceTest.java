@@ -109,10 +109,10 @@ public class GameServiceTest {
         try {
             auth = testAuthDao.createAuth("username");
             containsToken = testAuthDao.containsToken(auth.authToken());
+            testGameService.clear();
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
-        testGameService.clear();
         assertFalse(containsToken, "auth dao had token, should be empty");
         assertFalse(testGameDao.containsID(resultGameID), "game dao had and ID, should be empty");
     }
