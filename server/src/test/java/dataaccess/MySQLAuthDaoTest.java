@@ -167,6 +167,30 @@ public class MySQLAuthDaoTest {
         assertFalse(authDeleted);
     }
 
+    @Test
+    public void successContainsToken() {
+        String testToken = "testAuthToken";
+        try {
+            int userID = getUserID("testUser");
+            assertFalse(sqlAuthDao.containsToken((testToken)));
+            manuallyAddAuthData(userID, testToken);
+            assertTrue(sqlAuthDao.containsToken(testToken));
+            manuallyCleanupAuthData(testToken);
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void containsTokenFalseWhenNullAuthToken() {
+        String testToken = null;
+        try {
+            assertFalse(sqlAuthDao.containsToken(testToken));
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
     @AfterEach
     public void cleanup() {
         try {
