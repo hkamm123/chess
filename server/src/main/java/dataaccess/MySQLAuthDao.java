@@ -92,13 +92,42 @@ public class MySQLAuthDao implements AuthDao {
     }
 
     @Override
-    public boolean deleteAuth(String authToken) {
-        throw new RuntimeException("not implemented");
+    public boolean deleteAuth(String authToken) throws DataAccessException {
+        if (!containsToken(authToken)) {
+            return false;
+        }
+        try (var conn = getConnection()) {
+            String deleteStatement = """
+                    DELETE FROM sessions WHERE authToken = ?
+                    """;
+            try (var preparedStatement = conn.prepareStatement(deleteStatement)) {
+                preparedStatement.setString(1, authToken);
+                preparedStatement.executeUpdate();
+            }
+            return true;
+        } catch (SQLException | DataAccessException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 
     @Override
-    public boolean containsToken(String authToken) {
-        throw new RuntimeException("not implemented");
+    public boolean containsToken(String authToken) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String queryStatement = """
+                    SELECT * FROM sessions WHERE authToken = ?
+                    """;
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                preparedStatement.setString(1, authToken);
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 
     @Override

@@ -21,23 +21,35 @@ public class GameService {
     }
 
     public ListResult listGames(String authToken) {
-        if (!authDao.containsToken(authToken)) {
-            return new ListResult(null, UNAUTHORIZED_ERR_MSG);
+        try {
+            if (!authDao.containsToken(authToken)) {
+                return new ListResult(null, UNAUTHORIZED_ERR_MSG);
+            }
+            return new ListResult(gameDao.getGames(), null);
+        } catch (DataAccessException ex) {
+            return new ListResult(null, ex.getMessage());
         }
-        return new ListResult(gameDao.getGames(), null);
     }
 
     public CreateResult createGame(CreateRequest req, String authToken) {
-        if (!authDao.containsToken(authToken)) {
-            return new CreateResult(null, UNAUTHORIZED_ERR_MSG);
+        try {
+            if (!authDao.containsToken(authToken)) {
+                return new CreateResult(null, UNAUTHORIZED_ERR_MSG);
+            }
+        } catch (DataAccessException ex) {
+            return new CreateResult(null, ex.getMessage());
         }
         int gameID = gameDao.createGame(req.gameName());
         return new CreateResult(gameID, null);
     }
 
     public JoinResult joinGame(JoinRequest req, String authToken) {
-        if (!authDao.containsToken(authToken)) {    // handles bad auth token
-            return new JoinResult(UNAUTHORIZED_ERR_MSG);
+        try {
+            if (!authDao.containsToken(authToken)) {    // handles bad auth token
+                return new JoinResult(UNAUTHORIZED_ERR_MSG);
+            }
+        } catch (DataAccessException ex) {
+            return new JoinResult(ex.getMessage());
         }
         if (req.gameID() == null || !gameDao.containsID(req.gameID())) {    // handles no id or bad id
             return new JoinResult(BAD_REQUEST_ERR_MSG);
