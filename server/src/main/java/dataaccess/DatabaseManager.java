@@ -6,8 +6,25 @@ import java.util.Properties;
 public class DatabaseManager {
     private static final String DATABASE_NAME;
     private static final String USER;
-    private static final String PASSWORD;
+    private static String PASSWORD;
     private static final String CONNECTION_URL;
+
+    static void setPassword(String password) {
+        PASSWORD = password;
+    }
+
+    static void revertPassword() throws DataAccessException {
+        try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
+            if (propStream == null) {
+                throw new DataAccessException("Unable to load db.properties");
+            }
+            Properties props = new Properties();
+            props.load(propStream);
+            PASSWORD = props.getProperty("db.password");
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
 
     /*
      * Load the database information for the db.properties file.
@@ -59,7 +76,7 @@ public class DatabaseManager {
           whiteUserID int,
           blackUserID int,
           gameName varchar(256) NOT NULL,
-          chessGameJson varchar(1024) NOT NULL,
+          chessGameJson text NOT NULL,
           FOREIGN KEY (whiteUserID) REFERENCES users(userID),
           FOREIGN KEY (blackUserID) REFERENCES users(userID)
         )
