@@ -108,8 +108,8 @@ public class GameServiceTest {
         AuthData auth;
         try {
             auth = testAuthDao.createAuth("username");
-            containsToken = testAuthDao.containsToken(auth.authToken());
             testGameService.clear();
+            containsToken = testAuthDao.containsToken(auth.authToken());
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
