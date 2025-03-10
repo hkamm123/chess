@@ -2,39 +2,51 @@ package service;
 
 import dataaccess.*;
 import model.AuthData;
+import model.UserData;
+import org.eclipse.jetty.server.Authentication;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.*;
 
+import java.sql.SQLException;
+
 import static chess.ChessGame.TeamColor.WHITE;
+import static dataaccess.DatabaseManager.getConnection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
     GameDao testGameDao;
     AuthDao testAuthDao;
+    UserDao testUserDao;
     GameService testGameService;
 
     @BeforeEach
     public void setup() {
-        testGameDao = new MemoryGameDao();
-        testAuthDao = new MemoryAuthDao();
+        try {
+            testGameDao = new MySQLGameDao();
+            testAuthDao = new MySQLAuthDao();
+            testUserDao = new MySQLUserDao();
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         testGameService = new GameService(testGameDao, testAuthDao);
     }
 
     @Test
     public void successListGames() throws DataAccessException {
-        testGameDao.createGame("sample game");
-        testGameDao.createGame("second sample game");
+        testGameDao.createGame("testGame");
         AuthData auth;
         try {
-            auth = testAuthDao.createAuth("username");
+            testUserDao.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            auth = testAuthDao.createAuth("testUser");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
         assertTrue(testAuthDao.containsToken(auth.authToken()), "auth token not created in auth dao");
 
         ListResult testResult = testGameService.listGames(auth.authToken());
-        assertEquals(2, testResult.games().size(),
+        assertEquals(1, testResult.games().size(),
                 "expected 2 games, received: " + testResult.games().size());
         assertNull(testResult.message(), "message received was not null");
     }
@@ -42,7 +54,7 @@ public class GameServiceTest {
     @Test
     public void listGamesFailWhenBadAuthGiven() {
         try {
-            testGameDao.createGame("a sample game");
+            testGameDao.createGame("testGame");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
@@ -55,12 +67,13 @@ public class GameServiceTest {
     public void successCreateGame() throws DataAccessException {
         AuthData auth;
         try {
-            auth = testAuthDao.createAuth("username");
+            testUserDao.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            auth = testAuthDao.createAuth("testUser");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
         CreateResult testResult = testGameService.createGame(
-                new CreateRequest("a new game"),
+                new CreateRequest("testGame"),
                 auth.authToken()
         );
         assertNull(testResult.message(), "result message not null");
@@ -72,7 +85,7 @@ public class GameServiceTest {
     @Test
     public void createGameFailWhenBadAuthGiven() {
         CreateResult testResult = testGameService.createGame(
-                new CreateRequest("gameName"),
+                new CreateRequest("testGame"),
                 "bad auth token"
         );
         assertNull(testResult.gameID(), "result returned a gameID when a bad auth was given");
@@ -84,8 +97,9 @@ public class GameServiceTest {
         AuthData auth;
         int gameID;
         try {
-            gameID = testGameDao.createGame("new game");
-            auth = testAuthDao.createAuth("username");
+            testUserDao.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            gameID = testGameDao.createGame("testGame");
+            auth = testAuthDao.createAuth("testUser");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
@@ -100,7 +114,7 @@ public class GameServiceTest {
     public void joinGameFailWhenBadAuthGiven() {
         int gameID;
         try {
-            gameID = testGameDao.createGame("new game");
+            gameID = testGameDao.createGame("testGame");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
@@ -114,13 +128,42 @@ public class GameServiceTest {
     @Test
     public void successClear() {
         try {
-            int resultGameID = testGameDao.createGame("newGame");
-            AuthData auth = testAuthDao.createAuth("username");
+            int resultGameID = testGameDao.createGame("testGame");
+            testUserDao.createUser(new UserData("testUser", "testPassword", "testEmail"));
+            AuthData auth = testAuthDao.createAuth("testUser");
             testGameService.clear();
             boolean containsToken = testAuthDao.containsToken(auth.authToken());
             assertFalse(containsToken, "auth dao had token, should be empty");
             assertFalse(testGameDao.containsID(resultGameID), "game dao had and ID, should be empty");
         } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @AfterEach
+    public void cleanup() {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(
+                    "DELETE FROM games WHERE gameName = 'testGame'")) {
+                preparedStatement.execute();
+            }
+            int userID = 0;
+            try (var preparedStatement = conn.prepareStatement(
+                    "SELECT userID FROM users WHERE username = 'testUser'")) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userID = resultSet.getInt("userID");
+                }
+            }
+            try (var preparedStatement = conn.prepareStatement(
+                    "DELETE FROM sessions WHERE userID = " + userID)) {
+                preparedStatement.execute();
+            }
+            try (var preparedStatement = conn.prepareStatement(
+                    "DELETE FROM users WHERE username = 'testUser'")) {
+                preparedStatement.execute();
+            }
+        } catch (DataAccessException | SQLException ex) {
             throw new AssertionError(ex.getMessage());
         }
     }
