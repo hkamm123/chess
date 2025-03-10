@@ -15,8 +15,7 @@ public class MySQLAuthDao implements AuthDao {
 
     private int getUserIDFromUsername(String username) throws DataAccessException {
         int userID;
-        try {
-            var conn = getConnection();
+        try (var conn = getConnection()){
             var getUserIDStatement = """
                     SELECT (userID) FROM users WHERE username = ?
                     """;
@@ -26,7 +25,6 @@ public class MySQLAuthDao implements AuthDao {
                 resultSet.next();
                 userID = resultSet.getInt("userID");
             }
-            conn.close();
         } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException("Error: " + ex.getMessage());
         }
@@ -36,8 +34,7 @@ public class MySQLAuthDao implements AuthDao {
     @Override
     public AuthData createAuth(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
-        try {
-            var conn = getConnection();
+        try (var conn = getConnection()){
             int userID = getUserIDFromUsername(username);
             var createAuthStatement = """
                     INSERT INTO sessions (userID, authToken) VALUES (?, ?)
@@ -47,7 +44,6 @@ public class MySQLAuthDao implements AuthDao {
                 preparedStatement.setString(2, authToken);
                 preparedStatement.executeUpdate();
             }
-            conn.close();
             return new AuthData(authToken, username);
         } catch (Exception ex) {
             throw new DataAccessException("Error: " + ex.getMessage());

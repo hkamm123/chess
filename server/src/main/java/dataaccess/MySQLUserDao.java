@@ -16,13 +16,11 @@ public class MySQLUserDao implements UserDao {
     public UserData getUser(String username) throws DataAccessException {
         UserData output = null;
 
-        try {
+        try (var conn = getConnection()) {
             String statement = """
                     SELECT username, passwordHash, email FROM `chess`.`users`
                     WHERE username = ?
                     """;
-
-            var conn = getConnection();
 
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
@@ -44,12 +42,11 @@ public class MySQLUserDao implements UserDao {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        try {
+        try (var conn = getConnection()) {
             String statement = """
                     INSERT INTO `chess`.`users` (username, passwordHash, email)
                     VALUES (?, ?, ?)
                     """;
-            var conn = DatabaseManager.getConnection();
             try(var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, userData.username());
                 preparedStatement.setString(2, userData.password()); // service should've hashed it already
@@ -64,9 +61,8 @@ public class MySQLUserDao implements UserDao {
     @Override
     public boolean isValidCredentials(String username, String plainTextPassword) throws DataAccessException {
         String hashedPassword;
-        try {
+        try (var conn = getConnection()) {
             var statement = "SELECT passwordHash from users WHERE username = ?";
-            var conn = getConnection();
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
@@ -82,16 +78,13 @@ public class MySQLUserDao implements UserDao {
 
     @Override
     public void clear() throws DataAccessException {
-        try {
+        try (var conn = getConnection()) {
             var statement = """
                     DELETE FROM users
                     """;
-            var conn = getConnection();
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.execute();
             }
-
-            conn.close();
         } catch (Exception ex) {
             throw new DataAccessException("Error: " + ex.getMessage());
         }

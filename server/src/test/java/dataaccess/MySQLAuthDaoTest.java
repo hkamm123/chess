@@ -4,7 +4,6 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import static dataaccess.DatabaseManager.getConnection;
@@ -233,8 +232,7 @@ public class MySQLAuthDaoTest {
 
     @AfterEach
     public void cleanup() {
-        try {
-            var conn = getConnection();
+        try (var conn = getConnection()){
             var statement = """
             DELETE FROM `chess`.`users` WHERE email = 'testEmail'
             """;

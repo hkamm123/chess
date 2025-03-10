@@ -7,6 +7,7 @@ import service.UserService;
 
 import java.sql.SQLException;
 
+import static dataaccess.DatabaseManager.getConnection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLUserDaoTest {
@@ -25,8 +26,7 @@ public class MySQLUserDaoTest {
 
     @BeforeEach
     public void setup() {
-        try {
-            var conn = DatabaseManager.getConnection();
+        try (var conn = getConnection()){
             var statement = """
             INSERT INTO `chess`.`users` (username, passwordHash, email) 
             VALUES ('testUser', ?, 'testEmail')
@@ -82,8 +82,7 @@ public class MySQLUserDaoTest {
 
         // assert that the user is in the database
         String resultUsername = "";
-        try {
-            var conn = DatabaseManager.getConnection();
+        try (var conn = getConnection()){
             var statement = """
                     SELECT username FROM `chess`.`users` WHERE username = 'newUser'
                     """;
@@ -152,7 +151,7 @@ public class MySQLUserDaoTest {
 
         // get the connection
         try {
-            conn = DatabaseManager.getConnection();
+            conn = getConnection();
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
@@ -202,8 +201,7 @@ public class MySQLUserDaoTest {
 
     @AfterEach
     public void cleanup() {
-        try {
-            var conn = DatabaseManager.getConnection();
+        try (var conn = getConnection()) {
             var statement = """
             DELETE FROM `chess`.`users` WHERE email = 'testEmail'
             """;
