@@ -30,7 +30,7 @@ public class UserService {
         UserData userData = new UserData(req.username(), hashedPassword, req.email());
         try {
             userDao.createUser(userData);
-            return login(new LoginRequest(userData.username(), userData.password()));
+            return login(new LoginRequest(userData.username(), req.password()));
         } catch (DataAccessException ex) {
             return new RegisterResult(null, null, ex.getMessage());
         } catch (Exception ex) {
@@ -72,10 +72,10 @@ public class UserService {
 
     public void clear() throws DataAccessException {
         try {
+            authDao.clear();
             userDao.clear();
         } catch (DataAccessException ex) {
             throw new DataAccessException(ex.getMessage());
         }
-        authDao.clear();
     }
 }

@@ -66,8 +66,11 @@ public class MySQLUserDao implements UserDao {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 var rs = preparedStatement.executeQuery();
-                rs.next();
-                hashedPassword = rs.getString("passwordHash");
+                if (rs.next()) {
+                    hashedPassword = rs.getString("passwordHash");
+                } else {
+                    return false;
+                }
             }
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage());

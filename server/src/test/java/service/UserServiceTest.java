@@ -3,10 +3,15 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 
+import java.sql.SQLException;
+
+import static dataaccess.DatabaseManager.getConnection;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
@@ -16,19 +21,24 @@ public class UserServiceTest {
 
     @BeforeEach
     public void setup() {
-        testUserDao = new MemoryUserDao();
-        testAuthDao = new MemoryAuthDao();
+        try {
+            testUserDao = new MySQLUserDao();
+            testAuthDao = new MySQLAuthDao();
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         testUserService = new UserService(testUserDao, testAuthDao);
     }
 
     @Test
     public void successRegister() {
-        RegisterRequest testRegReq = new RegisterRequest("username", "password", "email");
+        RegisterRequest testRegReq = new RegisterRequest("testUser", "password", "email");
 
         try {
             RegisterResult actualResult = testUserService.register(testRegReq);
             assertEquals(
-                    "username", actualResult.username(),
+                    "testUser",
+                    actualResult.username(),
                     "registration did not return the given username"
             );
             assertNull(actualResult.message(), "result message is not null");
@@ -62,12 +72,13 @@ public class UserServiceTest {
     @Test
     public void successLogin() {
         try {
-            testUserDao.createUser(new UserData("username", "password", "email"));
+            String hashedPassword = BCrypt.hashpw("password", BCrypt.gensalt());
+            testUserDao.createUser(new UserData("testUser", hashedPassword, "email"));
             RegisterResult actualResult = testUserService.login(
-                    new LoginRequest("username", "password")
+                    new LoginRequest("testUser", "password")
             );
             assertEquals(
-                    "username", actualResult.username(),
+                    "testUser", actualResult.username(),
                     "registration did not return the given username"
             );
             assertNull(
@@ -96,8 +107,8 @@ public class UserServiceTest {
     @Test
     public void successLogout() {
         try {
-            testUserDao.createUser(new UserData("username", "password", "email"));
-            AuthData auth = testAuthDao.createAuth("username");
+            testUserDao.createUser(new UserData("testUser", "password", "email"));
+            AuthData auth = testAuthDao.createAuth("testUser");
             LogoutResult actualResult = testUserService.logout(auth.authToken());
             assertNull(actualResult.message(), "result message was not null");
             assertFalse(testAuthDao.containsToken(auth.authToken()));
@@ -109,7 +120,7 @@ public class UserServiceTest {
     @Test
     public void logoutFailWhenGivenBadAuthToken() {
         try {
-            testUserDao.createUser(new UserData("username", "password", "email"));
+            testUserDao.createUser(new UserData("testUser", "password", "email"));
             LogoutResult actualResult = testUserService.logout("badAuthToken");
             assertNotNull(actualResult.message());
         } catch (Exception ex) {
@@ -120,16 +131,39 @@ public class UserServiceTest {
     @Test
     public void successClear() {
         try {
-            testUserDao.createUser(new UserData("username", "password", "email"));
-            AuthData auth = testAuthDao.createAuth("username");
+            testUserDao.createUser(new UserData("testUser", "password", "email"));
+            AuthData auth = testAuthDao.createAuth("testUser");
             testUserService.clear();
             assertFalse(testAuthDao.containsToken(auth.authToken()),
                     "authDao contains a token, should be empty");
-            assertFalse(testUserDao.isValidCredentials("username", "password"),
+            assertFalse(testUserDao.isValidCredentials("testUser", "password"),
                     "userDao contains credentials, should be empty");
         } catch (Exception ex) {
-            throw new AssertionError("exception thrown when not expected");
+            throw new AssertionError("exception thrown when not expected: " + ex.getMessage());
         }
+    }
 
+    @AfterEach
+    public void cleanup() {
+        try (var conn = getConnection()) {
+            int userID = 0;
+            try (var preparedStatement = conn.prepareStatement(
+                    "SELECT userID FROM users WHERE username = 'testUser'")) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userID = resultSet.getInt("userID");
+                }
+            }
+            try (var preparedStatement = conn.prepareStatement(
+                    "DELETE FROM sessions WHERE userID = " + userID)) {
+                preparedStatement.execute();
+            }
+            try (var preparedStatement = conn.prepareStatement(
+                    "DELETE FROM users WHERE username = 'testUser'")) {
+                preparedStatement.execute();
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
     }
 }
