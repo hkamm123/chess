@@ -14,8 +14,7 @@ import java.sql.SQLWarning;
 import java.util.Collection;
 
 import static dataaccess.DatabaseManager.getConnection;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MySQLGameDaoTest {
     private static GameDao sqlGameDao;
@@ -85,16 +84,8 @@ public class MySQLGameDaoTest {
             int receivedID = sqlGameDao.createGame("newTestGame");
 
             // manually get the ID of the game with name "newTestGame"
-            try (var preparedStatement = conn.prepareStatement(
-                    "SELECT (gameID) FROM games WHERE gameName = 'newTestGame'")) {
-                var resultSet = preparedStatement.executeQuery();
-                /* this statement will inherently check for game creation
-                 by throwing an exception if the resultSet is empty
-                 */
-                resultSet.next();
-                int actualID = resultSet.getInt("gameID");
-                assertEquals(actualID, receivedID, "game ids were different");
-            }
+            int actualID = getGameID("newTestGame");
+            assertEquals(actualID, receivedID, "game ids were different");
         } catch (DataAccessException | SQLException ex) {
             throw new AssertionError(ex.getMessage());
         }
@@ -103,6 +94,41 @@ public class MySQLGameDaoTest {
     @Test
     public void createGameFailsWhenNullGameName() {
         assertThrows(DataAccessException.class, () -> sqlGameDao.createGame(null));
+    }
+
+    private int getGameID(String gameName) {
+        try (var conn = getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(
+                    "SELECT (gameID) FROM games WHERE gameName = ?")) {
+                preparedStatement.setString(1, gameName);
+                var resultSet = preparedStatement.executeQuery();
+                /* this statement will inherently check for game creation
+                 by throwing an exception if the resultSet is empty
+                 */
+                resultSet.next();
+                return resultSet.getInt("gameID");
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void successContainsID() {
+        boolean containsID = false;
+        try {
+            containsID = sqlGameDao.containsID(getGameID("testGame"));
+            assertTrue(containsID);
+            containsID = sqlGameDao.containsID(getGameID("testGame") + 10); // this ID shouldn't be there
+            assertFalse(containsID);
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void containsIDThrowsExceptionWhenNullGameID() {
+        assertThrows(DataAccessException.class, () -> sqlGameDao.containsID(null));
     }
 
     @AfterEach

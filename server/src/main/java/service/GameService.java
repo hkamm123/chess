@@ -48,11 +48,11 @@ public class GameService {
             if (!authDao.containsToken(authToken)) {    // handles bad auth token
                 return new JoinResult(UNAUTHORIZED_ERR_MSG);
             }
+            if (req.gameID() == null || !gameDao.containsID(req.gameID())) {    // handles no id or bad id
+                return new JoinResult(BAD_REQUEST_ERR_MSG);
+            }
         } catch (DataAccessException ex) {
             return new JoinResult(ex.getMessage());
-        }
-        if (req.gameID() == null || !gameDao.containsID(req.gameID())) {    // handles no id or bad id
-            return new JoinResult(BAD_REQUEST_ERR_MSG);
         }
         try {   // normal working case
             String username = authDao.getUsername(authToken);

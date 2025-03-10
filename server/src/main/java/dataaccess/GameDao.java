@@ -13,7 +13,7 @@ public interface GameDao {
 
     void clear();
 
-    boolean containsID(Integer id);
+    boolean containsID(Integer id) throws DataAccessException;
 
     void setPlayerColor(Integer gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException;
 }

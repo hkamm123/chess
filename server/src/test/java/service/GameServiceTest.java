@@ -113,18 +113,15 @@ public class GameServiceTest {
 
     @Test
     public void successClear() {
-        boolean containsToken;
-        int resultGameID;
-        AuthData auth;
         try {
-            resultGameID = testGameDao.createGame("newGame");
-            auth = testAuthDao.createAuth("username");
+            int resultGameID = testGameDao.createGame("newGame");
+            AuthData auth = testAuthDao.createAuth("username");
             testGameService.clear();
-            containsToken = testAuthDao.containsToken(auth.authToken());
+            boolean containsToken = testAuthDao.containsToken(auth.authToken());
+            assertFalse(containsToken, "auth dao had token, should be empty");
+            assertFalse(testGameDao.containsID(resultGameID), "game dao had and ID, should be empty");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
-        assertFalse(containsToken, "auth dao had token, should be empty");
-        assertFalse(testGameDao.containsID(resultGameID), "game dao had and ID, should be empty");
     }
 }

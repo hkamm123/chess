@@ -101,8 +101,23 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
-    public boolean containsID(Integer id) {
-        return false;
+    public boolean containsID(Integer id) throws DataAccessException {
+        if (id == null) {
+            throw new DataAccessException("Error: cannot check database for a null gameID");
+        }
+        try (var conn = getConnection()) {
+            String queryStatement = "SELECT * FROM games WHERE gameID = " + id;
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 
     @Override
