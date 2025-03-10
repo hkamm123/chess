@@ -11,7 +11,7 @@ public interface GameDao {
     //    returns the game ID
     int createGame(String gameName) throws DataAccessException;
 
-    void clear();
+    void clear() throws DataAccessException;
 
     boolean containsID(Integer id) throws DataAccessException;
 

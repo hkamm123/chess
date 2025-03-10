@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.util.Collection;
 
+import static chess.ChessGame.TeamColor.BLACK;
 import static dataaccess.DatabaseManager.getConnection;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -129,6 +130,71 @@ public class MySQLGameDaoTest {
     @Test
     public void containsIDThrowsExceptionWhenNullGameID() {
         assertThrows(DataAccessException.class, () -> sqlGameDao.containsID(null));
+    }
+
+    private int getUserID(String username) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String queryStatement = "SELECT userID FROM users WHERE username = '" + username + "'";
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                resultSet.next();
+                return resultSet.getInt("userID");
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void successSetPlayerColor() {
+        try {
+            int gameID = getGameID("testGame");
+            sqlGameDao.setPlayerColor(gameID, BLACK, "testUser");
+
+            // find the blackUserID and assert that it corresponds to the username "testUser"
+            String getBlackUserIDStatement = "SELECT blackUserID FROM games WHERE gameID = " + gameID;
+            try (var preparedStatement = getConnection().prepareStatement(getBlackUserIDStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                resultSet.next();
+                int receivedBlackUserID = resultSet.getInt("blackUserID");
+                int expectedBlackUserID = getUserID("testUser");
+                assertEquals(expectedBlackUserID, receivedBlackUserID, "blackUserID is not correct.");
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void setPlayerColorThrowsExWhenNullColor() {
+        int gameID = getGameID("testGame");
+        assertThrows(
+                DataAccessException.class,
+                () -> sqlGameDao.setPlayerColor(gameID, null, "testUser")
+        );
+    }
+
+    @Test
+    public void successClear() {
+        // get connection
+        try (var conn = getConnection()) {
+        // start transaction
+            try (var preparedStatement = conn.prepareStatement("START TRANSACTION;")) {
+                preparedStatement.execute();
+            }
+        // clear db, assert no games
+            sqlGameDao.clear();
+            try (var preparedStatement = conn.prepareStatement("SELECT * FROM games")) {
+                var resultSet = preparedStatement.executeQuery();
+                assertFalse(resultSet.next(), "games still contains at least one row");
+            }
+        // rollback
+            try (var preparedStatement = conn.prepareStatement("ROLLBACK;")) {
+                preparedStatement.execute();
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
     }
 
     @AfterEach

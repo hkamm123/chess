@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 import static dataaccess.DatabaseManager.getConnection;
 
 public class MySQLGameDao implements GameDao {
@@ -120,13 +122,52 @@ public class MySQLGameDao implements GameDao {
         }
     }
 
-    @Override
-    public void setPlayerColor(Integer gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException {
-
+    private int getUserID(String username) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String queryStatement = "SELECT userID FROM users WHERE username = '" + username + "'";
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if(resultSet.next()) {
+                    return resultSet.getInt("userID");
+                } else {
+                    throw new DataAccessException("userID not found");
+                }
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     @Override
-    public void clear() {
+    public void setPlayerColor(
+            Integer gameID,
+            ChessGame.TeamColor playerColor,
+            String username) throws DataAccessException {
+        String column = "";
+        int userID = getUserID("testUser");
+        if (playerColor == BLACK) {
+            column = "blackUserID";
+        } else if (playerColor == WHITE) {
+            column = "whiteUserID";
+        }
+        try (var conn = getConnection()) {
+            String updateStatement = "UPDATE games SET " + column + " = ? WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(updateStatement)) {
+                preparedStatement.setInt(1, userID);
+                preparedStatement.setInt(2, gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
+    }
 
+    @Override
+    public void clear() throws DataAccessException {
+        try (var preparedStatement = getConnection().prepareStatement("DELETE FROM games")) {
+            preparedStatement.execute();
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 }
