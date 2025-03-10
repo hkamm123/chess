@@ -138,11 +138,13 @@ public class MySQLUserDaoTest {
     }
 
     @Test
-    public void isValidCredentialsThrowsExceptionWhenNullUsername() {
-        assertThrows(
-                DataAccessException.class,
-                () -> sqlUserDao.isValidCredentials(null, "testPassword")
-                );
+    public void isValidCredentialsFalseWhenNullUsername() {
+        try {
+            boolean isValid = sqlUserDao.isValidCredentials(null, "testPassword");
+            assertFalse(isValid);
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
     }
 
     @Test
