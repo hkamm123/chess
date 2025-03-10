@@ -41,7 +41,11 @@ public class GameServiceTest {
 
     @Test
     public void listGamesFailWhenBadAuthGiven() {
-        testGameDao.createGame("a sample game");
+        try {
+            testGameDao.createGame("a sample game");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         ListResult testResult = testGameService.listGames("a bad auth token");
         assertNull(testResult.games(), "result games is not null");
         assertNotNull(testResult.message(), "result message is null");
@@ -77,9 +81,10 @@ public class GameServiceTest {
 
     @Test
     public void successJoinGame() {
-        int gameID = testGameDao.createGame("new game");
         AuthData auth;
+        int gameID;
         try {
+            gameID = testGameDao.createGame("new game");
             auth = testAuthDao.createAuth("username");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
@@ -93,7 +98,12 @@ public class GameServiceTest {
 
     @Test
     public void joinGameFailWhenBadAuthGiven() {
-        int gameID = testGameDao.createGame("new game");
+        int gameID;
+        try {
+            gameID = testGameDao.createGame("new game");
+        } catch (DataAccessException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
         JoinResult testResult = testGameService.joinGame(
                 new JoinRequest(WHITE, gameID),
                 "bad auth token"
@@ -104,9 +114,10 @@ public class GameServiceTest {
     @Test
     public void successClear() {
         boolean containsToken;
-        int resultGameID = testGameDao.createGame("newGame");
+        int resultGameID;
         AuthData auth;
         try {
+            resultGameID = testGameDao.createGame("newGame");
             auth = testAuthDao.createAuth("username");
             testGameService.clear();
             containsToken = testAuthDao.containsToken(auth.authToken());

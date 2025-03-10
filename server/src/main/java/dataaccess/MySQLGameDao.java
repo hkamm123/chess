@@ -74,8 +74,30 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
-    public int createGame(String gameName) {
-        return 0;
+    public int createGame(String gameName) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String json = serializer.toJson(new ChessGame());
+            String createStatement = """
+                    INSERT INTO games (gameName, chessGameJson) VALUES (?, ?)
+                    """;
+            try (var preparedStatement = conn.prepareStatement(createStatement)) {
+                preparedStatement.setString(1, gameName);
+                preparedStatement.setString(2, json);
+                preparedStatement.executeUpdate();
+            }
+
+            String getIDStatement = """
+                    SELECT (gameID) FROM games WHERE gameName = ?
+                    """;
+            try (var preparedStatement = conn.prepareStatement(getIDStatement)) {
+                preparedStatement.setString(1, gameName);
+                var resultSet = preparedStatement.executeQuery();
+                resultSet.next();
+                return resultSet.getInt("gameID");
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
     }
 
     @Override

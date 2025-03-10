@@ -14,6 +14,8 @@ import java.sql.SQLWarning;
 import java.util.Collection;
 
 import static dataaccess.DatabaseManager.getConnection;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MySQLGameDaoTest {
     private static GameDao sqlGameDao;
@@ -58,9 +60,9 @@ public class MySQLGameDaoTest {
     public void successGetGames() {
         try {
             Collection<GameData> receivedGames = sqlGameDao.getGames();
-            Assertions.assertEquals(1, receivedGames.size(), "size of received list incorrect");
+            assertEquals(1, receivedGames.size(), "size of received list incorrect");
             GameData gameData = receivedGames.iterator().next();
-            Assertions.assertEquals("testGame", gameData.gameName(), "returned game name incorrect");
+            assertEquals("testGame", gameData.gameName(), "returned game name incorrect");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
         }
@@ -75,6 +77,32 @@ public class MySQLGameDaoTest {
         } catch (DataAccessException ex) {
             throw new AssertionError("failed to reset db password because of error: " + ex.getMessage());
         }
+    }
+
+    @Test
+    public void successCreateGame() {
+        try (var conn = getConnection()){
+            int receivedID = sqlGameDao.createGame("newTestGame");
+
+            // manually get the ID of the game with name "newTestGame"
+            try (var preparedStatement = conn.prepareStatement(
+                    "SELECT (gameID) FROM games WHERE gameName = 'newTestGame'")) {
+                var resultSet = preparedStatement.executeQuery();
+                /* this statement will inherently check for game creation
+                 by throwing an exception if the resultSet is empty
+                 */
+                resultSet.next();
+                int actualID = resultSet.getInt("gameID");
+                assertEquals(actualID, receivedID, "game ids were different");
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new AssertionError(ex.getMessage());
+        }
+    }
+
+    @Test
+    public void createGameFailsWhenNullGameName() {
+        assertThrows(DataAccessException.class, () -> sqlGameDao.createGame(null));
     }
 
     @AfterEach

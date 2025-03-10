@@ -36,11 +36,11 @@ public class GameService {
             if (!authDao.containsToken(authToken)) {
                 return new CreateResult(null, UNAUTHORIZED_ERR_MSG);
             }
+            int gameID = gameDao.createGame(req.gameName());
+            return new CreateResult(gameID, null);
         } catch (DataAccessException ex) {
             return new CreateResult(null, ex.getMessage());
         }
-        int gameID = gameDao.createGame(req.gameName());
-        return new CreateResult(gameID, null);
     }
 
     public JoinResult joinGame(JoinRequest req, String authToken) {
