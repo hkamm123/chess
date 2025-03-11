@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
@@ -48,8 +49,12 @@ public class GameService {
             if (!authDao.containsToken(authToken)) {    // handles bad auth token
                 return new JoinResult(UNAUTHORIZED_ERR_MSG);
             }
-            if (req.gameID() == null || !gameDao.containsID(req.gameID())) {    // handles no id or bad id
-                return new JoinResult(BAD_REQUEST_ERR_MSG);
+            if (req.gameID() == null || !gameDao.containsID(req.gameID()) // no ID or bad ID
+            || req.playerColor() == null // null color
+            || req.playerColor() != ChessGame.TeamColor.WHITE) {
+                if (req.playerColor() != ChessGame.TeamColor.BLACK) { // color not white or black
+                    return new JoinResult(BAD_REQUEST_ERR_MSG);
+                }
             }
         } catch (DataAccessException ex) {
             return new JoinResult(ex.getMessage());

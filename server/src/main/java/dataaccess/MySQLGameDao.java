@@ -144,13 +144,21 @@ public class MySQLGameDao implements GameDao {
             ChessGame.TeamColor playerColor,
             String username) throws DataAccessException {
         String column = "";
-        int userID = getUserID("testUser");
+        int userID = getUserID(username);
         if (playerColor == BLACK) {
             column = "blackUserID";
         } else if (playerColor == WHITE) {
             column = "whiteUserID";
         }
         try (var conn = getConnection()) {
+            String queryStatement = "SELECT * FROM games WHERE " + column + " IS NULL AND gameID = " + gameID;
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if (!resultSet.next()) {
+                    throw new DataAccessException("color already taken");
+                }
+            }
+
             String updateStatement = "UPDATE games SET " + column + " = ? WHERE gameID = ?";
             try (var preparedStatement = conn.prepareStatement(updateStatement)) {
                 preparedStatement.setInt(1, userID);

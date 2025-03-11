@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import model.AuthData;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -13,6 +14,23 @@ import static service.UserService.UNAUTHORIZED_ERR_MSG;
 
 public class Server {
     private final Gson serializer = new Gson();
+    private final UserDao userDao;
+    private final AuthDao authDao;
+    private final GameDao gameDao;
+    private final UserService userService;
+    private final GameService gameService;
+
+    public Server() {
+        try {
+            userDao = new MySQLUserDao();
+            authDao = new MySQLAuthDao();
+            gameDao = new MySQLGameDao();
+            userService = new UserService(userDao, authDao);
+            gameService = new GameService(gameDao, authDao);
+        } catch (DataAccessException ex) {
+            throw new RuntimeException("Error initializing server: " + ex.getMessage());
+        }
+    }
 
     private String serialize(Object result) {
         return serializer.toJson(result);
@@ -32,25 +50,17 @@ public class Server {
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
 
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //This line initializes the server and can be removed once you have a functioning endpoint
 //        Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();
     }
 
-    // change these to sql daos when ready
-    private final UserDao userDao = new MemoryUserDao();
-    private final AuthDao authDao = new MemoryAuthDao();
-    private final GameDao gameDao = new MemoryGameDao();
-
-    private final UserService userService = new UserService(userDao, authDao);
-    private final GameService gameService = new GameService(gameDao, authDao);
-
     private Object clear(Request request, Response response) {
         try {
-            userService.clear();
             gameService.clear();
+            userService.clear();
         } catch (DataAccessException ex) {
             response.status(500);
             response.body(serialize(new LogoutResult(ex.getMessage())));
