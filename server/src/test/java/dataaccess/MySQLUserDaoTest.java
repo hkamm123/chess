@@ -203,17 +203,6 @@ public class MySQLUserDaoTest {
 
     @AfterEach
     public void cleanup() {
-        try (var conn = getConnection()) {
-            var statement = """
-            DELETE FROM `chess`.`users` WHERE email = 'testEmail'
-            """;
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (Exception ex) {
-            throw new AssertionError(
-                    "EXCEPTION DURING CLEANUP: " + ex.getMessage()
-            );
-        }
+        SQLDaoTestUtils.cleanup();
     }
 }

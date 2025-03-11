@@ -147,22 +147,7 @@ public class GameServiceTest {
                     "DELETE FROM games WHERE gameName = 'testGame'")) {
                 preparedStatement.execute();
             }
-            int userID = 0;
-            try (var preparedStatement = conn.prepareStatement(
-                    "SELECT userID FROM users WHERE username = 'testUser'")) {
-                var resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    userID = resultSet.getInt("userID");
-                }
-            }
-            try (var preparedStatement = conn.prepareStatement(
-                    "DELETE FROM sessions WHERE userID = " + userID)) {
-                preparedStatement.execute();
-            }
-            try (var preparedStatement = conn.prepareStatement(
-                    "DELETE FROM users WHERE username = 'testUser'")) {
-                preparedStatement.execute();
-            }
+            ServiceTestUtils.cleanupUsersAndSessions();
         } catch (DataAccessException | SQLException ex) {
             throw new AssertionError(ex.getMessage());
         }
