@@ -66,7 +66,7 @@ public class MySQLUserDaoTest {
     }
 
     @Test
-    public void successCreateUser() { // TODO: write this test
+    public void successCreateUser() {
         UserData userToCreate = new UserData(
                 "newUser", "newHash", "testEmail"
         );
