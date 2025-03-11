@@ -51,7 +51,7 @@ public class DatabaseManager {
     }
 
     private static final String[] CREATE_STATEMENTS = {
-        """
+            """
         CREATE TABLE IF NOT EXISTS `chess`.`users` (
           userID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           username varchar(256) NOT NULL,
@@ -60,7 +60,7 @@ public class DatabaseManager {
         )
         """,
 
-        """
+            """
         CREATE TABLE IF NOT EXISTS `chess`.`sessions` (
           sessionID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           userID int NOT NULL,
@@ -70,7 +70,7 @@ public class DatabaseManager {
         )
         """,
 
-        """
+            """
         CREATE TABLE IF NOT EXISTS `chess`.`games` (
           gameID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           whiteUserID int,

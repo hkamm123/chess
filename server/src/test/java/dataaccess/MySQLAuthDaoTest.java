@@ -58,7 +58,7 @@ public class MySQLAuthDaoTest {
     public void successCreateAuth() {
         AuthData actual = null;
 
-        try (var conn = getConnection()){
+        try (var conn = getConnection()) {
             actual = sqlAuthDao.createAuth("testUser");
             AuthData expected = new AuthData(
                     "someAuthToken",
@@ -70,8 +70,8 @@ public class MySQLAuthDaoTest {
             int userID = getUserID("testUser");
 
             String deleteStatement = """
-                DELETE FROM sessions WHERE userID = ?
-            """;
+                        DELETE FROM sessions WHERE userID = ?
+                    """;
             try (var preparedStatement = conn.prepareStatement(deleteStatement)) {
                 preparedStatement.setInt(1, userID);
                 preparedStatement.executeUpdate();

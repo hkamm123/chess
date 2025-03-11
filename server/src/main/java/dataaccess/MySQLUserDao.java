@@ -22,7 +22,7 @@ public class MySQLUserDao implements UserDao {
                     WHERE username = ?
                     """;
 
-            try(var preparedStatement = conn.prepareStatement(statement)) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, username);
                 var resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
@@ -47,7 +47,7 @@ public class MySQLUserDao implements UserDao {
                     INSERT INTO `chess`.`users` (username, passwordHash, email)
                     VALUES (?, ?, ?)
                     """;
-            try(var preparedStatement = conn.prepareStatement(statement)) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, userData.username());
                 preparedStatement.setString(2, userData.password()); // service should've hashed it already
                 preparedStatement.setString(3, userData.email());

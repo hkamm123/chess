@@ -26,11 +26,11 @@ public class MySQLUserDaoTest {
 
     @BeforeEach
     public void setup() {
-        try (var conn = getConnection()){
+        try (var conn = getConnection()) {
             var statement = """
-            INSERT INTO `chess`.`users` (username, passwordHash, email) 
-            VALUES ('testUser', ?, 'testEmail')
-            """;
+                    INSERT INTO `chess`.`users` (username, passwordHash, email) 
+                    VALUES ('testUser', ?, 'testEmail')
+                    """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.setString(1, hashedpw);
                 preparedStatement.executeUpdate();
@@ -46,7 +46,7 @@ public class MySQLUserDaoTest {
     public void successGetUser() {
         UserData expected = new UserData("testUser", hashedpw, "testEmail");
         UserData actual = null;
-        try{
+        try {
             actual = sqlUserDao.getUser("testUser");
         } catch (DataAccessException ex) {
             throw new AssertionError(ex.getMessage());
@@ -82,13 +82,13 @@ public class MySQLUserDaoTest {
 
         // assert that the user is in the database
         String resultUsername = "";
-        try (var conn = getConnection()){
+        try (var conn = getConnection()) {
             var statement = """
                     SELECT username FROM `chess`.`users` WHERE username = 'newUser'
                     """;
-            try(var preparedStatement = conn.prepareStatement(statement)) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
                 var resultSet = preparedStatement.executeQuery();
-                while(resultSet.next()) {
+                while (resultSet.next()) {
                     resultUsername = resultSet.getString("username");
                 }
             }

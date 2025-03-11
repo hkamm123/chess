@@ -26,7 +26,7 @@ public class MySQLGameDao implements GameDao {
             String queryStatement = "SELECT username FROM users WHERE userID = " + userID;
             try (var preparedStatement = conn.prepareStatement(queryStatement)) {
                 var resultSet = preparedStatement.executeQuery();
-                if(resultSet.next()) {
+                if (resultSet.next()) {
                     return resultSet.getString("username");
                 } else {
                     return null;
@@ -60,7 +60,7 @@ public class MySQLGameDao implements GameDao {
             String queryStatement = "SELECT * FROM games";
             try (var preparedStatement = conn.prepareStatement(queryStatement)) {
                 var resultSet = preparedStatement.executeQuery();
-                while(resultSet.next()) {
+                while (resultSet.next()) {
                     int gameID = resultSet.getInt("gameID");
                     int whiteUserID = resultSet.getInt("whiteUserID");
                     int blackUserID = resultSet.getInt("blackUserID");
@@ -127,7 +127,7 @@ public class MySQLGameDao implements GameDao {
             String queryStatement = "SELECT userID FROM users WHERE username = '" + username + "'";
             try (var preparedStatement = conn.prepareStatement(queryStatement)) {
                 var resultSet = preparedStatement.executeQuery();
-                if(resultSet.next()) {
+                if (resultSet.next()) {
                     return resultSet.getInt("userID");
                 } else {
                     throw new DataAccessException("userID not found");

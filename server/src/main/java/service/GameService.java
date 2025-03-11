@@ -50,8 +50,8 @@ public class GameService {
                 return new JoinResult(UNAUTHORIZED_ERR_MSG);
             }
             if (req.gameID() == null || !gameDao.containsID(req.gameID()) // no ID or bad ID
-            || req.playerColor() == null // null color
-            || req.playerColor() != ChessGame.TeamColor.WHITE) {
+                    || req.playerColor() == null // null color
+                    || req.playerColor() != ChessGame.TeamColor.WHITE) {
                 if (req.playerColor() != ChessGame.TeamColor.BLACK) { // color not white or black
                     return new JoinResult(BAD_REQUEST_ERR_MSG);
                 }

@@ -68,7 +68,8 @@ public class MySQLGameDaoTest {
         }
     }
 
-    @Test public void getGamesFailsWhenDatabaseDown() {
+    @Test
+    public void getGamesFailsWhenDatabaseDown() {
         // simulate database being down by setting the wrong password
         DatabaseManager.setPassword("invalidPassword");
         Assertions.assertThrows(DataAccessException.class, () -> sqlGameDao.getGames());
@@ -81,7 +82,7 @@ public class MySQLGameDaoTest {
 
     @Test
     public void successCreateGame() {
-        try (var conn = getConnection()){
+        try (var conn = getConnection()) {
             int receivedID = sqlGameDao.createGame("newTestGame");
 
             // manually get the ID of the game with name "newTestGame"
@@ -178,17 +179,17 @@ public class MySQLGameDaoTest {
     public void successClear() {
         // get connection
         try (var conn = getConnection()) {
-        // start transaction
+            // start transaction
             try (var preparedStatement = conn.prepareStatement("START TRANSACTION;")) {
                 preparedStatement.execute();
             }
-        // clear db, assert no games
+            // clear db, assert no games
             sqlGameDao.clear();
             try (var preparedStatement = conn.prepareStatement("SELECT * FROM games")) {
                 var resultSet = preparedStatement.executeQuery();
                 assertFalse(resultSet.next(), "games still contains at least one row");
             }
-        // rollback
+            // rollback
             try (var preparedStatement = conn.prepareStatement("ROLLBACK;")) {
                 preparedStatement.execute();
             }
