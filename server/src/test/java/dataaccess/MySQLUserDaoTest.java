@@ -28,7 +28,7 @@ public class MySQLUserDaoTest {
     public void setup() {
         try (var conn = getConnection()) {
             var statement = """
-                    INSERT INTO `chess`.`users` (username, passwordHash, email) 
+                    INSERT INTO users (username, passwordHash, email) 
                     VALUES ('testUser', ?, 'testEmail')
                     """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -84,7 +84,7 @@ public class MySQLUserDaoTest {
         String resultUsername = "";
         try (var conn = getConnection()) {
             var statement = """
-                    SELECT username FROM `chess`.`users` WHERE username = 'newUser'
+                    SELECT username FROM users WHERE username = 'newUser'
                     """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 var resultSet = preparedStatement.executeQuery();
@@ -173,7 +173,7 @@ public class MySQLUserDaoTest {
             sqlUserDao.clear();
 
             var statement = """
-                    SELECT * from `chess`.`users`
+                    SELECT * from users
                     """;
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 var resultSet = preparedStatement.executeQuery();

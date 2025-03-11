@@ -51,8 +51,9 @@ public class DatabaseManager {
     }
 
     private static final String[] CREATE_STATEMENTS = {
+            "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME +
             """
-        CREATE TABLE IF NOT EXISTS `chess`.`users` (
+        .users (
           userID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           username varchar(256) NOT NULL,
           passwordHash varchar(512) NOT NULL,
@@ -60,8 +61,9 @@ public class DatabaseManager {
         )
         """,
 
+            "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME +
             """
-        CREATE TABLE IF NOT EXISTS `chess`.`sessions` (
+        .sessions (
           sessionID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           userID int NOT NULL,
           authToken varchar(512) NOT NULL,
@@ -70,8 +72,9 @@ public class DatabaseManager {
         )
         """,
 
+            "CREATE TABLE IF NOT EXISTS " + DATABASE_NAME +
             """
-        CREATE TABLE IF NOT EXISTS `chess`.`games` (
+        .games (
           gameID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
           whiteUserID int,
           blackUserID int,

@@ -18,7 +18,7 @@ public class MySQLUserDao implements UserDao {
 
         try (var conn = getConnection()) {
             String statement = """
-                    SELECT username, passwordHash, email FROM `chess`.`users`
+                    SELECT username, passwordHash, email FROM users
                     WHERE username = ?
                     """;
 
@@ -44,7 +44,7 @@ public class MySQLUserDao implements UserDao {
     public void createUser(UserData userData) throws DataAccessException {
         try (var conn = getConnection()) {
             String statement = """
-                    INSERT INTO `chess`.`users` (username, passwordHash, email)
+                    INSERT INTO users (username, passwordHash, email)
                     VALUES (?, ?, ?)
                     """;
             try (var preparedStatement = conn.prepareStatement(statement)) {

@@ -89,7 +89,7 @@ public class MySQLAuthDaoTest {
     private void manuallyAddAuthData(int userID, String authToken) throws DataAccessException {
         try (var conn = getConnection()) {
             var insertStatement = """
-                    INSERT INTO `chess`.`sessions` (userID, authToken) VALUES (?, ?)
+                    INSERT INTO sessions (userID, authToken) VALUES (?, ?)
                     """;
             try (var preparedStatement = conn.prepareStatement(insertStatement)) {
                 preparedStatement.setInt(1, userID);
