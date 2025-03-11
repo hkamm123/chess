@@ -6,11 +6,11 @@ import java.util.Properties;
 public class DatabaseManager {
     private static final String DATABASE_NAME;
     private static final String USER;
-    private static String PASSWORD;
+    private static String password;
     private static final String CONNECTION_URL;
 
     static void setPassword(String password) {
-        PASSWORD = password;
+        DatabaseManager.password = password;
     }
 
     static void revertPassword() throws DataAccessException {
@@ -20,7 +20,7 @@ public class DatabaseManager {
             }
             Properties props = new Properties();
             props.load(propStream);
-            PASSWORD = props.getProperty("db.password");
+            password = props.getProperty("db.password");
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
         }
@@ -39,7 +39,7 @@ public class DatabaseManager {
                 props.load(propStream);
                 DATABASE_NAME = props.getProperty("db.name");
                 USER = props.getProperty("db.user");
-                PASSWORD = props.getProperty("db.password");
+                password = props.getProperty("db.password");
 
                 var host = props.getProperty("db.host");
                 var port = Integer.parseInt(props.getProperty("db.port"));
@@ -50,7 +50,7 @@ public class DatabaseManager {
         }
     }
 
-    private static final String[] createStatements = {
+    private static final String[] CREATE_STATEMENTS = {
         """
         CREATE TABLE IF NOT EXISTS `chess`.`users` (
           userID int PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -89,11 +89,11 @@ public class DatabaseManager {
     static void configureDatabase() throws DataAccessException {
         try {
             var statement = "CREATE DATABASE IF NOT EXISTS " + DATABASE_NAME;
-            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            var conn = DriverManager.getConnection(CONNECTION_URL, USER, password);
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
-            for (var createStatement : createStatements) {
+            for (var createStatement : CREATE_STATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(createStatement)) {
                     preparedStatement.executeUpdate();
                 }
@@ -117,7 +117,7 @@ public class DatabaseManager {
      */
     public static Connection getConnection() throws DataAccessException {
         try {
-            var conn = DriverManager.getConnection(CONNECTION_URL, USER, PASSWORD);
+            var conn = DriverManager.getConnection(CONNECTION_URL, USER, password);
             conn.setCatalog(DATABASE_NAME);
             return conn;
         } catch (SQLException e) {
