@@ -11,3 +11,4 @@ out/
 
 ### Chess project ###
 server/**/db.properties
+client/src/main/java/ui/TicTacToe.java
