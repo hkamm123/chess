@@ -26,16 +26,6 @@ public class ChessBoardPrinter {
             KING, "K"
     );
 
-    public static void main(String[] args) {
-        ChessBoard myBoard = new ChessBoard();
-        myBoard.resetBoard();
-        myBoard.addPiece(new ChessPosition(4, 5), new ChessPiece(ChessGame.TeamColor.BLACK, PAWN));
-        System.out.println("WHITE PERSPECTIVE:");
-        drawBoard(myBoard, WHITE);
-        System.out.println("BLACK PERSPECTIVE:");
-        drawBoard(myBoard, BLACK);
-    }
-
     public static void drawBoard(ChessBoard board, Perspective perspective) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
