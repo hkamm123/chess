@@ -1,13 +1,18 @@
 package ui;
 
 import client.ServerFacade;
+import model.GameData;
 import server.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 public class ChessClient {
     private final ServerFacade serverFacade;
     private final String serverUrl;
+    private List<GameData> games;
 
     private enum State {
         LOGGEDIN,
@@ -20,6 +25,7 @@ public class ChessClient {
         this.serverFacade = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.state = State.LOGGEDOUT;
+        this.games = new ArrayList<GameData>();
     }
 
     public String help() {
@@ -66,6 +72,7 @@ public class ChessClient {
             case "li" -> login();
             case "lo" -> logout();
             case "c" -> createGame();
+            case "lg" -> listGames();
             default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -108,7 +115,7 @@ public class ChessClient {
         return "Logged out successfully!" + "\n" + help();
     }
 
-    public String createGame() {
+    private String createGame() {
         if (state != State.LOGGEDIN) {
             return "Please login to create a game.";
         }
@@ -117,7 +124,40 @@ public class ChessClient {
         if (result.message() != null) {
             return result.message();
         }
-        return "Game created successfully!"; // consider listing games here
+        return "Game created successfully!\n" + listGames();
+    }
+
+    private String listGames() {
+        if (state != State.LOGGEDIN) {
+            return "Please login to see games.";
+        }
+        ListResult result = serverFacade.listGames(authToken);
+        if (result.message() != null) {
+            return result.message();
+        }
+        games = new ArrayList<>();
+        games.addAll(result.games());
+        return displayGamesAsString();
+    }
+
+    private String displayGamesAsString() {
+        StringBuilder gamesStringBuilder = new StringBuilder();
+        for (int i = 0; i < games.size(); i++) {
+            GameData game = games.get(i);
+            String gameString = "Game " + (i+1) + ": " + game.gameName() + "\n";
+            gamesStringBuilder.append(gameString);
+            String blackPlayer = "open";
+            String whitePlayer = "open";
+            if (game.whiteUsername() != null) {
+                whitePlayer = game.whiteUsername();
+            }
+            if (game.blackUsername() != null) {
+                blackPlayer = game.blackUsername();
+            }
+            gamesStringBuilder.append("  White Player: " + whitePlayer + "\n");
+            gamesStringBuilder.append("  Black Player: " + blackPlayer + "\n");
+        }
+        return gamesStringBuilder.toString();
     }
 
     private String getInput(String prompt) {

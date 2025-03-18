@@ -56,8 +56,16 @@ public class ServerFacade {
     }
 
     public ListResult listGames(String authToken) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        try {
+            return clientCommunicator.makeRequest(
+                    "GET",
+                    "/game",
+                    null,
+                    authToken,
+                    ListResult.class);
+        } catch (ResponseException ex) {
+            return new ListResult(null, ex.getMessage());
+        }
     }
 
     public CreateResult createGame(CreateRequest req, String authToken) {
