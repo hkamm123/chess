@@ -1,10 +1,7 @@
 package ui;
 
 import client.ServerFacade;
-import server.LoginRequest;
-import server.LogoutResult;
-import server.RegisterRequest;
-import server.RegisterResult;
+import server.*;
 
 import java.util.Scanner;
 
@@ -68,6 +65,7 @@ public class ChessClient {
             case "r" -> register();
             case "li" -> login();
             case "lo" -> logout();
+            case "c" -> createGame();
             default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -108,6 +106,18 @@ public class ChessClient {
         state = State.LOGGEDOUT;
         authToken = "";
         return "Logged out successfully!" + "\n" + help();
+    }
+
+    public String createGame() {
+        if (state != State.LOGGEDIN) {
+            return "Please login to create a game.";
+        }
+        String gameName = getInput("Please enter a game name: ");
+        CreateResult result = serverFacade.createGame(new CreateRequest(gameName), authToken);
+        if (result.message() != null) {
+            return result.message();
+        }
+        return "Game created successfully!"; // consider listing games here
     }
 
     private String getInput(String prompt) {

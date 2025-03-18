@@ -43,7 +43,6 @@ public class ServerFacade {
     }
 
     public LogoutResult logout(String authToken) {
-        // TODO: implement
         try {
             return clientCommunicator.makeRequest("DELETE",
                     "/session",
@@ -61,12 +60,15 @@ public class ServerFacade {
         throw new RuntimeException("Not implemented");
     }
 
-    public CreateResult createGame(CreateRequest req) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+    public CreateResult createGame(CreateRequest req, String authToken) {
+        try {
+            return clientCommunicator.makeRequest("POST", "/game", req, authToken, CreateResult.class);
+        } catch (ResponseException ex) {
+            return new CreateResult(null, ex.getMessage());
+        }
     }
 
-    public JoinResult joinGame(JoinRequest req) {
+    public JoinResult joinGame(JoinRequest req, String authToken) {
         // TODO: implement
         throw new RuntimeException("Not implemented");
     }

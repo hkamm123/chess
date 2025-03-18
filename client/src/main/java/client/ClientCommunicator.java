@@ -29,11 +29,11 @@ public class ClientCommunicator {
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
-            writeBody(request, http);
             if (authToken != null) {
                 http.setRequestProperty("Authorization", authToken);
             }
+
+            writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
