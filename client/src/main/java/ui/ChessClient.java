@@ -19,7 +19,6 @@ public class ChessClient {
     }
 
     public String help() {
-        // TODO: implement
         // returns a list of help options based on the state of the user (logged in or out)
 
         String preLoginMenu = """
@@ -30,7 +29,6 @@ public class ChessClient {
                 'li' - login an existing user
                 
                 'quit' - quit the program
-                
                 """;
 
         String postLoginMenu = """
@@ -57,5 +55,10 @@ public class ChessClient {
     public String eval(String line) {
         // TODO: implement
         // evaluates a command, using ServerFacade to make http requests, and returns the string that will be printed
+        return switch (line) {
+            case "quit" -> "quit";
+            case "h" -> help();
+            default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
+        };
     }
 }
