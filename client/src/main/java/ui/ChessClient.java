@@ -1,6 +1,7 @@
 package ui;
 
 import client.ServerFacade;
+import server.LoginRequest;
 import server.RegisterRequest;
 import server.RegisterResult;
 
@@ -64,6 +65,7 @@ public class ChessClient {
             case "quit" -> "quit";
             case "h" -> help();
             case "r" -> register();
+            case "li" -> login();
             default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -78,7 +80,19 @@ public class ChessClient {
         }
         authToken = result.authToken();
         state = State.LOGGEDIN;
-        return "Login Successful!";
+        return "Registration Successful! Logged in as " + username + "\n" + help();
+    }
+
+    private String login() {
+        String username = getInput("Please enter your username: ");
+        String password = getInput("Please enter your password: ");
+        RegisterResult result = serverFacade.login(new LoginRequest(username, password));
+        if (result.message() != null) {
+            return result.message();
+        }
+        authToken = result.authToken();
+        state = State.LOGGEDIN;
+        return "Logged in as " + username + "\n" + help();
     }
 
     private String getInput(String prompt) {

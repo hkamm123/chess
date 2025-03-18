@@ -29,8 +29,17 @@ public class ServerFacade {
     }
 
     public RegisterResult login(LoginRequest req) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        try {
+            return clientCommunicator.makeRequest(
+                    "POST",
+                    "/session",
+                    req,
+                    null,
+                    RegisterResult.class
+            );
+        } catch (ResponseException ex) {
+            return new RegisterResult(null, null, ex.getMessage());
+        }
     }
 
     public LogoutResult logout(String authToken) {
