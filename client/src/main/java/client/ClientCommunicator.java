@@ -17,10 +17,11 @@ public class ClientCommunicator {
         this.serverUrl = serverUrl;
     }
 
-    private <T> T makeRequest(
+    public <T> T makeRequest(
             String method,
             String path,
             Object request,
+            String authToken,
             Class<T> responseClass
     ) throws ResponseException {
         try {
@@ -30,6 +31,9 @@ public class ClientCommunicator {
             http.setDoOutput(true);
 
             writeBody(request, http);
+            if (authToken != null) {
+                http.setRequestProperty("Authorization", authToken);
+            }
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);

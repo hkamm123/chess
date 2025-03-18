@@ -1,15 +1,6 @@
 package client;
 
-import com.google.gson.Gson;
 import server.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 
 public class ServerFacade {
     private final ClientCommunicator clientCommunicator;
@@ -19,30 +10,46 @@ public class ServerFacade {
     }
 
     public RegisterResult register(RegisterRequest req) {
-        // TODO: implement
+        try {
+            return clientCommunicator.makeRequest(
+                    "POST",
+                    "/user",
+                    req,
+                    null,
+                    RegisterResult.class
+            );
+        } catch (ResponseException ex) {
+            return new RegisterResult(null, null, ex.getMessage());
+        }
     }
 
     public LogoutResult clear() { // LogoutResult is reused for this because ClearResult would be same
         // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 
     public RegisterResult login(LoginRequest req) {
         // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 
-    public LogoutResult logout() {
+    public LogoutResult logout(String authToken) {
         // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 
-    public ListResult listGames() {
+    public ListResult listGames(String authToken) {
         // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 
-    public CreateResult createGame() {
+    public CreateResult createGame(CreateRequest req) {
         // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 
-    public JoinResult joinGame() {
+    public JoinResult joinGame(JoinRequest req) {
         // TODO: implement
+        throw new RuntimeException("Not implemented");
     }
 }

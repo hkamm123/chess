@@ -1,6 +1,10 @@
 package ui;
 
 import client.ServerFacade;
+import server.RegisterRequest;
+import server.RegisterResult;
+
+import java.util.Scanner;
 
 public class ChessClient {
     private final ServerFacade serverFacade;
@@ -11,6 +15,7 @@ public class ChessClient {
         LOGGEDOUT
     }
     private State state;
+    private String authToken;
 
     public ChessClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -58,7 +63,27 @@ public class ChessClient {
         return switch (line) {
             case "quit" -> "quit";
             case "h" -> help();
+            case "r" -> register();
             default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
+    }
+
+    private String register() {
+        String username = getInput("Please enter the username you wish to register: ");
+        String password = getInput("Please enter the password you wish to register: ");
+        String email = getInput("Please enter the email you wish to register: ");
+        RegisterResult result = serverFacade.register(new RegisterRequest(username, password, email));
+        if (result.message() != null) {
+            return result.message();
+        }
+        authToken = result.authToken();
+        state = State.LOGGEDIN;
+        return "Login Successful!";
+    }
+
+    private String getInput(String prompt) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(prompt);
+        return scanner.nextLine();
     }
 }
