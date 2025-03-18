@@ -44,7 +44,16 @@ public class ServerFacade {
 
     public LogoutResult logout(String authToken) {
         // TODO: implement
-        throw new RuntimeException("Not implemented");
+        try {
+            return clientCommunicator.makeRequest("DELETE",
+                    "/session",
+                    null,
+                    authToken,
+                    LogoutResult.class
+            );
+        } catch (ResponseException ex) {
+            return new LogoutResult(ex.getMessage());
+        }
     }
 
     public ListResult listGames(String authToken) {

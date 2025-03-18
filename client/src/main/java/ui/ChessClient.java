@@ -2,6 +2,7 @@ package ui;
 
 import client.ServerFacade;
 import server.LoginRequest;
+import server.LogoutResult;
 import server.RegisterRequest;
 import server.RegisterResult;
 
@@ -66,6 +67,7 @@ public class ChessClient {
             case "h" -> help();
             case "r" -> register();
             case "li" -> login();
+            case "lo" -> logout();
             default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -93,6 +95,19 @@ public class ChessClient {
         authToken = result.authToken();
         state = State.LOGGEDIN;
         return "Logged in as " + username + "\n" + help();
+    }
+
+    private String logout() {
+        if (state != State.LOGGEDIN) {
+            return "It looks like you're not logged in.";
+        }
+        LogoutResult result = serverFacade.logout(authToken);
+        if (result.message() != null) {
+            return result.message();
+        }
+        state = State.LOGGEDOUT;
+        authToken = "";
+        return "Logged out successfully!" + "\n" + help();
     }
 
     private String getInput(String prompt) {
