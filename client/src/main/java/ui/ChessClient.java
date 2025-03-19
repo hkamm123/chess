@@ -1,13 +1,16 @@
 package ui;
 
+import chess.ChessGame;
 import client.ServerFacade;
 import model.GameData;
 import server.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
+
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 
 public class ChessClient {
     private final ServerFacade serverFacade;
@@ -52,7 +55,7 @@ public class ChessClient {
                 
                 'j' - join a game as a player
                 
-                'o' - join a game as an observer
+                'o' - observe a game as a non-player
                 """;
 
         if (state == State.LOGGEDIN) {
@@ -73,6 +76,7 @@ public class ChessClient {
             case "lo" -> logout();
             case "c" -> createGame();
             case "lg" -> listGames();
+            case "j" -> joinGame();
             default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -158,6 +162,34 @@ public class ChessClient {
             gamesStringBuilder.append("  Black Player: " + blackPlayer + "\n");
         }
         return gamesStringBuilder.toString();
+    }
+
+    private String joinGame() {
+        if (state != State.LOGGEDIN) {
+            return "Please login to join a game.";
+        }
+        System.out.print(listGames());
+        String gameNumber = getInput("Please enter the number of the game you wish to join: ");
+        int gameIndex = Integer.parseInt(gameNumber) - 1;
+        int gameID = games.get(gameIndex).gameID();
+        String colorString = getInput("Enter the desired color ('w' for white and 'b' for black): ");
+        ChessGame.TeamColor color = null;
+        if (colorString.equals("w")) {
+            if (games.get(gameIndex).whiteUsername() != null) {
+                return "Oops! Looks like that spot is already taken.\n" + help();
+            }
+            color = WHITE;
+        } else if (colorString.equals("b")) {
+            if (games.get(gameIndex).blackUsername() != null) {
+                return "Oops! Looks like that spot is already taken.\n" + help();
+            }
+            color = BLACK;
+        }
+        JoinResult result = serverFacade.joinGame(new JoinRequest(color, gameID), authToken);
+        if (result.message() != null) {
+            return result.message();
+        }
+        return "Joined game successfully!\n" + listGames();
     }
 
     private String getInput(String prompt) {

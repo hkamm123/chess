@@ -77,7 +77,10 @@ public class ServerFacade {
     }
 
     public JoinResult joinGame(JoinRequest req, String authToken) {
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        try {
+            return clientCommunicator.makeRequest("PUT", "/game", req, authToken, JoinResult.class);
+        } catch (ResponseException ex) {
+            return new JoinResult(ex.getMessage());
+        }
     }
 }
