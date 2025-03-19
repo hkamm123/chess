@@ -101,6 +101,25 @@ public class ServerFacadeTests {
         assertNotNull(logoutResult.message(), "bad logout did not return an error message");
     }
 
+    @Test
+    public void successListGames() {
+        RegisterRequest regReq = new RegisterRequest("username", "password", "email");
+        RegisterResult regRes = serverFacade.register(regReq);
+        assertNull(regRes.message());
+        String auth = regRes.authToken();
+
+        ListResult result = serverFacade.listGames(auth);
+        assertNull(result.message(), "result had an error message when not expected");
+        assertEquals(0, result.games().size(), "resulting games list did not exist or had wrong size");
+    }
+
+    @Test
+    public void listGamesFailWhenBadAuth() {
+        ListResult result = serverFacade.listGames("bad auth");
+        assertNotNull(result.message(), "result did not contain an error message");
+        assertNull(result.games(), "result contained a games list when not expected");
+    }
+
 //    TODO: write tests for listGames
 //    TODO: write tests for createGame
 //    TODO: write tests for joinGame
