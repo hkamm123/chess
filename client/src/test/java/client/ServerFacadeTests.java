@@ -1,10 +1,7 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import server.LogoutResult;
-import server.RegisterRequest;
-import server.RegisterResult;
-import server.Server;
+import server.*;
 
 import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,7 +21,8 @@ public class ServerFacadeTests {
     }
 
     @AfterAll
-    static void stopServer() {
+    static void cleanup() {
+        serverFacade.clear();
         server.stop();
     }
 
@@ -62,5 +60,26 @@ public class ServerFacadeTests {
     public void successClear() {
         LogoutResult result = serverFacade.clear();
         assertNull(result.message(), "clear returned an error message");
+    }
+
+    @Test
+    public void successLogin() {
+        RegisterRequest regReq = new RegisterRequest("username", "password", "email");
+        RegisterResult regResult = serverFacade.register(regReq);
+        String existingAuthToken = regResult.authToken();
+
+        RegisterResult loginResult = serverFacade.login(new LoginRequest("username", "password"));
+        assertNotEquals(existingAuthToken, loginResult.authToken(), "login did not provide a unique auth");
+        assertNull(loginResult.message(), "login result contained an error message");
+        assertEquals("username", loginResult.username(), "login did not result in expected username");
+    }
+
+    @Test
+    public void loginFailsWhenBadCredentials() {
+        LoginRequest req = new LoginRequest("badUsername", "badPassword");
+        RegisterResult result = serverFacade.login(req);
+        assertNull(result.username(), "bad credentials login gave a username when not expected");
+        assertNull(result.authToken(), "bad credentials login gave an authtoken when not expected");
+        assertNotNull(result.message(), "bad credentials login did not result in error message");
     }
 }
