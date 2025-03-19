@@ -1,6 +1,7 @@
 package client;
 
 import org.junit.jupiter.api.*;
+import server.LogoutResult;
 import server.RegisterRequest;
 import server.RegisterResult;
 import server.Server;
@@ -55,5 +56,11 @@ public class ServerFacadeTests {
         assertNull(secondResult.username(), "duplicate username registration returned a username");
         assertNull(secondResult.authToken(), "duplicate username registration returned an authToken");
         assertNotNull(secondResult.message(), "duplicate username registration did not return a message");
+    }
+
+    @Test
+    public void successClear() {
+        LogoutResult result = serverFacade.clear();
+        assertNull(result.message(), "clear returned an error message");
     }
 }
