@@ -57,6 +57,13 @@ public class ClientCommunicator {
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, ResponseException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
+            if (status == 403) {
+                throw new ResponseException(403, "Ope! Looks like that username is already taken.");
+            }
+            if (status == 401) {
+                throw new ResponseException(401, "Ope! Looks like that's an invalid username and/or password.");
+            }
+
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
                     throw ResponseException.fromJson(respErr);
