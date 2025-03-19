@@ -82,4 +82,26 @@ public class ServerFacadeTests {
         assertNull(result.authToken(), "bad credentials login gave an authtoken when not expected");
         assertNotNull(result.message(), "bad credentials login did not result in error message");
     }
+
+    @Test
+    public void successLogout() {
+        RegisterRequest regReq = new RegisterRequest("username", "password", "email");
+        RegisterResult regRes = serverFacade.register(regReq);
+        assertNull(regRes.message());
+        assertEquals("username", regRes.username());
+        String auth = regRes.authToken();
+        LogoutResult logoutResult = serverFacade.logout(auth);
+        assertNull(logoutResult.message(), "logout returned an error message when not expected");
+    }
+
+    @Test
+    public void logoutFailWhenNotLoggedIn() {
+        String auth = "some nonexistent auth";
+        LogoutResult logoutResult = serverFacade.logout(auth);
+        assertNotNull(logoutResult.message(), "bad logout did not return an error message");
+    }
+
+//    TODO: write tests for listGames
+//    TODO: write tests for createGame
+//    TODO: write tests for joinGame
 }
