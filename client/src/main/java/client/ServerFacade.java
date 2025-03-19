@@ -24,8 +24,16 @@ public class ServerFacade {
     }
 
     public LogoutResult clear() { // LogoutResult is reused for this because ClearResult would be same
-        // TODO: implement
-        throw new RuntimeException("Not implemented");
+        try {
+            return clientCommunicator.makeRequest(
+                    "DELETE",
+                    "/db",
+                    null,
+                    null,
+                    LogoutResult.class);
+        } catch (ResponseException ex) {
+            return new LogoutResult(ex.getMessage());
+        }
     }
 
     public RegisterResult login(LoginRequest req) {
