@@ -78,7 +78,8 @@ public class ChessClient {
             case "c" -> createGame();
             case "lg" -> listGames();
             case "j" -> joinGame();
-            default -> "Oops! That command is not recognized. Please enter 'h' for a list of possible commands.";
+            case "o" -> observeGame();
+            default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
 
@@ -171,13 +172,10 @@ public class ChessClient {
         }
         System.out.print(listGames());
         String gameNumber = getInput("Please enter the number of the game you wish to join: ");
-        if (!gameNumber.matches("\\d+")) {
+        if (!isValidGameNumber(gameNumber)) {
             return "Ope! Looks like you entered an invalid game number.\n" + help();
         }
         int gameIndex = Integer.parseInt(gameNumber) - 1;
-        if (gameIndex >= games.size()) {
-            return "Ope! Looks like you entered an invalid game number.\n" + help();
-        }
         int gameID = games.get(gameIndex).gameID();
         String colorString = getInput("Enter the desired color ('w' for white and 'b' for black): ");
         ChessGame.TeamColor color = null;
@@ -203,6 +201,24 @@ public class ChessClient {
         }
         ChessBoardPrinter.drawBoard(games.get(gameIndex).game().getBoard(), perspective);
         return "";
+    }
+
+    private String observeGame() {
+        if (state != State.LOGGEDIN) {
+            return "Please login to observe a game.";
+        }
+        System.out.print(listGames());
+        String gameNumber = getInput("Please enter the number of the game you wish to observe: ");
+        if (!isValidGameNumber(gameNumber)) {
+            return "Ope! Looks like you entered an invalid game number.\n" + help();
+        }
+        int gameIndex = Integer.parseInt(gameNumber) - 1;
+        ChessBoardPrinter.drawBoard(games.get(gameIndex).game().getBoard(), ChessBoardPrinter.Perspective.WHITE);
+        return "";
+    }
+
+    private boolean isValidGameNumber(String gameNumber) {
+        return (gameNumber.matches("\\d+") && (Integer.parseInt(gameNumber) - 1 < games.size()));
     }
 
     private String getInput(String prompt) {
