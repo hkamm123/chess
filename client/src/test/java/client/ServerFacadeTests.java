@@ -120,7 +120,26 @@ public class ServerFacadeTests {
         assertNull(result.games(), "result contained a games list when not expected");
     }
 
-//    TODO: write tests for listGames
-//    TODO: write tests for createGame
+    @Test
+    public void successCreateGame() {
+        RegisterRequest regReq = new RegisterRequest("username", "password", "email");
+        RegisterResult regRes = serverFacade.register(regReq);
+        assertNull(regRes.message());
+        String auth = regRes.authToken();
+
+        CreateRequest createReq = new CreateRequest("new game");
+        CreateResult result = serverFacade.createGame(createReq, auth);
+        assertNull(result.message(), "result contained an unexpected error message");
+        assertNotNull(result.gameID(), "result did not contain a gameID");
+    }
+
+    @Test
+    public void createGameFailsWithBadAuth() {
+        CreateRequest req = new CreateRequest("new game");
+        CreateResult result = serverFacade.createGame(req, "bad auth");
+        assertNotNull(result.message(), "result did not contain an error message");
+        assertNull(result.gameID(), "result contained an unexpected gameID");
+    }
+
 //    TODO: write tests for joinGame
 }
