@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import client.ServerFacade;
 import model.GameData;
@@ -170,26 +171,38 @@ public class ChessClient {
         }
         System.out.print(listGames());
         String gameNumber = getInput("Please enter the number of the game you wish to join: ");
+        if (!gameNumber.matches("\\d+")) {
+            return "Ope! Looks like you entered an invalid game number.\n" + help();
+        }
         int gameIndex = Integer.parseInt(gameNumber) - 1;
+        if (gameIndex >= games.size()) {
+            return "Ope! Looks like you entered an invalid game number.\n" + help();
+        }
         int gameID = games.get(gameIndex).gameID();
         String colorString = getInput("Enter the desired color ('w' for white and 'b' for black): ");
         ChessGame.TeamColor color = null;
+        ChessBoardPrinter.Perspective perspective = null;
         if (colorString.equals("w")) {
             if (games.get(gameIndex).whiteUsername() != null) {
-                return "Oops! Looks like that spot is already taken.\n" + help();
+                return "Ope! Looks like that spot is already taken.\n" + help();
             }
             color = WHITE;
+            perspective = ChessBoardPrinter.Perspective.WHITE;
         } else if (colorString.equals("b")) {
             if (games.get(gameIndex).blackUsername() != null) {
-                return "Oops! Looks like that spot is already taken.\n" + help();
+                return "Ope! Looks like that spot is already taken.\n" + help();
             }
             color = BLACK;
+            perspective = ChessBoardPrinter.Perspective.BLACK;
+        } else {
+            return "Ope! Looks like your input was invalid.";
         }
         JoinResult result = serverFacade.joinGame(new JoinRequest(color, gameID), authToken);
         if (result.message() != null) {
             return result.message();
         }
-        return "Joined game successfully!\n" + listGames();
+        ChessBoardPrinter.drawBoard(games.get(gameIndex).game().getBoard(), perspective);
+        return "";
     }
 
     private String getInput(String prompt) {
