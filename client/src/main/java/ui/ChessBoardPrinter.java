@@ -17,7 +17,7 @@ import static ui.EscapeSequences.*;
 public class ChessBoardPrinter {
     public enum Perspective {BLACK, WHITE;}
 
-    private static final Map<ChessPiece.PieceType, String> pieceLetters = Map.of(
+    private static final Map<ChessPiece.PieceType, String> PIECE_LETTERS = Map.of(
             PAWN, "P",
             QUEEN, "Q",
             KNIGHT, "N",
@@ -93,14 +93,14 @@ public class ChessBoardPrinter {
             ChessPiece firstPiece = board.getPiece(new ChessPosition(row, colOrder[i]));
             String firstPieceLetter;
             if (firstPiece != null) {
-                firstPieceLetter = pieceLetters.get(firstPiece.getPieceType());
+                firstPieceLetter = PIECE_LETTERS.get(firstPiece.getPieceType());
             } else {
                 firstPieceLetter = " ";
             }
             ChessPiece secondPiece = board.getPiece(new ChessPosition(row, colOrder[i + 1]));
             String secondPieceLetter;
             if (secondPiece != null) {
-                secondPieceLetter = pieceLetters.get(secondPiece.getPieceType());
+                secondPieceLetter = PIECE_LETTERS.get(secondPiece.getPieceType());
             } else {
                 secondPieceLetter = " ";
             }

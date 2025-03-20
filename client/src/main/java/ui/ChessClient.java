@@ -66,7 +66,6 @@ public class ChessClient {
     }
 
     public String eval(String line) {
-        // TODO: implement
         // evaluates a command, using ServerFacade to make http requests, and returns the string that will be printed
         return switch (line) {
             case "quit" -> "quit";
