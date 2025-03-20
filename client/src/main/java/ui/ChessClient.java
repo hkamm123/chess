@@ -22,6 +22,7 @@ public class ChessClient {
         LOGGEDIN,
         LOGGEDOUT
     }
+
     private State state;
     private String authToken;
 
@@ -150,7 +151,7 @@ public class ChessClient {
         StringBuilder gamesStringBuilder = new StringBuilder();
         for (int i = 0; i < games.size(); i++) {
             GameData game = games.get(i);
-            String gameString = "Game " + (i+1) + ": " + game.gameName() + "\n";
+            String gameString = "Game " + (i + 1) + ": " + game.gameName() + "\n";
             gamesStringBuilder.append(gameString);
             String blackPlayer = "open";
             String whitePlayer = "open";

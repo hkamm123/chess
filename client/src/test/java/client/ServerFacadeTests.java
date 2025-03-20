@@ -1,10 +1,12 @@
 package client;
 
 import chess.ChessGame;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import server.*;
 
-import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 import static org.junit.jupiter.api.Assertions.*;
 
 

@@ -72,10 +72,10 @@ public class ChessBoardPrinter {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    private static void drawRows(PrintStream out, ChessBoard board, int[] rowOrder, int[]colOrder) {
-        for (int i = 0; i < 7; i+=2) {
+    private static void drawRows(PrintStream out, ChessBoard board, int[] rowOrder, int[] colOrder) {
+        for (int i = 0; i < 7; i += 2) {
             drawRow(out, board, rowOrder[i], colOrder, SET_BG_COLOR_WHITE, SET_BG_COLOR_BLACK);
-            drawRow(out, board, rowOrder[i+1], colOrder, SET_BG_COLOR_BLACK, SET_BG_COLOR_WHITE);
+            drawRow(out, board, rowOrder[i + 1], colOrder, SET_BG_COLOR_BLACK, SET_BG_COLOR_WHITE);
         }
     }
 
@@ -89,7 +89,7 @@ public class ChessBoardPrinter {
     ) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         drawRowBox(out, row);
-        for (int i = 0; i < 7; i+=2) {
+        for (int i = 0; i < 7; i += 2) {
             ChessPiece firstPiece = board.getPiece(new ChessPosition(row, colOrder[i]));
             String firstPieceLetter;
             if (firstPiece != null) {
@@ -97,7 +97,7 @@ public class ChessBoardPrinter {
             } else {
                 firstPieceLetter = " ";
             }
-            ChessPiece secondPiece = board.getPiece(new ChessPosition(row, colOrder[i+1]));
+            ChessPiece secondPiece = board.getPiece(new ChessPosition(row, colOrder[i + 1]));
             String secondPieceLetter;
             if (secondPiece != null) {
                 secondPieceLetter = pieceLetters.get(secondPiece.getPieceType());
