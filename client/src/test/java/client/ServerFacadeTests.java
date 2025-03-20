@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import server.*;
 
@@ -141,5 +142,31 @@ public class ServerFacadeTests {
         assertNull(result.gameID(), "result contained an unexpected gameID");
     }
 
-//    TODO: write tests for joinGame
+    @Test
+    public void successJoinGame() {
+        RegisterRequest regReq = new RegisterRequest("username", "password", "email");
+        RegisterResult regRes = serverFacade.register(regReq);
+        assertNull(regRes.message());
+        String auth = regRes.authToken();
+        CreateResult createRes = serverFacade.createGame(new CreateRequest("newGame"), auth);
+
+        JoinRequest joinReq = new JoinRequest(ChessGame.TeamColor.WHITE, createRes.gameID());
+        JoinResult result = serverFacade.joinGame(joinReq, auth);
+        assertNull(result.message(), "result contained an unexpected error message");
+    }
+
+    @Test
+    public void joinGameFailsWhenColorTaken() {
+        RegisterRequest regReq = new RegisterRequest("username", "password", "email");
+        RegisterResult regRes = serverFacade.register(regReq);
+        assertNull(regRes.message());
+        String auth = regRes.authToken();
+        CreateResult createRes = serverFacade.createGame(new CreateRequest("newGame"), auth);
+
+        JoinRequest joinReq = new JoinRequest(ChessGame.TeamColor.WHITE, createRes.gameID());
+        JoinResult firstResult = serverFacade.joinGame(joinReq, auth);
+        assertNull(firstResult.message());
+        JoinResult secondResult = serverFacade.joinGame(joinReq, auth);
+        assertNotNull(secondResult.message(), "result did not contain an error message");
+    }
 }
