@@ -1,6 +1,4 @@
-package client;
-
-import server.*;
+package server;
 
 public class ServerFacade {
     private final ClientCommunicator clientCommunicator;
