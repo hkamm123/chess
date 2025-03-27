@@ -18,11 +18,13 @@ public class ChessClient {
 
     private enum State {
         LOGGEDIN,
-        LOGGEDOUT
+        LOGGEDOUT,
+        INGAME
     }
 
     private State state;
     private String authToken;
+    private String username;
 
     public ChessClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -58,8 +60,19 @@ public class ChessClient {
                 'o' - observe a game as a non-player
                 """;
 
+        String inGameMenu = """
+                'h' - display a list of commands
+                'b' - redraw chess board
+                'l' - leave game
+                'm' - make move
+                'rs' - resign
+                'hm' - highlight legal moves
+                """;
+
         if (state == State.LOGGEDIN) {
             return postLoginMenu;
+        } else if (state == State.INGAME) {
+            return inGameMenu;
         } else {
             return preLoginMenu;
         }
@@ -103,6 +116,7 @@ public class ChessClient {
         }
         authToken = result.authToken();
         state = State.LOGGEDIN;
+        this.username = username;
         return "Logged in as " + username + "\n" + help();
     }
 
@@ -115,6 +129,7 @@ public class ChessClient {
             return result.message();
         }
         state = State.LOGGEDOUT;
+        this.username = null;
         authToken = "";
         return "Logged out successfully!" + "\n" + help();
     }
@@ -197,8 +212,9 @@ public class ChessClient {
         if (result.message() != null) {
             return result.message();
         }
+        state = State.INGAME;
         ChessBoardPrinter.drawBoard(games.get(gameIndex).game().getBoard(), perspective);
-        return "";
+        return help();
     }
 
     private String observeGame() {
