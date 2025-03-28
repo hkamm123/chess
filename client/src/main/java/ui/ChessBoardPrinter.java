@@ -137,7 +137,7 @@ public class ChessBoardPrinter {
             }
 
             // setting square color based on whether it should be highlighted
-            if (highlightPositions.contains(new ChessPosition(row, i))) {
+            if (highlightPositions.contains(new ChessPosition(row, colOrder[i]))) {
                 out.print(SET_BG_COLOR_YELLOW); // highlight the square
             } else {
                 out.print(firstColEscSeq);
@@ -145,7 +145,11 @@ public class ChessBoardPrinter {
             setColorForPiece(out, firstPiece);
             drawBox(out, firstPieceLetter);
 
-            out.print(secondColEscSeq);
+            if (highlightPositions.contains(new ChessPosition(row, colOrder[i + 1]))) {
+                out.print(SET_BG_COLOR_YELLOW);
+            } else {
+                out.print(secondColEscSeq);
+            }
             setColorForPiece(out, secondPiece);
             drawBox(out, secondPieceLetter);
         }

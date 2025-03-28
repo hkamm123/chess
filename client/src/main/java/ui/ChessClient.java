@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import model.GameData;
 import server.*;
 
@@ -19,7 +20,8 @@ public class ChessClient {
     private enum State {
         LOGGEDIN,
         LOGGEDOUT,
-        INGAME
+        INGAME,
+        OBSERVING
     }
 
     private State state;
@@ -70,13 +72,20 @@ public class ChessClient {
                 'rs' - resign
                 'hm' - highlight legal moves
                 """;
-        if (state == State.LOGGEDIN) {
-            return postLoginMenu;
-        } else if (state == State.INGAME) {
-            return inGameMenu;
-        } else {
-            return preLoginMenu;
-        }
+
+        String observingMenu = """
+                'h' - display a list of commands
+                'b' - redraw chess board
+                'l' - leave game
+                'hm' - highlight legal moves
+                """;
+
+        return switch(state) {
+            case LOGGEDIN -> postLoginMenu;
+            case LOGGEDOUT -> preLoginMenu;
+            case INGAME -> inGameMenu;
+            case OBSERVING -> observingMenu;
+        };
     }
 
     public String eval(String line) {
@@ -92,6 +101,7 @@ public class ChessClient {
             case "j" -> joinGame();
             case "o" -> observeGame();
             case "b" -> redrawBoard();
+            case "hm" -> highlightMoves();
             default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -239,7 +249,7 @@ public class ChessClient {
     }
 
     private String redrawBoard() {
-        if (state != State.INGAME) {
+        if (state != State.INGAME && state != State.OBSERVING) {
             return "Looks like you're not currently in a game.";
         }
         if (currentGame == null || currentPerspective == null) { // these are set when the user joins or observes
@@ -247,6 +257,26 @@ public class ChessClient {
         }
         ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
         return "";
+    }
+
+    private String highlightMoves() {
+        if (state != State.INGAME && state != State.OBSERVING) {
+            return "Looks like you're not currently in a game.";
+        }
+        String input = getInput(
+                "Please enter the position of the piece whose moves you want to highlight.\n" +
+                "(use the form b2): "
+        );
+        if (!isValidPosition(input)) {
+            return "Ope! That input was not recognized. Please try again.";
+        }
+        try {
+            ChessPosition piecePosition = getPositionFromInput(input);
+            ChessBoardPrinter.drawBoard(currentGame, currentPerspective, piecePosition);
+            return "";
+        } catch (Exception ex) {
+            return "Ope! Looks like there was a problem. Please try again.";
+        }
     }
 
     private boolean isValidGameNumber(String gameNumber) {
@@ -257,5 +287,29 @@ public class ChessClient {
         Scanner scanner = new Scanner(System.in);
         System.out.print(prompt);
         return scanner.nextLine();
+    }
+
+    private boolean isValidPosition(String input) {
+        return input.matches("[a-h][1-8]");
+    }
+
+    private ChessPosition getPositionFromInput(String input) {
+        char colLetter = input.charAt(0);
+        char rowNumber = input.charAt(1);
+        int col = switch(colLetter) {
+            case 'a' -> 1;
+            case 'b' -> 2;
+            case 'c' -> 3;
+            case 'd' -> 4;
+            case 'e' -> 5;
+            case 'f' -> 6;
+            case 'g' -> 7;
+            case 'h' -> 8;
+            default -> throw new IllegalStateException("Unexpected value: " + colLetter);
+        };
+
+        int row = Integer.parseInt(String.valueOf(rowNumber));
+
+        return new ChessPosition(row, col);
     }
 }
