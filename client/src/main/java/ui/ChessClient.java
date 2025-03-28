@@ -25,6 +25,8 @@ public class ChessClient {
     private State state;
     private String authToken;
     private String username;
+    private ChessGame currentGame;
+    private ChessBoardPrinter.Perspective currentPerspective;
 
     public ChessClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -68,7 +70,6 @@ public class ChessClient {
                 'rs' - resign
                 'hm' - highlight legal moves
                 """;
-
         if (state == State.LOGGEDIN) {
             return postLoginMenu;
         } else if (state == State.INGAME) {
@@ -90,6 +91,7 @@ public class ChessClient {
             case "lg" -> listGames();
             case "j" -> joinGame();
             case "o" -> observeGame();
+            case "b" -> redrawBoard();
             default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -212,8 +214,10 @@ public class ChessClient {
         if (result.message() != null) {
             return result.message();
         }
+        currentGame = games.get(gameIndex).game();
+        currentPerspective = perspective;
         state = State.INGAME;
-        ChessBoardPrinter.drawBoard(games.get(gameIndex).game().getBoard(), perspective);
+        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
         return help();
     }
 
@@ -227,7 +231,21 @@ public class ChessClient {
             return "Ope! Looks like you entered an invalid game number.\n" + help();
         }
         int gameIndex = Integer.parseInt(gameNumber) - 1;
-        ChessBoardPrinter.drawBoard(games.get(gameIndex).game().getBoard(), ChessBoardPrinter.Perspective.WHITE);
+        currentPerspective = ChessBoardPrinter.Perspective.WHITE;
+        currentGame = games.get(gameIndex).game();
+        state = State.INGAME;
+        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
+        return help();
+    }
+
+    private String redrawBoard() {
+        if (state != State.INGAME) {
+            return "Looks like you're not currently in a game.";
+        }
+        if (currentGame == null || currentPerspective == null) { // these are set when the user joins or observes
+            return "Ope! Looks like there was an error. Please try again.";
+        }
+        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
         return "";
     }
 

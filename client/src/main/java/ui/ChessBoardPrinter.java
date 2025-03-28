@@ -1,12 +1,12 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static chess.ChessPiece.PieceType.*;
@@ -26,7 +26,7 @@ public class ChessBoardPrinter {
             KING, "K"
     );
 
-    public static void drawBoard(ChessBoard board, Perspective perspective) {
+    public static void drawBoard(ChessGame game, Perspective perspective, ChessPosition highlightPiecePosition) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         String[] headers = new String[0];
@@ -42,9 +42,17 @@ public class ChessBoardPrinter {
             colsInOrder = new int[]{8, 7, 6, 5, 4, 3, 2, 1};
         }
 
+        Collection<ChessPosition> highlightPositions = new ArrayList<>();
+        if (highlightPiecePosition != null) {
+            highlightPositions.add(highlightPiecePosition);
+            for (ChessMove move : game.validMoves(highlightPiecePosition)) {
+                highlightPositions.add(move.getEndPosition());
+            }
+        }
+
         out.print(ERASE_SCREEN);
         drawHeaders(out, headers);
-        drawRows(out, board, rowsInOrder, colsInOrder);
+        drawRows(out, game.getBoard(), rowsInOrder, colsInOrder, highlightPositions);
         drawHeaders(out, headers);
     }
 
@@ -72,10 +80,32 @@ public class ChessBoardPrinter {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    private static void drawRows(PrintStream out, ChessBoard board, int[] rowOrder, int[] colOrder) {
+    private static void drawRows(
+            PrintStream out,
+            ChessBoard board,
+            int[] rowOrder,
+            int[] colOrder,
+            Collection<ChessPosition> highlightPositions
+    ) {
         for (int i = 0; i < 7; i += 2) {
-            drawRow(out, board, rowOrder[i], colOrder, SET_BG_COLOR_WHITE, SET_BG_COLOR_BLACK);
-            drawRow(out, board, rowOrder[i + 1], colOrder, SET_BG_COLOR_BLACK, SET_BG_COLOR_WHITE);
+            drawRow(
+                    out,
+                    board,
+                    rowOrder[i],
+                    colOrder,
+                    SET_BG_COLOR_WHITE,
+                    SET_BG_COLOR_BLACK,
+                    highlightPositions
+            );
+            drawRow(
+                    out,
+                    board,
+                    rowOrder[i + 1],
+                    colOrder,
+                    SET_BG_COLOR_BLACK,
+                    SET_BG_COLOR_WHITE,
+                    highlightPositions
+            );
         }
     }
 
@@ -85,7 +115,8 @@ public class ChessBoardPrinter {
             int row,
             int[] colOrder,
             String firstColEscSeq,
-            String secondColEscSeq
+            String secondColEscSeq,
+            Collection<ChessPosition> highlightPositions
     ) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         drawRowBox(out, row);
@@ -104,7 +135,13 @@ public class ChessBoardPrinter {
             } else {
                 secondPieceLetter = " ";
             }
-            out.print(firstColEscSeq);
+
+            // setting square color based on whether it should be highlighted
+            if (highlightPositions.contains(new ChessPosition(row, i))) {
+                out.print(SET_BG_COLOR_YELLOW); // highlight the square
+            } else {
+                out.print(firstColEscSeq);
+            }
             setColorForPiece(out, firstPiece);
             drawBox(out, firstPieceLetter);
 
