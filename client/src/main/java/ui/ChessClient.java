@@ -243,7 +243,7 @@ public class ChessClient {
         int gameIndex = Integer.parseInt(gameNumber) - 1;
         currentPerspective = ChessBoardPrinter.Perspective.WHITE;
         currentGame = games.get(gameIndex).game();
-        state = State.INGAME;
+        state = State.OBSERVING;
         ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
         return help();
     }
