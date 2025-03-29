@@ -1,8 +1,11 @@
 package server;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
 import spark.*;
@@ -12,6 +15,7 @@ import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 import static service.UserService.UNAUTHORIZED_ERR_MSG;
 
+@WebSocket
 public class Server {
     private final Gson serializer = new Gson();
     private final UserDao userDao;
@@ -49,6 +53,8 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
+
+        Spark.webSocket("/ws", Server.class);
 
         //This line initializes the server and can be removed once you have a functioning endpoint
 //        Spark.init();
@@ -128,6 +134,23 @@ public class Server {
         response.status(getStatus(result.message()));
         response.body(serialize(result));
         return response.body();
+    }
+
+    private void makeMove(String authToken, int gameID, ChessMove move) {
+        //TODO: implement
+        // this very well could need a different return type or different parameters
+        // the purpose of this is not a new endpoint, but just updating the game in the database
+        // this will require corresponding methods in GameService and GameDAO
+    }
+
+    @OnWebSocketMessage
+    public void onMessage(Session session, String message) throws Exception {
+        //TODO: implement
+        // 1. deserialize message into appropriate subclass of UserGameCommand (or double deserialize)
+        // 1.5 authorize user by checking authtoken
+        // 2. make necessary changes to db and/or session
+        // 3. create appropriate ServerMessage
+        // 4. serialize and send the message for the WebsocketCommunicator to handle
     }
 
     public void stop() {

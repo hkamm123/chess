@@ -4,6 +4,10 @@ import chess.ChessGame;
 import chess.ChessPosition;
 import model.GameData;
 import server.*;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +16,7 @@ import java.util.Scanner;
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
     private final ServerFacade serverFacade;
     private final String serverUrl;
     private List<GameData> games;
@@ -104,6 +108,30 @@ public class ChessClient {
             case "hm" -> highlightMoves();
             default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
+            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
+            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+        }
+    }
+
+    private void displayNotification(String msg) {
+//        TODO: implement
+//        this should just print out the notification message to the console
+    }
+
+    private void displayError(String msg) {
+//        TODO: implement
+//        this should print the error message to the console
+    }
+
+    private void loadGame(ChessGame game) {
+//        TODO: implement
+//        this should update the currentGame and print the board
     }
 
     private String register() {
