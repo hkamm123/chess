@@ -6,4 +6,8 @@ public class NotificationMessage extends ServerMessage {
         super(ServerMessageType.NOTIFICATION);
         this.message = msg;
     }
+
+    public String getMessage() {
+        return message;
+    }
 }

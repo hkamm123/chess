@@ -1,10 +1,15 @@
-package server;
+package client;
+
+import server.*;
+import ui.WebsocketCommunicator;
 
 public class ServerFacade {
     private final ClientCommunicator clientCommunicator;
+    private final WebsocketCommunicator websocketCommunicator;
 
-    public ServerFacade(String serverUrl) {
+    public ServerFacade(String serverUrl, ServerMessageObserver smo) {
         this.clientCommunicator = new ClientCommunicator(serverUrl);
+        this.websocketCommunicator = new WebsocketCommunicator(serverUrl, smo);
     }
 
     public RegisterResult register(RegisterRequest req) {

@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessPosition;
+import client.ServerFacade;
 import model.GameData;
 import server.*;
 import websocket.messages.ErrorMessage;
@@ -35,7 +36,7 @@ public class ChessClient implements ServerMessageObserver {
     private ChessBoardPrinter.Perspective currentPerspective;
 
     public ChessClient(String serverUrl) {
-        this.serverFacade = new ServerFacade(serverUrl);
+        this.serverFacade = new ServerFacade(serverUrl, this);
         this.serverUrl = serverUrl;
         this.state = State.LOGGEDOUT;
         this.games = new ArrayList<GameData>();
@@ -129,7 +130,7 @@ public class ChessClient implements ServerMessageObserver {
 //        this should print the error message to the console
     }
 
-    private void loadGame(ChessGame game) {
+    private void loadGame(String gameJson) {
 //        TODO: implement
 //        this should update the currentGame and print the board
     }
