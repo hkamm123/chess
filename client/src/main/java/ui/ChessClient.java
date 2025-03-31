@@ -7,6 +7,7 @@ import client.ServerFacade;
 import com.google.gson.Gson;
 import model.GameData;
 import server.*;
+import websocket.commands.ConnectCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -273,9 +274,15 @@ public class ChessClient implements ServerMessageObserver {
         }
         int gameIndex = Integer.parseInt(gameNumber) - 1;
         currentPerspective = ChessBoardPrinter.Perspective.WHITE;
-        currentGame = games.get(gameIndex).game();
-        state = State.OBSERVING;
-        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
+        try {
+            serverFacade.connect(new ConnectCommand(authToken, games.get(gameIndex).gameID(), null));
+            state = State.OBSERVING;
+        } catch (Exception ex) {
+            ex.printStackTrace(); // TODO: take this out
+            return "Ope! Looks like there was an error. Please try again.";
+        }
+//        currentGame = games.get(gameIndex).game();
+//        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
         return help();
     }
 

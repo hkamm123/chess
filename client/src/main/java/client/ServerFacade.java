@@ -103,8 +103,8 @@ public class ServerFacade {
         }
     }
 
-    private void connect(ConnectCommand command) throws Exception {
-        String commandMsg = serializer.toJson(command);
-        websocketCommunicator.send(commandMsg);
+    public void connect(ConnectCommand command) throws Exception {
+        String commandJson = serializer.toJson(command);
+        websocketCommunicator.send(commandJson);
     }
 }
