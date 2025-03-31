@@ -1,17 +1,16 @@
 package ui;
 
 import com.google.gson.Gson;
-import org.glassfish.tyrus.core.wsadl.model.Endpoint;
 import server.ServerMessageObserver;
 import websocket.messages.ErrorMessage;
-import websocket.messages.ServerMessage;
+
 import javax.websocket.*;
 
 import java.net.URI;
 
 public class WebsocketCommunicator extends Endpoint {
     private String serverURL;
-    private Gson gson;
+    private Gson serializer;
     private ServerMessageObserver observer;
     private Session session;
 
@@ -20,22 +19,12 @@ public class WebsocketCommunicator extends Endpoint {
         try {
             URI socketURI = new URI(serverURL + "/ws");
             this.observer = observer;
-            this.gson = new Gson();
+            this.serializer = new Gson();
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                public void onMessage(String message) {
-                    try {
-                        ServerMessage msg = gson.fromJson(message, ServerMessage.class);
-                        observer.notify(msg);
-                    } catch (Exception ex) {
-                        observer.notify(new ErrorMessage(ex.getMessage()));
-                    }
-                }
-            });
         } catch (Exception ex) {
+            ex.printStackTrace();
             System.out.println("Error creating Websocket communicator.");
         }
     }
@@ -44,5 +33,19 @@ public class WebsocketCommunicator extends Endpoint {
         this.session.getBasicRemote().sendText(msg);
     }
 
-    public void onOpen(Session session, EndpointConfig endpointConfig) {}
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+        System.out.println("WS connection opened"); //  TODO: remove this after debugging
+        this.session = session;
+
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            public void onMessage(String message) {
+                try {
+                    observer.notify(message);
+                } catch (Exception ex) {
+                    ErrorMessage err = new ErrorMessage(ex.getMessage());
+                    observer.notify(serializer.toJson(err));
+                }
+            }
+        });
+    }
 }

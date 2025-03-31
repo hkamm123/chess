@@ -1,8 +1,10 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
 import client.ServerFacade;
+import com.google.gson.Gson;
 import model.GameData;
 import server.*;
 import websocket.messages.ErrorMessage;
@@ -16,11 +18,14 @@ import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
+import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
+import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
 
 public class ChessClient implements ServerMessageObserver {
     private final ServerFacade serverFacade;
     private final String serverUrl;
     private List<GameData> games;
+    private Gson serializer;
 
     private enum State {
         LOGGEDIN,
@@ -40,6 +45,7 @@ public class ChessClient implements ServerMessageObserver {
         this.serverUrl = serverUrl;
         this.state = State.LOGGEDOUT;
         this.games = new ArrayList<GameData>();
+        this.serializer = new Gson();
     }
 
     public String help() {
@@ -112,17 +118,17 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     @Override
-    public void notify(ServerMessage message) {
+    public void notify(String msgJson) {
+        ServerMessage message = serializer.fromJson(msgJson, ServerMessage.class);
         switch (message.getServerMessageType()) {
-            case NOTIFICATION -> displayNotification(((NotificationMessage) message).getMessage());
-            case ERROR -> displayError(((ErrorMessage) message).getErrorMessage());
-            case LOAD_GAME -> loadGame(((LoadGameMessage) message).getGame());
+            case NOTIFICATION -> displayNotification(((NotificationMessage) serializer.fromJson(msgJson, NotificationMessage.class)).getMessage());
+            case ERROR -> displayError(((ErrorMessage) serializer.fromJson(msgJson, ErrorMessage.class)).getErrorMessage());
+            case LOAD_GAME -> loadGame((LoadGameMessage) serializer.fromJson(msgJson, LoadGameMessage.class));
         }
     }
 
     private void displayNotification(String msg) {
-//        TODO: implement
-//        this should just print out the notification message to the console
+        System.out.println(SET_TEXT_COLOR_GREEN + msg + SET_TEXT_COLOR_WHITE);
     }
 
     private void displayError(String msg) {
@@ -130,9 +136,9 @@ public class ChessClient implements ServerMessageObserver {
 //        this should print the error message to the console
     }
 
-    private void loadGame(String gameJson) {
-//        TODO: implement
-//        this should update the currentGame and print the board
+    private void loadGame(LoadGameMessage message) {
+        this.currentGame = serializer.fromJson(message.getGame(), ChessGame.class);
+        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
     }
 
     private String register() {
@@ -249,15 +255,13 @@ public class ChessClient implements ServerMessageObserver {
         } else {
             return "Ope! Looks like your input was invalid.";
         }
+        currentPerspective = perspective;
         JoinResult result = serverFacade.joinGame(new JoinRequest(color, gameID), authToken);
         if (result.message() != null) {
             return result.message();
         }
-        currentGame = games.get(gameIndex).game();
-        currentPerspective = perspective;
         state = State.INGAME;
-        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
-        return help();
+        return "";
     }
 
     private String observeGame() {
