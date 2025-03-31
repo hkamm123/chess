@@ -18,8 +18,7 @@ import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
-import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
-import static ui.EscapeSequences.SET_TEXT_COLOR_WHITE;
+import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageObserver {
     private final ServerFacade serverFacade;
@@ -132,8 +131,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private void displayError(String msg) {
-//        TODO: implement
-//        this should print the error message to the console
+        System.out.println(SET_TEXT_COLOR_RED + msg + SET_TEXT_COLOR_WHITE); // TODO: hide these messages from the user
     }
 
     private void loadGame(LoadGameMessage message) {
