@@ -19,9 +19,7 @@ import websocket.messages.ServerMessage;
 
 import javax.websocket.Endpoint;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.*;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
@@ -37,7 +35,7 @@ public class Server {
     private final GameDao gameDao;
     private final UserService userService;
     private final GameService gameService;
-    private HashMap<Integer, Collection<Session>> sessions;
+    private final HashMap<Integer, Set<Session>> sessions;
 
     public Server() {
         try {
@@ -179,8 +177,14 @@ public class Server {
         if (sessions.containsKey(gameID)) {
             sessions.get(gameID).add(session);
         } else {
-            sessions.put(gameID, new ArrayList<>());
+            sessions.put(gameID, new HashSet<>());
             sessions.get(gameID).add(session);
+        }
+    }
+
+    private void removeSession(int gameID, Session session) {
+        if (sessions.containsKey(gameID)) {
+            sessions.get(gameID).remove(session);
         }
     }
 
@@ -220,6 +224,15 @@ public class Server {
 
     private void leaveGame(Session session, String username, LeaveCommand command) {
         // TODO: implement
+        try {
+            gameService.removePlayerFromGame(username, command.getGameID(), command.getAuthToken());
+            removeSession(command.getGameID(), session);
+            for (Session s : sessions.get(command.getGameID())) {
+                sendMessage(s, new NotificationMessage(username + " has left the game."));
+            }
+        } catch (Exception ex) {
+            sendMessage(session, new ErrorMessage(ex.getMessage()));
+        }
     }
 
     private void resign(Session session, String username, ResignCommand command) {

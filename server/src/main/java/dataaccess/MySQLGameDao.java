@@ -171,6 +171,62 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
+    public void removePlayerFromGame(String username, Integer gameID) throws DataAccessException {
+        try (var conn = getConnection()) {
+            int[] userIDs = new int[]{0,0};
+            // get the whiteUserID from the selected game
+            String queryStatement = "SELECT whiteUserID FROM games WHERE " + "gameID = " + gameID;
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userIDs[0] = resultSet.getInt(1);
+                }
+            }
+
+            // get the blackUserID from the selected game
+            queryStatement = queryStatement.replace("whiteUserID", "blackUserID");
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userIDs[1] = resultSet.getInt(1);
+                }
+            }
+
+            // get the userID based on the given username
+            int userID = 0;
+            try (var preparedStatement = conn.prepareStatement("SELECT userID FROM users WHERE username = ?")) {
+                preparedStatement.setString(1, username);
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userID = resultSet.getInt(1);
+                }
+            }
+
+            // if the white spot in the game is taken, set the whiteUserID to null if it matches the given user's userID
+            if (userIDs[0] != 0) {
+                String updateStatement = "UPDATE games SET whiteUserID = NULL WHERE whiteUserID = ? AND gameID = ?";
+                try (var preparedStatement = conn.prepareStatement(updateStatement)) {
+                    preparedStatement.setInt(1, userID);
+                    preparedStatement.setInt(2, gameID);
+                    preparedStatement.executeUpdate();
+                }
+            }
+
+            // same as above but with black
+            if (userIDs[1] != 0) {
+                String updateStatement = "UPDATE games SET blackUserID = NULL WHERE blackUserID = ? AND gameID = ?";
+                try (var preparedStatement = conn.prepareStatement(updateStatement)) {
+                    preparedStatement.setInt(1, userID);
+                    preparedStatement.setInt(2, gameID);
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
+    }
+
+    @Override
     public void clear() throws DataAccessException {
         try (var preparedStatement = getConnection().prepareStatement("DELETE FROM games")) {
             preparedStatement.execute();

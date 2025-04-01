@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+// OBSOLETE CLASS - DO NOT USE
 public class MemoryGameDao implements GameDao {
     private Collection<GameData> games = new ArrayList<>();
     private int nextID = 1;
@@ -66,6 +67,11 @@ public class MemoryGameDao implements GameDao {
                         gameToUpdate.gameName(),
                         gameToUpdate.game()));
         }
+    }
+
+    @Override
+    public void removePlayerFromGame(String username, Integer gameID) throws DataAccessException {
+
     }
 
     @Override

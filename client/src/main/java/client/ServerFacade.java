@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import server.*;
 import ui.WebsocketCommunicator;
 import websocket.commands.ConnectCommand;
-
-import java.util.concurrent.ConcurrentNavigableMap;
+import websocket.commands.LeaveCommand;
+import websocket.commands.UserGameCommand;
 
 public class ServerFacade {
     private final ClientCommunicator clientCommunicator;
@@ -96,14 +96,14 @@ public class ServerFacade {
     public JoinResult joinGame(JoinRequest req, String authToken) {
         try {
             ConnectCommand command = new ConnectCommand(authToken, req.gameID(), req.playerColor());
-            connect(command);
+            sendCommand(command);
             return clientCommunicator.makeRequest("PUT", "/game", req, authToken, JoinResult.class);
         } catch (Exception ex) {
             return new JoinResult(ex.getMessage());
         }
     }
 
-    public void connect(ConnectCommand command) throws Exception {
+    public void sendCommand(UserGameCommand command) throws Exception {
         String commandJson = serializer.toJson(command);
         websocketCommunicator.send(commandJson);
     }

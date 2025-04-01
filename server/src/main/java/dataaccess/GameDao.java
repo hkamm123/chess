@@ -16,4 +16,6 @@ public interface GameDao {
     boolean containsID(Integer id) throws DataAccessException;
 
     void setPlayerColor(Integer gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException;
+
+    void removePlayerFromGame(String username, Integer gameID) throws DataAccessException;
 }

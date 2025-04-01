@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPosition;
 import client.ServerFacade;
@@ -8,6 +7,7 @@ import com.google.gson.Gson;
 import model.GameData;
 import server.*;
 import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -26,6 +26,7 @@ public class ChessClient implements ServerMessageObserver {
     private final String serverUrl;
     private List<GameData> games;
     private Gson serializer;
+    private int currentGameID;
 
     private enum State {
         LOGGEDIN,
@@ -46,6 +47,7 @@ public class ChessClient implements ServerMessageObserver {
         this.state = State.LOGGEDOUT;
         this.games = new ArrayList<GameData>();
         this.serializer = new Gson();
+        this.currentGameID = 0;
     }
 
     public String help() {
@@ -113,6 +115,7 @@ public class ChessClient implements ServerMessageObserver {
             case "o" -> observeGame();
             case "b" -> redrawBoard();
             case "hm" -> highlightMoves();
+            case "l" -> leaveGame();
             default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -236,6 +239,7 @@ public class ChessClient implements ServerMessageObserver {
         }
         int gameIndex = Integer.parseInt(gameNumber) - 1;
         int gameID = games.get(gameIndex).gameID();
+        currentGameID = gameID;
         String colorString = getInput("Enter the desired color ('w' for white and 'b' for black): ");
         ChessGame.TeamColor color = null;
         ChessBoardPrinter.Perspective perspective = null;
@@ -273,9 +277,10 @@ public class ChessClient implements ServerMessageObserver {
             return "Ope! Looks like you entered an invalid game number.\n" + help();
         }
         int gameIndex = Integer.parseInt(gameNumber) - 1;
+        currentGameID = games.get(gameIndex).gameID();
         currentPerspective = ChessBoardPrinter.Perspective.WHITE;
         try {
-            serverFacade.connect(new ConnectCommand(authToken, games.get(gameIndex).gameID(), null));
+            serverFacade.sendCommand(new ConnectCommand(authToken, currentGameID, null));
             state = State.OBSERVING;
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: take this out
@@ -314,6 +319,23 @@ public class ChessClient implements ServerMessageObserver {
             return "";
         } catch (Exception ex) {
             return "Ope! Looks like there was a problem. Please try again.";
+        }
+    }
+
+    private String leaveGame() {
+        if (state != State.INGAME && state != State.OBSERVING) {
+            return "Looks like you're not in a game.";
+        }
+        try {
+            serverFacade.sendCommand(new LeaveCommand(authToken, currentGameID));
+            currentGameID = 0;
+            currentGame = null;
+            currentPerspective = null;
+            state = State.LOGGEDIN;
+            return "";
+        } catch (Exception ex) {
+            ex.printStackTrace(); //TODO: hide this
+            return "Ope! Looks like an error has occurred. Please try again.";
         }
     }
 
