@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import model.GameData;
 
 import java.util.Collection;
@@ -18,4 +19,6 @@ public interface GameDao {
     void setPlayerColor(Integer gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException;
 
     void removePlayerFromGame(String username, Integer gameID) throws DataAccessException;
+
+    ChessGame makeMoveAndUpdate(int gameID, ChessMove move) throws DataAccessException;
 }

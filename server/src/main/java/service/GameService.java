@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
@@ -83,6 +84,17 @@ public class GameService {
         try {
             if (authDao.containsToken(authToken))
                 gameDao.removePlayerFromGame(username, gameID);
+        } catch (DataAccessException ex) {
+            throw new Exception(ex.getMessage());
+        }
+    }
+
+    public ChessGame makeMove(int gameID, String authToken, ChessMove move) throws Exception {
+        if (!authDao.containsToken(authToken)) {
+            throw new Exception("unauthorized");
+        }
+        try {
+            return gameDao.makeMoveAndUpdate(gameID, move);
         } catch (DataAccessException ex) {
             throw new Exception(ex.getMessage());
         }

@@ -1,13 +1,13 @@
 package ui;
 
-import chess.ChessGame;
-import chess.ChessPosition;
+import chess.*;
 import client.ServerFacade;
 import com.google.gson.Gson;
 import model.GameData;
 import server.*;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -19,6 +19,7 @@ import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageObserver {
@@ -116,6 +117,7 @@ public class ChessClient implements ServerMessageObserver {
             case "b" -> redrawBoard();
             case "hm" -> highlightMoves();
             case "l" -> leaveGame();
+            case "m" -> makeMove();
             default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -339,6 +341,60 @@ public class ChessClient implements ServerMessageObserver {
             ex.printStackTrace(); //TODO: hide this
             return "Ope! Looks like an error has occurred. Please try again.";
         }
+    }
+
+    private String makeMove() { // consider breaking the input handling into a separate method
+        if (state != State.INGAME) {
+            return "Ope! Looks like you're not currently playing a game.";
+        }
+
+        // handling inputs
+        String startPosInput = getInput("Please enter the position of the piece you would like to move: ");
+        String endPosInput = getInput("Please enter the position to which you'd like to move: ");
+        if (!isValidPosition(startPosInput) || !isValidPosition(endPosInput)) {
+            return "Ope! Looks like your input was invalid.";
+        }
+        ChessPosition startPos = getPositionFromInput(startPosInput);
+        ChessPosition endPos = getPositionFromInput(endPosInput);
+        ChessPiece.PieceType promotionPiece = null;
+        ChessPiece movingPiece = currentGame.getBoard().getPiece(startPos);
+        if (movingPiece.getPieceType() == PAWN) {
+            if ((currentPerspective == ChessBoardPrinter.Perspective.WHITE && endPos.getRow() == 8)
+                    || currentPerspective == ChessBoardPrinter.Perspective.BLACK && endPos.getRow() == 1) {
+                String promoPieceInput = getInput("Enter the type of piece you'd like to promote the pawn to: ");
+                try {
+                    promotionPiece = getPieceTypeFromInput(promoPieceInput);
+                } catch (IllegalStateException ex) {
+                    return "Ope! Looks like your input was invalid.";
+                }
+            }
+        }
+        ChessMove requestedMove = new ChessMove(startPos, endPos, promotionPiece);
+
+        // checking the move locally
+        if (!currentGame.validMoves(startPos).contains(requestedMove)) {
+            return "Ope! Looks like that move is not valid.";
+        }
+
+        // updating the board through websocket connection
+        MakeMoveCommand cmd = new MakeMoveCommand(authToken, currentGameID, requestedMove);
+        try {
+            serverFacade.sendCommand(cmd);
+        } catch (Exception ex) {
+            ex.printStackTrace(); // TODO: remove this and handle it before it gets to user
+            return "Ope! Looks like there was an error.";
+        }
+        return "";
+    }
+
+    private ChessPiece.PieceType getPieceTypeFromInput(String input) {
+        return switch (input.toLowerCase()) {
+            case "queen" -> QUEEN;
+            case "rook" -> ROOK;
+            case "bishop" -> BISHOP;
+            case "knight" -> KNIGHT;
+            default -> throw new IllegalStateException("invalid input");
+        };
     }
 
     private boolean isValidGameNumber(String gameNumber) {

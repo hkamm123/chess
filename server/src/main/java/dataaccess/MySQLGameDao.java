@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 
@@ -220,6 +222,41 @@ public class MySQLGameDao implements GameDao {
                     preparedStatement.setInt(2, gameID);
                     preparedStatement.executeUpdate();
                 }
+            }
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException("Error: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public ChessGame makeMoveAndUpdate(int gameID, ChessMove move) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String gameJson = null;
+            String queryStatement = "SELECT chessGameJson FROM games WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                preparedStatement.setInt(1, gameID);
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    gameJson = resultSet.getString(1);
+                }
+                if (gameJson == null) {
+                    throw new DataAccessException("Could not find game in database.");
+                }
+            }
+
+            ChessGame game = serializer.fromJson(gameJson, ChessGame.class);
+            try {
+                game.makeMove(move);
+            } catch (InvalidMoveException ex) {
+                throw new DataAccessException("Invalid move.");
+            }
+
+            String updateStatement = "UPDATE games SET chessGameJson = ? WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(updateStatement)) {
+                preparedStatement.setString(1, serializer.toJson(game));
+                preparedStatement.setInt(2, gameID);
+                preparedStatement.executeUpdate();
+                return game;
             }
         } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException("Error: " + ex.getMessage());

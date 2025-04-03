@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -72,6 +73,11 @@ public class MemoryGameDao implements GameDao {
     @Override
     public void removePlayerFromGame(String username, Integer gameID) throws DataAccessException {
 
+    }
+
+    @Override
+    public ChessGame makeMoveAndUpdate(int gameID, ChessMove move) {
+        return null;
     }
 
     @Override

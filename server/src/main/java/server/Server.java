@@ -146,15 +146,8 @@ public class Server {
         return response.body();
     }
 
-    private void makeMove(Session session, String username, MakeMoveCommand command) {
-        //TODO: implement
-        // the purpose of this is not a new endpoint, but just updating the game in the database
-        // this will require corresponding methods in GameService and GameDAO
-    }
-
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
-        //TODO: implement
         try {
             UserGameCommand command = serializer.fromJson(message, UserGameCommand.class);
 
@@ -194,6 +187,26 @@ public class Server {
         } catch (IOException ex) {
             throw new RuntimeException(ex.getMessage());
         }
+    }
+
+    private void makeMove(Session session, String username, MakeMoveCommand command) {
+        try {
+            ChessGame updatedGame = gameService.makeMove(command.getGameID(), command.getAuthToken(), command.getMove());
+
+            for (Session s : sessions.get(command.getGameID())) {
+                sendMessage(s, new LoadGameMessage(serializer.toJson(updatedGame)));
+                sendMessage(s, new NotificationMessage(username + " made move " + command.getMove().toString()));
+            }
+            checkForDanger(command.getGameID(), updatedGame);
+        } catch (Exception ex) {
+            sendMessage(session, new ErrorMessage(ex.getMessage())); // TODO: handle this better if needed
+        }
+    }
+
+    private void checkForDanger(int gameID, ChessGame updatedGame) {
+        // TODO: implement
+        // somehow get the username of the white and black players
+        // check for check, stalemate, and checkmate, sending NotificationMessages accordingly to all players/observers
     }
 
     private void connect(Session session, String username, ConnectCommand command) {
