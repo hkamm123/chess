@@ -81,6 +81,11 @@ public class MemoryGameDao implements GameDao {
     }
 
     @Override
+    public String[] getUsernames(int gameID) {
+        return new String[0];
+    }
+
+    @Override
     public void clear() {
         games = new ArrayList<>();
         nextID = 1;

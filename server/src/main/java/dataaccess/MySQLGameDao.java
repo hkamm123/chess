@@ -6,6 +6,7 @@ import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.GameData;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -175,24 +176,7 @@ public class MySQLGameDao implements GameDao {
     @Override
     public void removePlayerFromGame(String username, Integer gameID) throws DataAccessException {
         try (var conn = getConnection()) {
-            int[] userIDs = new int[]{0,0};
-            // get the whiteUserID from the selected game
-            String queryStatement = "SELECT whiteUserID FROM games WHERE " + "gameID = " + gameID;
-            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
-                var resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    userIDs[0] = resultSet.getInt(1);
-                }
-            }
-
-            // get the blackUserID from the selected game
-            queryStatement = queryStatement.replace("whiteUserID", "blackUserID");
-            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
-                var resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    userIDs[1] = resultSet.getInt(1);
-                }
-            }
+            int[] userIDs = getUserIDsFromGame(gameID);
 
             // get the userID based on the given username
             int userID = 0;
@@ -248,7 +232,7 @@ public class MySQLGameDao implements GameDao {
             try {
                 game.makeMove(move);
             } catch (InvalidMoveException ex) {
-                throw new DataAccessException("Invalid move.");
+                throw new DataAccessException("Ope! Looks like that move is not valid.");
             }
 
             String updateStatement = "UPDATE games SET chessGameJson = ? WHERE gameID = ?";
@@ -259,7 +243,37 @@ public class MySQLGameDao implements GameDao {
                 return game;
             }
         } catch (DataAccessException | SQLException ex) {
-            throw new DataAccessException("Error: " + ex.getMessage());
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public String[] getUsernames(int gameID) throws DataAccessException {
+        try (var conn = getConnection()) {
+            int[] userIDs = getUserIDsFromGame(gameID);
+            String[] usernames = new String[]{null, null};
+
+            String queryStatement = "SELECT username FROM users WHERE userID = ?";
+            // finding the white username
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                preparedStatement.setInt(1, userIDs[0]);
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    usernames[0] = resultSet.getString(1);
+                }
+            }
+
+            // finding the black username
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                preparedStatement.setInt(1, userIDs[1]);
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    usernames[1] = resultSet.getString(1);
+                }
+            }
+            return usernames;
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
@@ -269,6 +283,33 @@ public class MySQLGameDao implements GameDao {
             preparedStatement.execute();
         } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException("Error: " + ex.getMessage());
+        }
+    }
+
+    private int[] getUserIDsFromGame(int gameID) throws DataAccessException {
+        try (var conn = getConnection()) {
+            int[] userIDs = new int[]{0,0};
+            // get the whiteUserID from the selected game
+            String queryStatement = "SELECT whiteUserID FROM games WHERE " + "gameID = " + gameID;
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userIDs[0] = resultSet.getInt(1);
+                }
+            }
+
+            // get the blackUserID from the selected game
+            queryStatement = queryStatement.replace("whiteUserID", "blackUserID");
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    userIDs[1] = resultSet.getInt(1);
+                }
+            }
+
+            return userIDs;
+        } catch (DataAccessException | SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
         }
     }
 }

@@ -99,4 +99,12 @@ public class GameService {
             throw new Exception(ex.getMessage());
         }
     }
+
+    public String[] getUsernames(int gameID) throws Exception {
+        try {
+            return gameDao.getUsernames(gameID);
+        } catch (DataAccessException ex) {
+            throw new Exception(ex.getMessage());
+        }
+    }
 }

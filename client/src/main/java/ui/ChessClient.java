@@ -373,7 +373,7 @@ public class ChessClient implements ServerMessageObserver {
 
         // checking the move locally
         if (!currentGame.validMoves(startPos).contains(requestedMove)) {
-            return "Ope! Looks like that move is not valid.";
+            return SET_TEXT_COLOR_RED + "Ope! Looks like that move is not valid." + SET_TEXT_COLOR_WHITE;
         }
 
         // updating the board through websocket connection

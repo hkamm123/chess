@@ -21,4 +21,6 @@ public interface GameDao {
     void removePlayerFromGame(String username, Integer gameID) throws DataAccessException;
 
     ChessGame makeMoveAndUpdate(int gameID, ChessMove move) throws DataAccessException;
+
+    String[] getUsernames(int gameID) throws DataAccessException;
 }

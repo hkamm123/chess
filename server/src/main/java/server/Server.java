@@ -203,10 +203,34 @@ public class Server {
         }
     }
 
-    private void checkForDanger(int gameID, ChessGame updatedGame) {
+    private void checkForDanger(int gameID, ChessGame game) throws Exception {
         // TODO: implement
         // somehow get the username of the white and black players
+        String[] usernames = gameService.getUsernames(gameID);
+        String whiteUsername = usernames[0];
+        String blackUsername = usernames[1];
+
         // check for check, stalemate, and checkmate, sending NotificationMessages accordingly to all players/observers
+        checkColorForDanger(gameID, whiteUsername, WHITE, game);
+        checkColorForDanger(gameID, blackUsername, BLACK, game);
+    }
+
+    private void checkColorForDanger(int gameID, String username, ChessGame.TeamColor color, ChessGame game) {
+        if (username != null && game.isInCheckmate(color)) {
+            for (Session s : sessions.get(gameID)) {
+                sendMessage(s, new NotificationMessage(username + " is in checkmate."));
+            }
+        } else if (username != null && game.isInStalemate(color)) {
+            for (Session s : sessions.get(gameID)) {
+                sendMessage(s, new NotificationMessage(username + " is in stalemate."));
+            }
+        } else {
+            if (username != null && game.isInCheck(color)) {
+                for (Session s : sessions.get(gameID)) {
+                    sendMessage(s, new NotificationMessage(username + " is in check."));
+                }
+            }
+        }
     }
 
     private void connect(Session session, String username, ConnectCommand command) {
