@@ -299,7 +299,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String redrawBoard() {
-        if (state != State.INGAME && state != State.OBSERVING) {
+        if (state != State.INGAME && state != State.OBSERVING && state != State.GAMEOVER) {
             return "Looks like you're not currently in a game.";
         }
         if (currentGame == null || currentPerspective == null) { // these are set when the user joins or observes
@@ -330,7 +330,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String leaveGame() {
-        if (state != State.INGAME && state != State.OBSERVING) {
+        if (state != State.INGAME && state != State.OBSERVING && state != State.GAMEOVER) {
             return "Looks like you're not in a game.";
         }
         try {
