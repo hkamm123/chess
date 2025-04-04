@@ -8,6 +8,7 @@ import server.*;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -33,7 +34,8 @@ public class ChessClient implements ServerMessageObserver {
         PREGAME,
         LOGGEDOUT,
         INGAME,
-        OBSERVING
+        OBSERVING,
+        GAMEOVER
     }
 
     private State state;
@@ -98,7 +100,7 @@ public class ChessClient implements ServerMessageObserver {
             case PREGAME -> postLoginMenu;
             case LOGGEDOUT -> preLoginMenu;
             case INGAME -> inGameMenu;
-            case OBSERVING -> observingMenu;
+            case OBSERVING, GAMEOVER -> observingMenu;
         };
     }
 
@@ -118,6 +120,7 @@ public class ChessClient implements ServerMessageObserver {
             case "hm" -> highlightMoves();
             case "l" -> leaveGame();
             case "m" -> makeMove();
+            case "rs" -> resign();
             default -> "Ope! That command is not recognized. Please enter 'h' for a list of possible commands.";
         };
     }
@@ -382,6 +385,21 @@ public class ChessClient implements ServerMessageObserver {
             serverFacade.sendCommand(cmd);
         } catch (Exception ex) {
             ex.printStackTrace(); // TODO: remove this and handle it before it gets to user
+            return "Ope! Looks like there was an error.";
+        }
+        return "";
+    }
+
+    private String resign() {
+        if (state != State.INGAME) {
+            return "Ope! Looks like you're not currently playing a game.";
+        }
+        ResignCommand cmd = new ResignCommand(authToken, currentGameID);
+        try {
+            serverFacade.sendCommand(cmd);
+            state = State.GAMEOVER;
+        } catch (Exception ex) {
+            ex.printStackTrace(); // TODO: handle this better
             return "Ope! Looks like there was an error.";
         }
         return "";

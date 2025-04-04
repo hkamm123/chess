@@ -218,11 +218,11 @@ public class Server {
     private void checkColorForDanger(int gameID, String username, ChessGame.TeamColor color, ChessGame game) {
         if (username != null && game.isInCheckmate(color)) {
             for (Session s : sessions.get(gameID)) {
-                sendMessage(s, new NotificationMessage(username + " is in checkmate."));
+                sendMessage(s, new NotificationMessage(username + " is in checkmate. Game is over."));
             }
         } else if (username != null && game.isInStalemate(color)) {
             for (Session s : sessions.get(gameID)) {
-                sendMessage(s, new NotificationMessage(username + " is in stalemate."));
+                sendMessage(s, new NotificationMessage("Stalemate. Game is over."));
             }
         } else {
             if (username != null && game.isInCheck(color)) {
@@ -260,7 +260,6 @@ public class Server {
     }
 
     private void leaveGame(Session session, String username, LeaveCommand command) {
-        // TODO: implement
         try {
             gameService.removePlayerFromGame(username, command.getGameID(), command.getAuthToken());
             removeSession(command.getGameID(), session);
@@ -273,7 +272,15 @@ public class Server {
     }
 
     private void resign(Session session, String username, ResignCommand command) {
-        // TODO: implement
+        try {
+            if (authDao.containsToken(command.getAuthToken())) {
+                for (Session s : sessions.get(command.getGameID())) {
+                    sendMessage(s, new NotificationMessage(username + " has resigned. Game is over."));
+                }
+            }
+        } catch (DataAccessException ex) {
+            sendMessage(session, new ErrorMessage("Unexpected error. Please try again."));
+        }
     }
 
     public void stop() {
