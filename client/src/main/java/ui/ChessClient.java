@@ -137,6 +137,9 @@ public class ChessClient implements ServerMessageObserver {
 
     private void displayNotification(String msg) {
         System.out.println(SET_TEXT_COLOR_GREEN + msg + SET_TEXT_COLOR_WHITE);
+        if (msg.contains("Game is over.")) {
+            state = State.GAMEOVER;
+        }
     }
 
     private void displayError(String msg) {
