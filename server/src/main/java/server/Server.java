@@ -195,7 +195,9 @@ public class Server {
 
             for (Session s : sessions.get(command.getGameID())) {
                 sendMessage(s, new LoadGameMessage(serializer.toJson(updatedGame)));
-                sendMessage(s, new NotificationMessage(username + " made move " + command.getMove().toString()));
+                if (s != session) {
+                    sendMessage(s, new NotificationMessage(username + " made move " + command.getMove().toString()));
+                }
             }
             checkForDanger(command.getGameID(), updatedGame);
         } catch (Exception ex) {
