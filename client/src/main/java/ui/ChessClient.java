@@ -96,11 +96,18 @@ public class ChessClient implements ServerMessageObserver {
                 'hm' - highlight legal moves
                 """;
 
+        String gameOverMenu = """
+                'h' - display a list of commands
+                'b' - redraw chess board
+                'l' - leave game
+                """;
+
         return switch(state) {
             case PREGAME -> postLoginMenu;
             case LOGGEDOUT -> preLoginMenu;
             case INGAME -> inGameMenu;
-            case OBSERVING, GAMEOVER -> observingMenu;
+            case OBSERVING -> observingMenu;
+            case GAMEOVER -> gameOverMenu;
         };
     }
 
@@ -313,8 +320,10 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String highlightMoves() {
-        if (state != State.INGAME && state != State.OBSERVING) {
+        if (state != State.INGAME && state != State.OBSERVING && state != State.GAMEOVER) {
             return "Looks like you're not currently in a game.";
+        } else if (state == State.GAMEOVER) {
+            return "The game is over. There are no legal moves.";
         }
         String input = getInput(
                 "Please enter the position of the piece whose moves you want to highlight.\n" +
