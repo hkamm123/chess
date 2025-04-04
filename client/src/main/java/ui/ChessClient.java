@@ -172,6 +172,9 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String login() {
+        if (state != State.LOGGEDOUT) {
+            return "Ope! Looks like you're already logged in.";
+        }
         String username = getInput("Please enter your username: ");
         String password = getInput("Please enter your password: ");
         RegisterResult result = serverFacade.login(new LoginRequest(username, password));
@@ -187,7 +190,7 @@ public class ChessClient implements ServerMessageObserver {
     private String logout() {
         if (state == State.LOGGEDOUT) {
             return "It looks like you're not logged in.";
-        } else if (state == State.INGAME || state == State.OBSERVING) {
+        } else if (state == State.INGAME || state == State.OBSERVING || state == State.GAMEOVER) {
             return "Please leave the current game to logout.";
         }
         LogoutResult result = serverFacade.logout(authToken);
@@ -202,7 +205,11 @@ public class ChessClient implements ServerMessageObserver {
 
     private String createGame() {
         if (state != State.PREGAME) {
-            return "Please login to create a game.";
+            if (state == State.LOGGEDOUT) {
+                return "Please login to create a game.";
+            } else {
+                return "Please leave the current game to create a new one.";
+            }
         }
         String gameName = getInput("Please enter a game name: ");
         CreateResult result = serverFacade.createGame(new CreateRequest(gameName), authToken);
@@ -214,7 +221,11 @@ public class ChessClient implements ServerMessageObserver {
 
     private String listGames() {
         if (state != State.PREGAME) {
-            return "Please login to see games.";
+            if (state == State.LOGGEDOUT) {
+                return "Please login to see games.";
+            } else {
+                return "Please leave the current game to list games.";
+            }
         }
         ListResult result = serverFacade.listGames(authToken);
         if (result.message() != null) {
@@ -247,7 +258,11 @@ public class ChessClient implements ServerMessageObserver {
 
     private String joinGame() {
         if (state != State.PREGAME) {
-            return "Please login to join a game.";
+            if (state == State.LOGGEDOUT) {
+                return "Please login to join a game.";
+            } else {
+                return "Please leave the current game to join another one.";
+            }
         }
         System.out.print(listGames());
         String gameNumber = getInput("Please enter the number of the game you wish to join: ");
@@ -286,7 +301,11 @@ public class ChessClient implements ServerMessageObserver {
 
     private String observeGame() {
         if (state != State.PREGAME) {
-            return "Please login to observe a game.";
+            if (state == State.LOGGEDOUT) {
+                return "Please login to observe a game.";
+            } else {
+                return "Please leave the current game to observe another one.";
+            }
         }
         System.out.print(listGames());
         String gameNumber = getInput("Please enter the number of the game you wish to observe: ");
