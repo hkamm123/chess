@@ -16,6 +16,7 @@ import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -424,6 +425,10 @@ public class ChessClient implements ServerMessageObserver {
     private String resign() {
         if (state != State.INGAME) {
             return "Ope! Looks like you're not currently playing a game.";
+        }
+        String confirmation = getInput("Are you sure you want to resign? (y/n)");
+        if (!confirmation.equalsIgnoreCase("y")) {
+            return "Resign cancelled. Please continue.";
         }
         ResignCommand cmd = new ResignCommand(authToken, currentGameID);
         try {
