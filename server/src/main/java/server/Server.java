@@ -36,6 +36,7 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private final HashMap<Integer, Set<Session>> sessions;
+    private final HashMap<Integer, Set<String>> resignedPlayers;
 
     public Server() {
         try {
@@ -45,6 +46,7 @@ public class Server {
             userService = new UserService(userDao, authDao);
             gameService = new GameService(gameDao, authDao);
             sessions = new HashMap<>();
+            resignedPlayers = new HashMap<>();
         } catch (DataAccessException ex) {
             throw new RuntimeException("Error initializing server: " + ex.getMessage());
         }
@@ -191,7 +193,7 @@ public class Server {
 
     private void makeMove(Session session, String username, MakeMoveCommand command) {
         try {
-            ChessGame updatedGame = gameService.makeMove(command.getGameID(), command.getAuthToken(), command.getMove());
+            ChessGame updatedGame = gameService.makeMove(command.getGameID(), command.getAuthToken(), username, command.getMove());
 
             for (Session s : sessions.get(command.getGameID())) {
                 sendMessage(s, new LoadGameMessage(serializer.toJson(updatedGame)));
@@ -245,6 +247,7 @@ public class Server {
         }
         if (game == null) {
             sendMessage(session, new ErrorMessage("Error: could not find game."));
+            return;
         } else {
             sendMessage(session, new LoadGameMessage(serializer.toJson(game)));
         }

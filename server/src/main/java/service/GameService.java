@@ -5,10 +5,15 @@ import chess.ChessMove;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
+import model.GameData;
 import server.*;
 
 import javax.xml.crypto.Data;
 
+import java.util.Collection;
+
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 import static dataaccess.UserDao.BAD_REQUEST_ERR_MSG;
 import static dataaccess.UserDao.USER_TAKEN_ERR_MSG;
 import static service.UserService.UNAUTHORIZED_ERR_MSG;
@@ -52,8 +57,8 @@ public class GameService {
             }
             if (req.gameID() == null || !gameDao.containsID(req.gameID()) // no ID or bad ID
                     || req.playerColor() == null // null color
-                    || req.playerColor() != ChessGame.TeamColor.WHITE) {
-                if (req.playerColor() != ChessGame.TeamColor.BLACK) { // color not white or black
+                    || req.playerColor() != WHITE) {
+                if (req.playerColor() != BLACK) { // color not white or black
                     return new JoinResult(BAD_REQUEST_ERR_MSG);
                 }
             }
@@ -89,11 +94,32 @@ public class GameService {
         }
     }
 
-    public ChessGame makeMove(int gameID, String authToken, ChessMove move) throws Exception {
+    public ChessGame makeMove(int gameID, String authToken, String username, ChessMove move) throws Exception {
         if (!authDao.containsToken(authToken)) {
             throw new Exception("unauthorized");
         }
         try {
+            String whiteUsername = null;
+            String blackUsername = null;
+            ChessGame game = null;
+            Collection<GameData> games = listGames(authToken).games();
+            for (GameData gd : games) {
+                if (gd.gameID() == gameID) {
+                    game = gd.game();
+                    whiteUsername = gd.whiteUsername();
+                    blackUsername = gd.blackUsername();
+                }
+            }
+            if (game == null) {
+                throw new DataAccessException("Error: could not find requested game.");
+            }
+            ChessGame.TeamColor pieceColor = game.getBoard().getPiece(move.getStartPosition()).getTeamColor();
+            if (pieceColor == WHITE && (whiteUsername == null || !whiteUsername.equals(username))) {
+                throw new DataAccessException("Error: this user cannot move this piece.");
+            }
+            if (pieceColor == BLACK && (blackUsername == null || !blackUsername.equals(username))) {
+                throw new DataAccessException("Error: this user cannot move this piece.");
+            }
             return gameDao.makeMoveAndUpdate(gameID, move);
         } catch (DataAccessException ex) {
             throw new Exception(ex.getMessage());
