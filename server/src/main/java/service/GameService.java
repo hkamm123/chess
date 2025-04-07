@@ -87,8 +87,9 @@ public class GameService {
 
     public void removePlayerFromGame(String username, Integer gameID, String authToken) throws Exception {
         try {
-            if (authDao.containsToken(authToken))
+            if (authDao.containsToken(authToken)) {
                 gameDao.removePlayerFromGame(username, gameID);
+            }
         } catch (DataAccessException ex) {
             throw new Exception(ex.getMessage());
         }

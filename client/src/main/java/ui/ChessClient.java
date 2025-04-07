@@ -150,7 +150,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private void displayError(String msg) {
-        System.out.println(SET_TEXT_COLOR_RED + msg + SET_TEXT_COLOR_WHITE); // TODO: hide these messages from the user
+        System.out.println(SET_TEXT_COLOR_RED + msg + SET_TEXT_COLOR_WHITE);
     }
 
     private void loadGame(LoadGameMessage message) {
@@ -319,11 +319,9 @@ public class ChessClient implements ServerMessageObserver {
             serverFacade.sendCommand(new ConnectCommand(authToken, currentGameID, null));
             state = State.OBSERVING;
         } catch (Exception ex) {
-            ex.printStackTrace(); // TODO: take this out
-            return "Ope! Looks like there was an error. Please try again.";
+            displayError("Ope! Looks like there was an error. Please try again.");
+            return "";
         }
-//        currentGame = games.get(gameIndex).game();
-//        ChessBoardPrinter.drawBoard(currentGame, currentPerspective, null);
         return help();
     }
 
@@ -356,7 +354,8 @@ public class ChessClient implements ServerMessageObserver {
             ChessBoardPrinter.drawBoard(currentGame, currentPerspective, piecePosition);
             return "";
         } catch (Exception ex) {
-            return "Ope! Looks like there was a problem. Please try again.";
+            displayError("Ope! Looks like there was a problem. Please try again.");
+            return "";
         }
     }
 
@@ -372,8 +371,8 @@ public class ChessClient implements ServerMessageObserver {
             state = State.PREGAME;
             return "";
         } catch (Exception ex) {
-            ex.printStackTrace(); //TODO: hide this
-            return "Ope! Looks like an error has occurred. Please try again.";
+            displayError("Ope! Looks like an error has occurred. Please try again.");
+            return "";
         }
     }
 
@@ -415,8 +414,7 @@ public class ChessClient implements ServerMessageObserver {
         try {
             serverFacade.sendCommand(cmd);
         } catch (Exception ex) {
-            ex.printStackTrace(); // TODO: remove this and handle it before it gets to user
-            return "Ope! Looks like there was an error.";
+            displayError("Ope! Looks like there was an error.");
         }
         return "";
     }
@@ -434,8 +432,7 @@ public class ChessClient implements ServerMessageObserver {
             serverFacade.sendCommand(cmd);
             state = State.GAMEOVER;
         } catch (Exception ex) {
-            ex.printStackTrace(); // TODO: handle this better
-            return "Ope! Looks like there was an error.";
+            displayError("Ope! Looks like there was an error.");
         }
         return "";
     }

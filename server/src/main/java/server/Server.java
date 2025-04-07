@@ -202,13 +202,11 @@ public class Server {
             }
             checkForDanger(command.getGameID(), updatedGame);
         } catch (Exception ex) {
-            sendMessage(session, new ErrorMessage(ex.getMessage())); // TODO: handle this better if needed
+            sendMessage(session, new ErrorMessage("Unexpected error. Please try again."));
         }
     }
 
     private void checkForDanger(int gameID, ChessGame game) throws Exception {
-        // TODO: implement
-        // somehow get the username of the white and black players
         String[] usernames = gameService.getUsernames(gameID);
         String whiteUsername = usernames[0];
         String blackUsername = usernames[1];
@@ -258,7 +256,7 @@ public class Server {
         }
         for (Session s : sessions.get(command.getGameID())) {
             if (s != session) {
-                sendMessage(s, new NotificationMessage(username + " has joined the game" + notificationAppendage)); // TODO: as b/w/observer
+                sendMessage(s, new NotificationMessage(username + " has joined the game" + notificationAppendage));
             }
         }
     }
@@ -276,7 +274,6 @@ public class Server {
     }
 
     private void resign(Session session, String username, ResignCommand command) {
-        // TODO: make a "gameOver" flag in the games db table
         try {
             if (!authDao.containsToken(command.getAuthToken())) {
                 throw new DataAccessException("Error: unauthorized.");

@@ -33,9 +33,7 @@ public class WebsocketCommunicator extends Endpoint {
     }
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {
-        System.out.println("WS connection opened"); //  TODO: remove this after debugging
         this.session = session;
-
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) {
                 try {
