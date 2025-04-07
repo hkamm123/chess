@@ -1,7 +1,6 @@
 package ui;
 
 import com.google.gson.Gson;
-import server.ServerMessageObserver;
 import websocket.messages.ErrorMessage;
 
 import javax.websocket.*;

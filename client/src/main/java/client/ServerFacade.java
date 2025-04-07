@@ -2,9 +2,9 @@ package client;
 
 import com.google.gson.Gson;
 import server.*;
+import ui.ServerMessageObserver;
 import ui.WebsocketCommunicator;
 import websocket.commands.ConnectCommand;
-import websocket.commands.LeaveCommand;
 import websocket.commands.UserGameCommand;
 
 public class ServerFacade {

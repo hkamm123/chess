@@ -16,7 +16,6 @@ import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.BLACK;
