@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ChessGame {
     private ChessBoard board = new ChessBoard();
     private TeamColor teamTurn = TeamColor.WHITE;
+    private boolean gameOverFlag = false;
 
     public ChessGame() {
         this.board.resetBoard();
@@ -23,6 +24,15 @@ public class ChessGame {
     private ChessGame(ChessGame game) {
         this.board = game.board.clone();
         this.teamTurn = game.teamTurn;
+        this.gameOverFlag = game.isOver();
+    }
+
+    public boolean isOver() {
+        return gameOverFlag;
+    }
+
+    public void setGameOverFlag(boolean bool) {
+        gameOverFlag = bool;
     }
 
     /**
@@ -58,6 +68,9 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        if (isOver()) {
+            return new ArrayList<>(); // no moves are valid if the game is over
+        }
         ChessPiece currentPiece = board.getPiece(startPosition);
         if (currentPiece == null) {
             return null;

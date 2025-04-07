@@ -133,4 +133,8 @@ public class GameService {
             throw new Exception(ex.getMessage());
         }
     }
+
+    public void setGameToOver(Integer gameID) throws DataAccessException {
+        gameDao.setGameToOver(gameID);
+    }
 }

@@ -278,7 +278,6 @@ public class Server {
 
     private void resign(Session session, String username, ResignCommand command) {
         // TODO: make a "gameOver" flag in the games db table
-        // TODO: check if the user trying to resign is actually a player in the game (not an observer)
         try {
             if (!authDao.containsToken(command.getAuthToken())) {
                 throw new DataAccessException("Error: unauthorized.");
@@ -296,6 +295,7 @@ public class Server {
                     (whiteUsername != null && whiteUsername.equals(username)) ||
                             (blackUsername != null && blackUsername.equals(username))
             ) {
+                gameService.setGameToOver(command.getGameID());
                 for (Session s : sessions.get(command.getGameID())) {
                     sendMessage(s, new NotificationMessage(username + " has resigned. Game is over."));
                 }

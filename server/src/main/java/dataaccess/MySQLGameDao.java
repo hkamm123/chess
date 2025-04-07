@@ -215,33 +215,15 @@ public class MySQLGameDao implements GameDao {
     @Override
     public ChessGame makeMoveAndUpdate(int gameID, ChessMove move) throws DataAccessException {
         try (var conn = getConnection()) {
-            String gameJson = null;
-            String queryStatement = "SELECT chessGameJson FROM games WHERE gameID = ?";
-            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
-                preparedStatement.setInt(1, gameID);
-                var resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) {
-                    gameJson = resultSet.getString(1);
-                }
-                if (gameJson == null) {
-                    throw new DataAccessException("Could not find game in database.");
-                }
-            }
-
-            ChessGame game = serializer.fromJson(gameJson, ChessGame.class);
+            ChessGame game = getGameByID(gameID);
             try {
                 game.makeMove(move);
             } catch (InvalidMoveException ex) {
                 throw new DataAccessException("Ope! Looks like that move is not valid.");
             }
 
-            String updateStatement = "UPDATE games SET chessGameJson = ? WHERE gameID = ?";
-            try (var preparedStatement = conn.prepareStatement(updateStatement)) {
-                preparedStatement.setString(1, serializer.toJson(game));
-                preparedStatement.setInt(2, gameID);
-                preparedStatement.executeUpdate();
-                return game;
-            }
+            updateGame(gameID, game);
+            return game;
         } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException(ex.getMessage());
         }
@@ -278,11 +260,56 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
+    public void setGameToOver(Integer gameID) throws DataAccessException {
+        ChessGame game = getGameByID(gameID);
+        if (game.isOver()) {
+            throw new DataAccessException("Game is already over.");
+        } else {
+            game.setGameOverFlag(true);
+            updateGame(gameID, game);
+        }
+    }
+
+    @Override
     public void clear() throws DataAccessException {
         try (var preparedStatement = getConnection().prepareStatement("DELETE FROM games")) {
             preparedStatement.execute();
         } catch (DataAccessException | SQLException ex) {
             throw new DataAccessException("Error: " + ex.getMessage());
+        }
+    }
+
+    private ChessGame getGameByID(int gameID) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String gameJson = null;
+            String queryStatement = "SELECT chessGameJson FROM games WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(queryStatement)) {
+                preparedStatement.setInt(1, gameID);
+                var resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    gameJson = resultSet.getString(1);
+                }
+                if (gameJson == null) {
+                    throw new DataAccessException("Could not find game in database.");
+                }
+            }
+
+            return serializer.fromJson(gameJson, ChessGame.class);
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
+    }
+
+    private void updateGame(int gameID, ChessGame game) throws DataAccessException {
+        try (var conn = getConnection()) {
+            String updateStatement = "UPDATE games SET chessGameJson = ? WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(updateStatement)) {
+                preparedStatement.setString(1, serializer.toJson(game));
+                preparedStatement.setInt(2, gameID);
+                preparedStatement.executeUpdate();
+            }
+        } catch (Exception ex) {
+            throw new DataAccessException(ex.getMessage());
         }
     }
 

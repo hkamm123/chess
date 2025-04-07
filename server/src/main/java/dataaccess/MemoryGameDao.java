@@ -86,6 +86,11 @@ public class MemoryGameDao implements GameDao {
     }
 
     @Override
+    public void setGameToOver(Integer gameID) {
+
+    }
+
+    @Override
     public void clear() {
         games = new ArrayList<>();
         nextID = 1;

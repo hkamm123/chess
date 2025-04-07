@@ -23,4 +23,6 @@ public interface GameDao {
     ChessGame makeMoveAndUpdate(int gameID, ChessMove move) throws DataAccessException;
 
     String[] getUsernames(int gameID) throws DataAccessException;
+
+    void setGameToOver(Integer gameID) throws DataAccessException;
 }
