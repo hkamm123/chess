@@ -202,7 +202,8 @@ public class Server {
             }
             checkForDanger(command.getGameID(), updatedGame);
         } catch (Exception ex) {
-            sendMessage(session, new ErrorMessage("Unexpected error. Please try again."));
+            sendMessage(session, new ErrorMessage("Ope! An error has occurred. " +
+                    "Please make sure your move is valid and try again."));
         }
     }
 

@@ -448,7 +448,11 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private boolean isValidGameNumber(String gameNumber) {
-        return (gameNumber.matches("\\d+") && (Integer.parseInt(gameNumber) - 1 < games.size()));
+        return (
+                gameNumber.matches("\\d+")
+                && (Integer.parseInt(gameNumber) - 1 < games.size())
+                && (Integer.parseInt(gameNumber) >= 1)
+        );
     }
 
     private String getInput(String prompt) {
