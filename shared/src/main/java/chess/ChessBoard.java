@@ -59,14 +59,14 @@ public class ChessBoard {
         addPiece(new ChessPosition(1, 7), new ChessPiece(WHITE, KNIGHT));
         addPiece(new ChessPosition(1, 8), new ChessPiece(WHITE, ROOK));
 
-        addPiece(new ChessPosition(8, 1), new ChessPiece(WHITE, ROOK));
-        addPiece(new ChessPosition(8, 2), new ChessPiece(WHITE, KNIGHT));
-        addPiece(new ChessPosition(8, 3), new ChessPiece(WHITE, BISHOP));
-        addPiece(new ChessPosition(8, 4), new ChessPiece(WHITE, QUEEN));
-        addPiece(new ChessPosition(8, 5), new ChessPiece(WHITE, KING));
-        addPiece(new ChessPosition(8, 6), new ChessPiece(WHITE, BISHOP));
-        addPiece(new ChessPosition(8, 7), new ChessPiece(WHITE, KNIGHT));
-        addPiece(new ChessPosition(8, 8), new ChessPiece(WHITE, ROOK));
+        addPiece(new ChessPosition(8, 1), new ChessPiece(BLACK, ROOK));
+        addPiece(new ChessPosition(8, 2), new ChessPiece(BLACK, KNIGHT));
+        addPiece(new ChessPosition(8, 3), new ChessPiece(BLACK, BISHOP));
+        addPiece(new ChessPosition(8, 4), new ChessPiece(BLACK, QUEEN));
+        addPiece(new ChessPosition(8, 5), new ChessPiece(BLACK, KING));
+        addPiece(new ChessPosition(8, 6), new ChessPiece(BLACK, BISHOP));
+        addPiece(new ChessPosition(8, 7), new ChessPiece(BLACK, KNIGHT));
+        addPiece(new ChessPosition(8, 8), new ChessPiece(BLACK, ROOK));
     }
 
     @Override
@@ -81,5 +81,24 @@ public class ChessBoard {
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(squares);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder out = new StringBuilder();
+        for (int i = 8; i >= 1; i--) {
+            // add each piece in the row, starting with row 8
+            for (int j = 1; j <= 8; j++) {
+                out.append("|");
+                ChessPiece piece = getPiece(new ChessPosition(i, j));
+                if (piece != null) {
+                    out.append(getPiece(new ChessPosition(i, j)).toString());
+                } else {
+                    out.append(" ");
+                }
+            }
+            out.append("|\n");
+        }
+        return out.toString();
     }
 }
