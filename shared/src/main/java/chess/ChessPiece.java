@@ -3,6 +3,8 @@ package chess;
 import java.util.Collection;
 import java.util.Objects;
 
+import static chess.ChessGame.TeamColor.WHITE;
+
 /**
  * Represents a single chess piece
  * <p>
@@ -67,5 +69,21 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(color, type);
+    }
+
+    @Override
+    public String toString() {
+        String letter = switch(type) {
+            case PAWN -> "p";
+            case ROOK -> "r";
+            case KNIGHT -> "n";
+            case BISHOP -> "b";
+            case KING -> "k";
+            case QUEEN -> "q";
+        };
+        if (color == WHITE) {
+            return letter.toUpperCase();
+        }
+        return letter;
     }
 }
