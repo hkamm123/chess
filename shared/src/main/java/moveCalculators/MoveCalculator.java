@@ -19,6 +19,9 @@ public interface MoveCalculator {
      * @return true if square is empty or contains a piece of color opposite myColor, false otherwise
      */
     default boolean checkSquare(ChessPosition square, ChessBoard board, ChessGame.TeamColor myColor) {
+        if (square == null) {
+            return false;
+        }
         return board.getPiece(square) == null || board.getPiece(square).getTeamColor() != myColor;
     }
 
