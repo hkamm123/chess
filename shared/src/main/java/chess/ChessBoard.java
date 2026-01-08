@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import static chess.ChessGame.TeamColor.*;
 import static chess.ChessPiece.PieceType.*;
 
@@ -64,5 +67,19 @@ public class ChessBoard {
         addPiece(new ChessPosition(8, 6), new ChessPiece(WHITE, BISHOP));
         addPiece(new ChessPosition(8, 7), new ChessPiece(WHITE, KNIGHT));
         addPiece(new ChessPosition(8, 8), new ChessPiece(WHITE, ROOK));
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) object;
+        return Objects.deepEquals(squares, that.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(squares);
     }
 }
