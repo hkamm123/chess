@@ -1,6 +1,7 @@
 package chess;
 
 import moveCalculators.BishopMoveCalculator;
+import moveCalculators.QueenMoveCalculator;
 import moveCalculators.RookMoveCalculator;
 
 import java.util.Collection;
@@ -60,6 +61,7 @@ public class ChessPiece {
         return switch(type) {
             case BISHOP -> new BishopMoveCalculator().pieceMoves(board, myPosition);
             case ROOK -> new RookMoveCalculator().pieceMoves(board, myPosition);
+            case QUEEN -> new QueenMoveCalculator().pieceMoves(board, myPosition);
             default -> null;
         };
     }
