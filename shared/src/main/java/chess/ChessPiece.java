@@ -12,8 +12,8 @@ import static chess.ChessGame.TeamColor.WHITE;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor color;
-    private PieceType type;
+    private final ChessGame.TeamColor color;
+    private final PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
