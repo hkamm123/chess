@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -52,6 +53,26 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        ChessPiece movingPiece = board.getPiece(startPosition);
+        if (movingPiece == null) {
+            return null;
+        }
+        Collection<ChessMove> pieceMoves = movingPiece.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new HashSet<>();
+        for (ChessMove m : pieceMoves) {
+            if (isValidMove(m)) {
+                validMoves.add(m);
+            }
+        }
+        return validMoves;
+    }
+
+    /**
+     * Makes the move "hypothetically" on a clone board and asserts that the move did not put its own king in check.
+     * @param move the potential move
+     * @return true if the move would not put its own king in check, false otherwise
+     */
+    private boolean isValidMove(ChessMove move) {
         throw new RuntimeException("Not implemented");
     }
 
