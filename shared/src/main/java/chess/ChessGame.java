@@ -148,4 +148,11 @@ public class ChessGame {
     public void setOver() {
         isOver = true;
     }
+
+    public ChessGame copy() {
+        ChessGame copy = new ChessGame();
+        copy.setBoard(this.board.copy());
+        copy.setTeamTurn(this.teamTurn);
+        return copy;
+    }
 }
