@@ -94,6 +94,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (validMoves(move.getStartPosition()) == null) {
+            throw new InvalidMoveException("Invalid move: there's no piece at that position");
+        }
         if (!validMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move: " + move);
         }
