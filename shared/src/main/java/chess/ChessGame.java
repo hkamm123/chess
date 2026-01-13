@@ -102,6 +102,10 @@ public class ChessGame {
         }
         board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
         board.addPiece(move.getStartPosition(), null);
+        teamTurn = switch(teamTurn) {
+            case WHITE -> TeamColor.BLACK;
+            case BLACK -> TeamColor.WHITE;
+        };
     }
 
     /**
