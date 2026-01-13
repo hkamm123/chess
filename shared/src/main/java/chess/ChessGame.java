@@ -73,7 +73,17 @@ public class ChessGame {
      * @return true if the move would not put its own king in check, false otherwise
      */
     private boolean isValidMove(ChessMove move) {
-        throw new RuntimeException("Not implemented");
+        // clone board and make move
+        ChessGame cloneGame = this.copy();
+        ChessBoard board = cloneGame.getBoard();
+        ChessPiece movingPiece = board.getPiece(move.getStartPosition());
+        if (movingPiece == null) {
+            return false;
+        }
+        board.addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getEndPosition(), movingPiece);
+        // check if the move put its own team in check
+        return !cloneGame.isInCheck(movingPiece.getTeamColor());
     }
 
     /**
@@ -83,7 +93,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        if (!validMoves(move.getStartPosition()).contains(move)) {
+            throw new InvalidMoveException("Invalid move: " + move);
+        }
+        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+        board.addPiece(move.getStartPosition(), null);
     }
 
     /**
