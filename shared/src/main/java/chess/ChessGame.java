@@ -96,6 +96,9 @@ public class ChessGame {
         if (!validMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move: " + move);
         }
+        if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Invalid move: it's not that color's turn");
+        }
         board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
         board.addPiece(move.getStartPosition(), null);
     }
