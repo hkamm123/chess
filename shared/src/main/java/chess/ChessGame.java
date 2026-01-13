@@ -103,7 +103,11 @@ public class ChessGame {
         if (board.getPiece(move.getStartPosition()).getTeamColor() != teamTurn) {
             throw new InvalidMoveException("Invalid move: it's not that color's turn");
         }
-        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+        ChessPiece pieceToAdd = board.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() != null) {
+            pieceToAdd = new ChessPiece(pieceToAdd.getTeamColor(), move.getPromotionPiece());
+        }
+        board.addPiece(move.getEndPosition(), pieceToAdd);
         board.addPiece(move.getStartPosition(), null);
         teamTurn = switch(teamTurn) {
             case WHITE -> TeamColor.BLACK;
