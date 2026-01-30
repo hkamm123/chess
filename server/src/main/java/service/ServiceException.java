@@ -9,8 +9,8 @@ public class ServiceException extends Exception {
     }
 
     private final ServiceExceptionType type;
-    public ServiceException(ServiceExceptionType type, String message) {
-        super(message);
+    public ServiceException(ServiceExceptionType type) {
+        super();
         this.type = type;
     }
 

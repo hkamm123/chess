@@ -10,7 +10,10 @@ import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
 import server.request.*;
 import server.result.LoginResult;
+import service.ServiceException;
 import service.UserService;
+
+import java.util.Map;
 
 public class Server {
 
@@ -28,12 +31,24 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::registrationHandler);
+
+        javalin.exception(ServiceException.class, this::exceptionHandler);
     }
 
-    private void registrationHandler(@NotNull Context context) {
+    private void registrationHandler(@NotNull Context context) throws ServiceException {
         RegisterRequest request = gson.fromJson(context.body(), RegisterRequest.class);
         LoginResult result = userService.register(request);
-        // TODO: handle errors and send result back
+        context.status(200);
+        context.json(gson.toJson(result));
+    }
+
+    private void exceptionHandler(@NotNull ServiceException e, @NotNull Context context) {
+        switch (e.getType()) {
+            case ALREADY_TAKEN -> {
+                context.status(403);
+                context.json(Map.of("message", "Error: already taken"));
+            }
+        }
     }
 
     public int run(int desiredPort) {

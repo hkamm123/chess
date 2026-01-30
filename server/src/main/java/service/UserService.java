@@ -19,11 +19,11 @@ public class UserService {
         this.authDao = authDao;
     }
 
-    public LoginResult register(RegisterRequest request) {
+    public LoginResult register(RegisterRequest request) throws ServiceException {
         try {
             UserData userData = userDao.getUser(request.username());
             if (userData != null) {
-                // TODO: throw an AlreadyTakenException here
+                throw new ServiceException(ServiceException.ServiceExceptionType.ALREADY_TAKEN);
             }
             userDao.createUser(new UserData(request.username(), request.password(), request.email()));
             String authToken = UUID.randomUUID().toString();
