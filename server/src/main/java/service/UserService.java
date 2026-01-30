@@ -20,6 +20,9 @@ public class UserService {
     }
 
     public LoginResult register(RegisterRequest request) throws ServiceException {
+        if (request.username() == null || request.password() == null || request.email() == null) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+        }
         try {
             UserData userData = userDao.getUser(request.username());
             if (userData != null) {
@@ -30,7 +33,7 @@ public class UserService {
             authDao.createAuth(new AuthData(authToken, request.username()));
             return new LoginResult(request.username(), authToken);
         } catch (DataAccessException ex) {
-            // TODO: throw some type of exception here (will result in 500)
+            throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
         }
     }
 }
