@@ -38,6 +38,9 @@ public class Server {
 
     private void registrationHandler(@NotNull Context context) throws ServiceException {
         RegisterRequest request = gson.fromJson(context.body(), RegisterRequest.class);
+        if (request.username() == null || request.password() == null || request.email() == null) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+        }
         LoginResult result = userService.register(request);
         context.status(200);
         context.json(gson.toJson(result));

@@ -21,9 +21,6 @@ public class UserService {
     }
 
     public LoginResult register(RegisterRequest request) throws ServiceException {
-        if (request.username() == null || request.password() == null || request.email() == null) {
-            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
-        }
         try {
             UserData userData = userDao.getUser(request.username());
             if (userData != null) {
