@@ -1,7 +1,12 @@
 package service;
 
 import dataaccess.AuthDao;
+import dataaccess.DataAccessException;
 import dataaccess.GameDao;
+import model.GameData;
+import server.result.ListGamesResult;
+
+import java.util.List;
 
 public class GameService {
     private final GameDao gameDao;
@@ -10,5 +15,17 @@ public class GameService {
     public GameService(GameDao gameDao, AuthDao authDao) {
         this.gameDao = gameDao;
         this.authDao = authDao;
+    }
+
+    public ListGamesResult listGames(String authToken) throws ServiceException {
+        try {
+            if (authDao.getAuth(authToken) == null) {
+                throw new ServiceException(ServiceException.ServiceExceptionType.UNAUTHORIZED);
+            }
+            List<GameData> games = gameDao.getGames();
+            return new ListGamesResult(games);
+        } catch (DataAccessException ex) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
+        }
     }
 }
