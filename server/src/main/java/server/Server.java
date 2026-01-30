@@ -54,6 +54,7 @@ public class Server {
         }
         LoginResult result = userService.login(request);
         context.status(200);
+        context.json(gson.toJson(result));
     }
 
     private void logoutHandler(@NotNull Context context) throws ServiceException {
