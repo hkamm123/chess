@@ -6,6 +6,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
 import server.request.*;
+import server.result.ListGamesResult;
 import server.result.LoginResult;
 import service.GameService;
 import service.ServiceException;
@@ -34,6 +35,7 @@ public class Server {
         javalin.post("/user", this::registrationHandler);
         javalin.post("/session", this::loginHandler);
         javalin.delete("/session", this::logoutHandler);
+        javalin.get("/game", this::getGamesHandler);
 
         javalin.exception(ServiceException.class, this::exceptionHandler);
     }
@@ -65,6 +67,16 @@ public class Server {
         }
         userService.logout(authToken);
         context.status(200);
+    }
+
+    private void getGamesHandler(@NotNull Context context) throws ServiceException {
+        String authToken = context.header("authorization");
+        if (authToken == null || authToken.isEmpty()) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+        }
+        ListGamesResult result = gameService.listGames(authToken);
+        context.status(200);
+        context.json(gson.toJson(result));
     }
 
     private void exceptionHandler(@NotNull ServiceException e, @NotNull Context context) {
