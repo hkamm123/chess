@@ -31,6 +31,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::registrationHandler);
+        javalin.post("/session", this::loginHandler);
 
         javalin.exception(ServiceException.class, this::exceptionHandler);
     }
@@ -42,8 +43,26 @@ public class Server {
         context.json(gson.toJson(result));
     }
 
+    private void loginHandler(@NotNull Context context) throws ServiceException{
+        LoginRequest request = gson.fromJson(context.body(), LoginRequest.class);
+        if (request.username() == null || request.password() == null) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+        }
+        LoginResult result = userService.login(request);
+        context.status(200);
+        context.json(gson.toJson(result));
+    }
+
     private void exceptionHandler(@NotNull ServiceException e, @NotNull Context context) {
         switch (e.getType()) {
+            case BAD_REQUEST -> {
+                context.status(400);
+                context.json(gson.toJson(Map.of("message", "Error: bad request")));
+            }
+            case UNAUTHORIZED -> {
+                context.status(401);
+                context.json(gson.toJson(Map.of("message", "Error: unauthorized")));
+            }
             case ALREADY_TAKEN -> {
                 context.status(403);
                 context.json(gson.toJson(Map.of("message", "Error: already taken")));
@@ -51,10 +70,6 @@ public class Server {
             case SERVER_ERROR -> {
                 context.status(500);
                 context.json(gson.toJson(Map.of("message", "Error: unknown server error")));
-            }
-            case BAD_REQUEST -> {
-                context.status(400);
-                context.json(gson.toJson(Map.of("message", "Error: bad request")));
             }
         }
     }
