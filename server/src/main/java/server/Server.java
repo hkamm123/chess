@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.AuthDao;
-import dataaccess.MemoryAuthDao;
-import dataaccess.MemoryUserDao;
-import dataaccess.UserDao;
+import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +17,15 @@ public class Server {
     private final Javalin javalin;
     private final Gson gson;
     private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         gson = new Gson();
         UserDao userDao = new MemoryUserDao();
         AuthDao authDao = new MemoryAuthDao();
+        GameDao gameDao = new MemoryGameDao();
         userService = new UserService(userDao, authDao);
+        gameService = new GameService(gameDao, authDao);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
