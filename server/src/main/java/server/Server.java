@@ -7,6 +7,7 @@ import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
 import server.request.*;
 import server.result.LoginResult;
+import service.GameService;
 import service.ServiceException;
 import service.UserService;
 
