@@ -46,15 +46,15 @@ public class Server {
         switch (e.getType()) {
             case ALREADY_TAKEN -> {
                 context.status(403);
-                context.json(Map.of("message", "Error: already taken"));
+                context.json(gson.toJson(Map.of("message", "Error: already taken")));
             }
             case SERVER_ERROR -> {
                 context.status(500);
-                context.json(Map.of("message", "Error: unknown server error"));
+                context.json(gson.toJson(Map.of("message", "Error: unknown server error")));
             }
             case BAD_REQUEST -> {
                 context.status(400);
-                context.json(Map.of("message", "Error: bad request"));
+                context.json(gson.toJson(Map.of("message", "Error: bad request")));
             }
         }
     }
