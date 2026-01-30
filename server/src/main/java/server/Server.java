@@ -6,6 +6,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
 import server.request.*;
+import server.result.CreateResult;
 import server.result.ListGamesResult;
 import server.result.LoginResult;
 import service.GameService;
@@ -86,7 +87,7 @@ public class Server {
             throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
         CreateRequest request = gson.fromJson(context.body(), CreateRequest.class);
-        CreateResult result = gameService.createGame(authToken, CreateRequest);
+        CreateResult result = gameService.createGame(authToken, request);
         context.status(200);
         context.json(gson.toJson(result));
     }
