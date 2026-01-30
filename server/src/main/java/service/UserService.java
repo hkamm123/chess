@@ -50,6 +50,18 @@ public class UserService {
         }
     }
 
+    public void logout(String authToken) throws ServiceException {
+        try {
+            if (authDao.getAuth(authToken) == null) {
+                throw new ServiceException(ServiceException.ServiceExceptionType.UNAUTHORIZED);
+            }
+
+            authDao.deleteAuth(authToken);
+        } catch (DataAccessException ex) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
+        }
+    }
+
     private boolean validatePassword(String requestPw, UserData userData) {
         return requestPw.equals(userData.password()); // TODO: change this to handle hashed passwords
     }

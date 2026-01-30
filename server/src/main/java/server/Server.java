@@ -32,6 +32,7 @@ public class Server {
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::registrationHandler);
         javalin.post("/session", this::loginHandler);
+        javalin.delete("/session", this::logoutHandler);
 
         javalin.exception(ServiceException.class, this::exceptionHandler);
     }
@@ -53,7 +54,15 @@ public class Server {
         }
         LoginResult result = userService.login(request);
         context.status(200);
-        context.json(gson.toJson(result));
+    }
+
+    private void logoutHandler(@NotNull Context context) throws ServiceException {
+        String authToken = context.header("authorization");
+        if (authToken == null) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+        }
+        userService.logout(authToken);
+        context.status(200);
     }
 
     private void exceptionHandler(@NotNull ServiceException e, @NotNull Context context) {
