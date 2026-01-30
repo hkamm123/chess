@@ -58,7 +58,7 @@ public class Server {
 
     private void logoutHandler(@NotNull Context context) throws ServiceException {
         String authToken = context.header("authorization");
-        if (authToken == null) {
+        if (authToken == null || authToken.isEmpty()) {
             throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
         userService.logout(authToken);
