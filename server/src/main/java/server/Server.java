@@ -88,10 +88,10 @@ public class Server {
 
     private void createGameHandler(@NotNull Context context) throws ServiceException {
         String authToken = context.header("authorization");
-        if (authToken == null || authToken.isEmpty()) {
+        CreateRequest request = gson.fromJson(context.body(), CreateRequest.class);
+        if (authToken == null || authToken.isEmpty() || request.gameName() == null) {
             throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
-        CreateRequest request = gson.fromJson(context.body(), CreateRequest.class);
         CreateResult result = gameService.createGame(authToken, request);
         context.status(200);
         context.json(gson.toJson(result));
