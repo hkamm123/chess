@@ -11,7 +11,6 @@ import server.result.CreateResult;
 import server.result.ListGamesResult;
 
 import java.util.List;
-import java.util.Objects;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;

@@ -69,18 +69,14 @@ public class Server {
 
     private void logoutHandler(@NotNull Context context) throws ServiceException {
         String authToken = context.header("authorization");
-        if (authToken == null || authToken.isEmpty()) {
-            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
-        }
+        assertAuthTokenNotBad(authToken);
         userService.logout(authToken);
         context.status(200);
     }
 
     private void getGamesHandler(@NotNull Context context) throws ServiceException {
         String authToken = context.header("authorization");
-        if (authToken == null || authToken.isEmpty()) {
-            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
-        }
+        assertAuthTokenNotBad(authToken);
         ListGamesResult result = gameService.listGames(authToken);
         context.status(200);
         context.json(gson.toJson(result));
@@ -88,8 +84,9 @@ public class Server {
 
     private void createGameHandler(@NotNull Context context) throws ServiceException {
         String authToken = context.header("authorization");
+        assertAuthTokenNotBad(authToken);
         CreateRequest request = gson.fromJson(context.body(), CreateRequest.class);
-        if (authToken == null || authToken.isEmpty() || request.gameName() == null) {
+        if (request.gameName() == null) {
             throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
         CreateResult result = gameService.createGame(authToken, request);
@@ -99,8 +96,9 @@ public class Server {
 
     private void joinGameHandler(@NotNull Context context) throws ServiceException {
         String authToken = context.header("authorization");
+        assertAuthTokenNotBad(authToken);
         JoinRequest request = gson.fromJson(context.body(), JoinRequest.class);
-        if (authToken == null || authToken.isEmpty() || request.playerColor() == null) {
+        if (request.playerColor() == null) {
             throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
         gameService.joinGame(authToken, request);
@@ -115,6 +113,12 @@ public class Server {
             context.status(200);
         } catch (DataAccessException ex) {
             throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
+        }
+    }
+
+    private void assertAuthTokenNotBad(String authToken) throws ServiceException {
+        if (authToken == null || authToken.isEmpty()) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
     }
 
