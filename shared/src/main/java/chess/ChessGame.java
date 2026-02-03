@@ -126,14 +126,26 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 currentPiece = board.getPiece(new ChessPosition(i, j));
-                if (currentPiece != null && currentPiece.getTeamColor() != teamColor) {
-                    for (ChessMove m : currentPiece.pieceMoves(board, new ChessPosition(i, j))) {
-                        if (board.getPiece(m.getEndPosition()) != null &&
-                                board.getPiece(m.getEndPosition()).equals(
-                                        new ChessPiece(teamColor, ChessPiece.PieceType.KING))) {
-                            return true;
-                        }
-                    }
+                if (pieceAttackingKing(currentPiece, board, new ChessPosition(i, j), teamColor)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean pieceAttackingKing(
+            ChessPiece currentPiece,
+            ChessBoard board,
+            ChessPosition currentPosition,
+            TeamColor kingColor
+    ) {
+        if (currentPiece != null && currentPiece.getTeamColor() != kingColor) {
+            for (ChessMove m : currentPiece.pieceMoves(board, currentPosition)) {
+                if (board.getPiece(m.getEndPosition()) != null &&
+                        board.getPiece(m.getEndPosition()).equals(
+                                new ChessPiece(kingColor, ChessPiece.PieceType.KING))) {
+                    return true;
                 }
             }
         }
