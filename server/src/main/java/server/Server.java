@@ -38,6 +38,7 @@ public class Server {
         javalin.delete("/session", this::logoutHandler);
         javalin.get("/game", this::getGamesHandler);
         javalin.post("/game", this::createGameHandler);
+        javalin.put("/game", this::joinGameHandler);
 
         javalin.exception(ServiceException.class, this::exceptionHandler);
     }
@@ -90,6 +91,16 @@ public class Server {
         CreateResult result = gameService.createGame(authToken, request);
         context.status(200);
         context.json(gson.toJson(result));
+    }
+
+    private void joinGameHandler(@NotNull Context context) throws ServiceException {
+        String authToken = context.header("authorization");
+        JoinRequest request = gson.fromJson(context.body(), JoinRequest.class);
+        if (authToken == null || authToken.isEmpty() || request.playerColor() == null) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+        }
+        gameService.joinGame(request);
+        context.status(200);
     }
 
     private void exceptionHandler(@NotNull ServiceException e, @NotNull Context context) {
