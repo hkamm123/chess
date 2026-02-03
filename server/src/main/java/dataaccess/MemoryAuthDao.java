@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryAuthDao implements AuthDao{
-    private final Map<String, AuthData> sessions;
+    private Map<String, AuthData> sessions;
 
     public MemoryAuthDao() {
         sessions = new HashMap<>();
@@ -25,5 +25,10 @@ public class MemoryAuthDao implements AuthDao{
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         sessions.remove(authToken);
+    }
+
+    @Override
+    public void clear() throws DataAccessException {
+        sessions = new HashMap<>();
     }
 }
