@@ -40,7 +40,7 @@ public class MemoryGameDao implements GameDao {
     }
 
     @Override
-    public void clearGames() throws DataAccessException {
+    public void clear() throws DataAccessException {
         games = new ConcurrentHashMap<>();
     }
 }
