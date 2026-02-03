@@ -26,9 +26,7 @@ public class GameService {
 
     public ListGamesResult listGames(String authToken) throws ServiceException {
         try {
-            if (authDao.getAuth(authToken) == null) {
-                throw new ServiceException(ServiceException.ServiceExceptionType.UNAUTHORIZED);
-            }
+            validateAuthToken(authToken);
             List<GameData> games = gameDao.getGames();
             return new ListGamesResult(games);
         } catch (DataAccessException ex) {
@@ -38,9 +36,7 @@ public class GameService {
 
     public CreateResult createGame(String authToken, CreateRequest request) throws ServiceException {
         try {
-            if (authDao.getAuth(authToken) == null) {
-                throw new ServiceException(ServiceException.ServiceExceptionType.UNAUTHORIZED);
-            }
+            validateAuthToken(authToken);
             int gameID = gameDao.createGame(request.gameName());
             return new CreateResult(gameID);
         } catch (DataAccessException ex) {
@@ -64,6 +60,16 @@ public class GameService {
             }
             GameData newGame = getUpdateGameData(request, game, auth); // sets updated username (see below)
             gameDao.updateGame(newGame);
+        } catch (DataAccessException ex) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
+        }
+    }
+
+    private void validateAuthToken(String authToken) throws ServiceException {
+        try {
+            if (authDao.getAuth(authToken) == null) {
+                throw new ServiceException(ServiceException.ServiceExceptionType.UNAUTHORIZED);
+            }
         } catch (DataAccessException ex) {
             throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
         }
