@@ -99,7 +99,7 @@ public class Server {
         if (authToken == null || authToken.isEmpty() || request.playerColor() == null) {
             throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
         }
-        gameService.joinGame(request);
+        gameService.joinGame(authToken, request);
         context.status(200);
     }
 

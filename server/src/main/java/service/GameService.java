@@ -3,12 +3,18 @@ package service;
 import dataaccess.AuthDao;
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
+import model.AuthData;
 import model.GameData;
 import server.request.CreateRequest;
+import server.request.JoinRequest;
 import server.result.CreateResult;
 import server.result.ListGamesResult;
 
 import java.util.List;
+import java.util.Objects;
+
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 
 public class GameService {
     private final GameDao gameDao;
@@ -41,5 +47,48 @@ public class GameService {
         } catch (DataAccessException ex) {
             throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
         }
+    }
+
+    public void joinGame(String authToken, JoinRequest request) throws ServiceException {
+        try {
+            AuthData auth = authDao.getAuth(authToken);
+            if (auth == null) {
+                throw new ServiceException(ServiceException.ServiceExceptionType.UNAUTHORIZED);
+            }
+            GameData game = gameDao.getGame(request.gameID());
+            if (game == null) {
+                throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
+            }
+            if ((request.playerColor() == WHITE && !Objects.equals(game.whiteUsername(), auth.username())) ||
+                    (request.playerColor() == BLACK && !Objects.equals(game.blackUsername(), auth.username()))) {
+                throw new ServiceException(ServiceException.ServiceExceptionType.ALREADY_TAKEN);
+            }
+            GameData newGame = getUpdateGameData(request, game, auth); // sets updated username (see below)
+            gameDao.updateGame(newGame);
+        } catch (DataAccessException ex) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
+        }
+    }
+
+    private GameData getUpdateGameData(JoinRequest request, GameData game, AuthData auth) {
+        GameData newGame;
+        if (request.playerColor() == WHITE) {
+            newGame = new GameData(
+                    game.gameID(),
+                    auth.username(),
+                    game.blackUsername(),
+                    game.gameName(),
+                    game.game()
+            );
+        } else {
+            newGame = new GameData(
+                    game.gameID(),
+                    game.whiteUsername(),
+                    auth.username(),
+                    game.gameName(),
+                    game.game()
+            );
+        }
+        return newGame;
     }
 }
