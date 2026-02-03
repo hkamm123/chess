@@ -21,12 +21,15 @@ public class Server {
     private final Gson gson;
     private final UserService userService;
     private final GameService gameService;
+    private final AuthDao authDao;
+    private final UserDao userDao;
+    private final GameDao gameDao;
 
     public Server() {
         gson = new Gson();
-        UserDao userDao = new MemoryUserDao();
-        AuthDao authDao = new MemoryAuthDao();
-        GameDao gameDao = new MemoryGameDao();
+        userDao = new MemoryUserDao();
+        authDao = new MemoryAuthDao();
+        gameDao = new MemoryGameDao();
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
 
@@ -39,6 +42,7 @@ public class Server {
         javalin.get("/game", this::getGamesHandler);
         javalin.post("/game", this::createGameHandler);
         javalin.put("/game", this::joinGameHandler);
+        javalin.delete("/db", this::clearHandler);
 
         javalin.exception(ServiceException.class, this::exceptionHandler);
     }
@@ -101,6 +105,17 @@ public class Server {
         }
         gameService.joinGame(authToken, request);
         context.status(200);
+    }
+
+    private void clearHandler(@NotNull Context context) throws ServiceException {
+        try {
+            authDao.clear();
+            userDao.clear();
+            gameDao.clear();
+            context.status(200);
+        } catch (DataAccessException ex) {
+            throw new ServiceException(ServiceException.ServiceExceptionType.SERVER_ERROR);
+        }
     }
 
     private void exceptionHandler(@NotNull ServiceException e, @NotNull Context context) {
