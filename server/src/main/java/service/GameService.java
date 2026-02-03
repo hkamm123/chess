@@ -59,8 +59,8 @@ public class GameService {
             if (game == null) {
                 throw new ServiceException(ServiceException.ServiceExceptionType.BAD_REQUEST);
             }
-            if ((request.playerColor() == WHITE && !Objects.equals(game.whiteUsername(), auth.username())) ||
-                    (request.playerColor() == BLACK && !Objects.equals(game.blackUsername(), auth.username()))) {
+            if ((request.playerColor() == WHITE && game.whiteUsername() != null) ||
+                    (request.playerColor() == BLACK && game.blackUsername() != null)) {
                 throw new ServiceException(ServiceException.ServiceExceptionType.ALREADY_TAKEN);
             }
             GameData newGame = getUpdateGameData(request, game, auth); // sets updated username (see below)
