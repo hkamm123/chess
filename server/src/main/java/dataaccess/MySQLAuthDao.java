@@ -54,6 +54,10 @@ public class MySQLAuthDao implements AuthDao {
 
     @Override
     public void clear() throws DataAccessException {
-
+        try (var conn = getConnection(); var statement = conn.prepareStatement("TRUNCATE TABLE sessions")) {
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 }
