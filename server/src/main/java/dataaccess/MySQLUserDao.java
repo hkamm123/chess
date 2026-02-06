@@ -50,6 +50,10 @@ public class MySQLUserDao implements UserDao {
 
     @Override
     public void clear() throws DataAccessException {
-
+        try (var conn = getConnection(); var statement = conn.prepareStatement("TRUNCATE TABLE users")) {
+            statement.execute();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 }
