@@ -27,9 +27,9 @@ public class Server {
 
     public Server() {
         gson = new Gson();
-        userDao = new MemoryUserDao();
         try {
             authDao = new MySQLAuthDao();
+            userDao = new MySQLUserDao();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
