@@ -59,7 +59,17 @@ public class MySQLGameDao implements GameDao {
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
-        return 0;
+        try (
+                var conn = getConnection();
+                var statement = conn.prepareStatement(
+                        "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (NULL, NULL, ?, ?)"
+                )) {
+            statement.setString(1, gameName);
+            statement.setString(2, new Gson().toJson(new ChessGame()));
+            return statement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     @Override
