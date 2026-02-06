@@ -28,7 +28,11 @@ public class Server {
     public Server() {
         gson = new Gson();
         userDao = new MemoryUserDao();
-        authDao = new MemoryAuthDao();
+        try {
+            authDao = new MySQLAuthDao();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         gameDao = new MemoryGameDao();
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
