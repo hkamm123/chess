@@ -33,7 +33,19 @@ public class MySQLUserDao implements UserDao {
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-
+        if (getUser(userData.username()) != null) {
+            throw new DataAccessException("Username already exists");
+        }
+        try (
+                var conn = getConnection();
+                var statement = conn.prepareStatement("INSERT INTO users VALUES (?, ?, ?)")) {
+            statement.setString(1, userData.username());
+            statement.setString(1, userData.password());
+            statement.setString(1, userData.email());
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            throw new DataAccessException(ex.getMessage());
+        }
     }
 
     @Override
