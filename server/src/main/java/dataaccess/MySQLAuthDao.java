@@ -44,7 +44,7 @@ public class MySQLAuthDao implements AuthDao {
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         try (var conn = getConnection();
-             var statement = conn.prepareStatement("DELETE * FROM sessions WHERE authToken = ?")) {
+             var statement = conn.prepareStatement("DELETE FROM sessions WHERE authToken = ?")) {
             statement.setString(1, authToken);
             statement.executeUpdate();
         } catch (SQLException ex) {
