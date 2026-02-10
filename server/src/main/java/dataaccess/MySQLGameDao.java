@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.GameData;
 
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import static dataaccess.DatabaseManager.*;
@@ -62,11 +63,20 @@ public class MySQLGameDao implements GameDao {
         try (
                 var conn = getConnection();
                 var statement = conn.prepareStatement(
-                        "INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (NULL, NULL, ?, ?)"
+                        """
+                        INSERT INTO games (whiteUsername, blackUsername, gameName, game) VALUES (NULL, NULL, ?, ?)
+                        """,
+                        Statement.RETURN_GENERATED_KEYS
                 )) {
             statement.setString(1, gameName);
             statement.setString(2, new Gson().toJson(new ChessGame()));
-            return statement.executeUpdate();
+            statement.executeUpdate();
+            var resultSet = statement.getGeneratedKeys();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
+            } else {
+                throw new DataAccessException("game was not created");
+            }
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage());
         }
