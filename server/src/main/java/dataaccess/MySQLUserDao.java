@@ -20,7 +20,7 @@ public class MySQLUserDao implements UserDao {
             if (resultSet.next()) {
                 return new UserData(
                         resultSet.getString("username"),
-                        resultSet.getString("password"),
+                        resultSet.getString("passwordHash"),
                         resultSet.getString("email")
                 );
             } else {
@@ -40,8 +40,8 @@ public class MySQLUserDao implements UserDao {
                 var conn = getConnection();
                 var statement = conn.prepareStatement("INSERT INTO users VALUES (?, ?, ?)")) {
             statement.setString(1, userData.username());
-            statement.setString(1, userData.password());
-            statement.setString(1, userData.email());
+            statement.setString(2, userData.password());
+            statement.setString(3, userData.email());
             statement.executeUpdate();
         } catch (SQLException ex) {
             throw new DataAccessException(ex.getMessage());
