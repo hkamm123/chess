@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDao;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import server.request.LoginRequest;
 import server.request.RegisterRequest;
 import server.result.LoginResult;
@@ -26,8 +27,8 @@ public class UserService {
             if (userData != null) {
                 throw new ServiceException(ServiceException.ServiceExceptionType.ALREADY_TAKEN);
             }
-            userDao.createUser(new UserData(request.username(), request.password(), request.email()));
-            // TODO: hash user's password before saving
+            String pwHash = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+            userDao.createUser(new UserData(request.username(), pwHash, request.email()));
             String authToken = UUID.randomUUID().toString();
             authDao.createAuth(new AuthData(authToken, request.username()));
             return new LoginResult(request.username(), authToken);
@@ -63,6 +64,6 @@ public class UserService {
     }
 
     private boolean validatePassword(String requestPw, UserData userData) {
-        return requestPw.equals(userData.password()); // TODO: change this to handle hashed passwords
+        return BCrypt.checkpw(requestPw, userData.password());
     }
 }
