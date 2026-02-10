@@ -30,10 +30,10 @@ public class Server {
         try {
             authDao = new MySQLAuthDao();
             userDao = new MySQLUserDao();
+            gameDao = new MySQLGameDao();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        gameDao = new MemoryGameDao();
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
 
