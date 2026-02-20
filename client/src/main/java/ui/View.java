@@ -7,7 +7,11 @@ public abstract class View {
         printPrompt();
         String nextInput = readInput();
         while (!nextInput.equals("quit")) {
-            eval(nextInput);
+            if (nextInput.equals("help") || nextInput.equals("h")) {
+                printHelpString();
+            } else {
+                eval(nextInput);
+            }
             printPrompt();
             nextInput = readInput();
         }
@@ -22,4 +26,6 @@ public abstract class View {
     protected abstract void printPrompt();
 
     protected abstract void eval(String input);
+
+    protected abstract void printHelpString();
 }
