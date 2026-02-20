@@ -5,10 +5,10 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDao;
 import model.AuthData;
 import model.GameData;
-import server.request.CreateRequest;
-import server.request.JoinRequest;
-import server.result.CreateResult;
-import server.result.ListGamesResult;
+import model.request.CreateRequest;
+import model.request.JoinRequest;
+import model.result.CreateResult;
+import model.result.ListGamesResult;
 
 import java.util.List;
 

@@ -1,6 +1,10 @@
 package ui;
 
+import ui.presenter.LoggedOutPresenter;
+
 public class LoggedOutView extends View {
+    private LoggedOutPresenter presenter = new LoggedOutPresenter();
+
     @Override
     protected void printPrompt() {
         System.out.print("[LOGGED OUT]>>> ");
@@ -8,10 +12,7 @@ public class LoggedOutView extends View {
 
     @Override
     protected void eval(String input) {
-        String response = switch(input) {
-            default -> "Ope! That command was not recognized.";
-        };
-        System.out.println(response);
+        System.out.println(presenter.eval(input));
     }
 
     @Override
