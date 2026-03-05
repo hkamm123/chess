@@ -1,25 +1,41 @@
-package ui;
+package ui.view;
 
 import ui.presenter.Presenter;
 
 import java.util.Scanner;
 
 public abstract class View {
+    private boolean running = true;
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
     protected Presenter presenter = presenterFactory();
 
     public void run() {
         printPrompt();
         String nextInput = readInput();
-        while (!nextInput.equals("quit")) {
-            if (nextInput.equals("help") || nextInput.equals("h")) {
+        while (true) {
+            if (nextInput.equals("quit")) {
+                cleanup();
+                break;
+            } else if (nextInput.equals("help") || nextInput.equals("h")) {
                 printHelpString();
             } else {
-                System.out.println(presenter.eval(nextInput));
+                presenter.eval(nextInput);
+                if (!running) {
+                    cleanup();
+                    break;
+                }
             }
             printPrompt();
             nextInput = readInput();
         }
-        System.out.println("See ya next time!");
     }
 
     private String readInput() {
@@ -30,6 +46,10 @@ public abstract class View {
     protected abstract void printPrompt();
 
     protected abstract void printHelpString();
+
+    protected void cleanup() {
+        return;
+    }
 
     protected abstract Presenter presenterFactory();
 }

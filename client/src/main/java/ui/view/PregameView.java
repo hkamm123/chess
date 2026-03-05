@@ -1,14 +1,17 @@
-package ui;
+package ui.view;
 
+import model.AuthData;
 import ui.presenter.PregamePresenter;
 import ui.presenter.Presenter;
 
 public class PregameView extends View {
     private final String username;
+    private final String authToken;
 
-    public PregameView(String username) {
+    public PregameView(AuthData authData) {
         super();
-        this.username = username;
+        this.username = authData.username();
+        this.authToken = authData.authToken();
     }
 
     @Override

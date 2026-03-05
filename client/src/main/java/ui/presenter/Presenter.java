@@ -1,5 +1,5 @@
 package ui.presenter;
 
 public abstract class Presenter {
-    public abstract String eval(String input);
+    public abstract void eval(String input);
 }

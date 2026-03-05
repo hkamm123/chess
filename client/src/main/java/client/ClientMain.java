@@ -1,7 +1,7 @@
 package client;
 
-import ui.LoggedOutView;
-import ui.View;
+import ui.view.LoggedOutView;
+import ui.view.View;
 
 public class ClientMain {
     public static void main(String[] args) {
