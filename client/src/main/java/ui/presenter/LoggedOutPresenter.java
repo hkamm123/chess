@@ -6,6 +6,13 @@ import ui.view.LoggedOutView;
 public class LoggedOutPresenter extends Presenter {
     private LoggedOutView view;
 
+    private String helpString = """
+                (r)egister <username> <password> <email> - register
+                (l)ogin <username> <password> - login
+                (h)elp - print the help menu
+                (q)uit - quit the program
+                """;
+
     public LoggedOutPresenter(LoggedOutView view) {
         this.view = view;
     }
@@ -13,15 +20,17 @@ public class LoggedOutPresenter extends Presenter {
     public void eval(String input) {
         String[] args = input.split(" ");
         switch (args[0]) {
-            case "register" -> register(args);
-            case "login" -> login(args);
+            case "register", "r" -> register(args);
+            case "login", "l" -> login(args);
+            case "help", "h" -> view.displayMessage(helpString);
+            case "quit", "q" -> view.setRunning(false);
             default -> view.displayMessage("Ope! It looks like that command was not recognized.");
         }
     }
 
     private void register(String[] args) {
         if (args.length != 4) {
-            view.displayMessage("input did not match expected format: register <username> <password> <email>");
+            view.displayMessage("input did not match expected format: (r)egister <username> <password> <email>");
             return;
         }
 
@@ -33,7 +42,7 @@ public class LoggedOutPresenter extends Presenter {
 
     private void login(String[] args) {
         if (args.length != 3) {
-            view.displayMessage("input did not match expected format: login <username> <password>");
+            view.displayMessage("input did not match expected format: (l)ogin <username> <password>");
             return;
         }
 

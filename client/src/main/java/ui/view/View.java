@@ -21,17 +21,9 @@ public abstract class View {
         printPrompt();
         String nextInput = readInput();
         while (true) {
-            if (nextInput.equals("quit")) {
-                cleanup();
+            presenter.eval(nextInput);
+            if (!running) {
                 break;
-            } else if (nextInput.equals("help") || nextInput.equals("h")) {
-                printHelpString();
-            } else {
-                presenter.eval(nextInput);
-                if (!running) {
-                    cleanup();
-                    break;
-                }
             }
             printPrompt();
             nextInput = readInput();
@@ -44,12 +36,6 @@ public abstract class View {
     }
 
     protected abstract void printPrompt();
-
-    protected abstract void printHelpString();
-
-    protected void cleanup() {
-        return;
-    }
 
     protected abstract Presenter presenterFactory();
 }

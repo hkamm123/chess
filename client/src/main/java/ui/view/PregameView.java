@@ -20,10 +20,6 @@ public class PregameView extends View {
     }
 
     @Override
-    protected void printHelpString() {
-    }
-
-    @Override
     protected Presenter presenterFactory() {
         return new PregamePresenter();
     }

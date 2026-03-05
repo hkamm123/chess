@@ -11,15 +11,6 @@ public class LoggedOutView extends View {
     }
 
     @Override
-    protected void printHelpString() {
-        System.out.print("""
-                register <username> <password> <email> - register
-                login <username> <password> - login
-                help - print the help menu
-                """);
-    }
-
-    @Override
     protected Presenter presenterFactory() {
         return new LoggedOutPresenter(this);
     }
