@@ -1,18 +1,12 @@
 package ui;
 
 import ui.presenter.LoggedOutPresenter;
+import ui.presenter.Presenter;
 
 public class LoggedOutView extends View {
-    private LoggedOutPresenter presenter = new LoggedOutPresenter();
-
     @Override
     protected void printPrompt() {
         System.out.print("[LOGGED OUT]>>> ");
-    }
-
-    @Override
-    protected void eval(String input) {
-        System.out.println(presenter.eval(input));
     }
 
     @Override
@@ -22,5 +16,10 @@ public class LoggedOutView extends View {
                 login <username> <password> - login
                 help - print the help menu
                 """);
+    }
+
+    @Override
+    protected Presenter presenterFactory() {
+        return new LoggedOutPresenter();
     }
 }

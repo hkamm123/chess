@@ -1,8 +1,12 @@
 package ui;
 
+import ui.presenter.Presenter;
+
 import java.util.Scanner;
 
 public abstract class View {
+    protected Presenter presenter = presenterFactory();
+
     public void run() {
         printPrompt();
         String nextInput = readInput();
@@ -10,7 +14,7 @@ public abstract class View {
             if (nextInput.equals("help") || nextInput.equals("h")) {
                 printHelpString();
             } else {
-                eval(nextInput);
+                System.out.println(presenter.eval(nextInput));
             }
             printPrompt();
             nextInput = readInput();
@@ -25,7 +29,7 @@ public abstract class View {
 
     protected abstract void printPrompt();
 
-    protected abstract void eval(String input);
-
     protected abstract void printHelpString();
+
+    protected abstract Presenter presenterFactory();
 }

@@ -1,7 +1,10 @@
 package ui;
 
+import ui.presenter.PregamePresenter;
+import ui.presenter.Presenter;
+
 public class PregameView extends View {
-    private String username;
+    private final String username;
 
     public PregameView(String username) {
         super();
@@ -14,10 +17,11 @@ public class PregameView extends View {
     }
 
     @Override
-    protected void eval(String input) {
+    protected void printHelpString() {
     }
 
     @Override
-    protected void printHelpString() {
+    protected Presenter presenterFactory() {
+        return new PregamePresenter();
     }
 }

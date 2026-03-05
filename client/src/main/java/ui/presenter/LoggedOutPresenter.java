@@ -2,7 +2,7 @@ package ui.presenter;
 
 import ui.PregameView;
 
-public class LoggedOutPresenter {
+public class LoggedOutPresenter extends Presenter {
     public String eval(String input) {
         String[] args = input.split(" ");
         return switch(args[0]) {
