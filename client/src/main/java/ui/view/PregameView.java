@@ -21,6 +21,6 @@ public class PregameView extends View {
 
     @Override
     protected Presenter presenterFactory() {
-        return new PregamePresenter();
+        return new PregamePresenter(this);
     }
 }
