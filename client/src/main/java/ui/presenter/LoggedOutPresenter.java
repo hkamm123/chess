@@ -1,5 +1,6 @@
 package ui.presenter;
 
+import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import model.result.LoginResult;
 import ui.model.HttpResponseException;
@@ -55,9 +56,13 @@ public class LoggedOutPresenter extends Presenter {
             return;
         }
 
-        // TODO: serverFacade request
-        AuthData authData = new AuthData("some token", args[1]);
-        view.displayMessage("Logged in successfully!");
-        view.navigateToPregame(authData);
+        try {
+            LoginResult result = serverFacade.login(new LoginRequest(args[1], args[2]));
+            AuthData authData = new AuthData(result.authToken(), result.username());
+            view.displayMessage("Logged in successfully!");
+            view.navigateToPregame(authData);
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
+        }
     }
 }
