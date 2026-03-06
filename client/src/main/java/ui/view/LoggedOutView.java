@@ -19,8 +19,4 @@ public class LoggedOutView extends View {
         setRunning(false);
         new PregameView(authData).run();
     }
-
-    public void displayMessage(String message) {
-        System.out.println(message);
-    }
 }

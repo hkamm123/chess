@@ -15,4 +15,8 @@ public class ServerFacade {
     public LoginResult login(LoginRequest req) throws HttpResponseException {
         return httpCommunicator.sendRequest(LoginResult.class, "POST", "/session", req);
     }
+
+    public void logout(String authToken) throws HttpResponseException {
+        httpCommunicator.sendRequest("DELETE", "/session", authToken);
+    }
 }

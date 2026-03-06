@@ -35,6 +35,10 @@ public abstract class View {
         return scanner.nextLine();
     }
 
+    public void displayMessage(String message) {
+        System.out.println(message);
+    }
+
     protected abstract void printPrompt();
 
     protected abstract Presenter presenterFactory();

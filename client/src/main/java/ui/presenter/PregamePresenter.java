@@ -1,8 +1,11 @@
 package ui.presenter;
 
+import ui.model.HttpResponseException;
+import ui.model.ServerFacade;
 import ui.view.PregameView;
 
 public class PregamePresenter extends Presenter {
+    private ServerFacade serverFacade = new ServerFacade();
     private PregameView view;
 
     private String helpString = """
@@ -23,11 +26,26 @@ public class PregamePresenter extends Presenter {
         String[] args = input.split(" ");
         switch (args[0]) {
             case "quit", "q" -> quit();
+            case "logout", "l" -> logout();
+        }
+    }
+
+    private void logout() {
+        try {
+            serverFacade.logout(view.getAuthToken());
+            view.displayMessage("Logged out successfully!");
+            view.navigateToLoggedOut();
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
         }
     }
 
     private void quit() {
-        // TODO: serverFacade logout request
-        view.setRunning(false);
+        try {
+            serverFacade.logout(view.getAuthToken());
+            view.setRunning(false);
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
+        }
     }
 }

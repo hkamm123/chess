@@ -14,6 +14,10 @@ public class PregameView extends View {
         this.authToken = authData.authToken();
     }
 
+    public String getAuthToken() {
+        return authToken;
+    }
+
     @Override
     protected void printPrompt() {
         System.out.print("[LOGGED IN as " + username + "]>>> ");
@@ -22,5 +26,10 @@ public class PregameView extends View {
     @Override
     protected Presenter presenterFactory() {
         return new PregamePresenter(this);
+    }
+
+    public void navigateToLoggedOut() {
+        setRunning(false);
+        new LoggedOutView().run();
     }
 }
