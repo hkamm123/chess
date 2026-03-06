@@ -9,15 +9,8 @@ import model.AuthData;
 import ui.view.LoggedOutView;
 
 public class LoggedOutPresenter extends Presenter {
-    private LoggedOutView view;
-    private ServerFacade serverFacade = new ServerFacade();
-
-    private String helpString = """
-                (r)egister <username> <password> <email> - register
-                (l)ogin <username> <password> - login
-                (h)elp - print the help menu
-                (q)uit - quit the program
-                """;
+    private final LoggedOutView view;
+    private final ServerFacade serverFacade = new ServerFacade();
 
     public LoggedOutPresenter(LoggedOutView view) {
         this.view = view;
@@ -25,6 +18,12 @@ public class LoggedOutPresenter extends Presenter {
 
     public void eval(String input) {
         String[] args = input.split(" ");
+        String helpString = """
+                (r)egister <username> <password> <email> - register
+                (l)ogin <username> <password> - login
+                (h)elp - print the help menu
+                (q)uit - quit the program
+                """;
         switch (args[0]) {
             case "register", "r" -> register(args);
             case "login", "l" -> login(args);

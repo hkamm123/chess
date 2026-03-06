@@ -5,17 +5,8 @@ import ui.model.ServerFacade;
 import ui.view.PregameView;
 
 public class PregamePresenter extends Presenter {
-    private ServerFacade serverFacade = new ServerFacade();
-    private PregameView view;
-
-    private String helpString = """
-            (c)reate <game name> - create a new game
-            (g)ames - list all the games
-            (p)lay <game number> <color> - play a game
-            (o)bserve <game number> - observe a game
-            (l)ogout - logout
-            (q)uit - logout and quit the program
-            """;
+    private final ServerFacade serverFacade = new ServerFacade();
+    private final PregameView view;
 
     public PregamePresenter(PregameView view) {
         this.view = view;
@@ -24,9 +15,18 @@ public class PregamePresenter extends Presenter {
     @Override
     public void eval(String input) {
         String[] args = input.split(" ");
+        String helpString = """
+                (c)reate <game name> - create a new game
+                (g)ames - list all the games
+                (p)lay <game number> <color> - play a game
+                (o)bserve <game number> - observe a game
+                (l)ogout - logout
+                (q)uit - logout and quit the program
+                """;
         switch (args[0]) {
-            case "quit", "q" -> quit();
             case "logout", "l" -> logout();
+            case "help", "h" -> view.displayMessage(helpString);
+            case "quit", "q" -> quit();
         }
     }
 
