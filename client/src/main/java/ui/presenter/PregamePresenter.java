@@ -1,5 +1,7 @@
 package ui.presenter;
 
+import model.request.CreateRequest;
+import model.result.CreateResult;
 import ui.model.HttpResponseException;
 import ui.model.ServerFacade;
 import ui.view.PregameView;
@@ -24,9 +26,24 @@ public class PregamePresenter extends Presenter {
                 (q)uit - logout and quit the program
                 """;
         switch (args[0]) {
+            case "create", "c" -> createGame(args);
             case "logout", "l" -> logout();
             case "help", "h" -> view.displayMessage(helpString);
             case "quit", "q" -> quit();
+        }
+    }
+
+    private void createGame(String[] args) {
+        if (args.length != 2) {
+            view.displayMessage("input did not match expected format: (c)reate <game name>");
+            return;
+        }
+
+        try {
+            CreateResult result = serverFacade.createGame(new CreateRequest(args[1]), view.getAuthToken());
+            view.displayMessage("Game created successfully!");
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
         }
     }
 
