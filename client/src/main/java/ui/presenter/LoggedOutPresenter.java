@@ -1,10 +1,15 @@
 package ui.presenter;
 
+import model.request.RegisterRequest;
+import model.result.LoginResult;
+import ui.model.HttpResponseException;
+import ui.model.ServerFacade;
 import model.AuthData;
 import ui.view.LoggedOutView;
 
 public class LoggedOutPresenter extends Presenter {
     private LoggedOutView view;
+    private ServerFacade serverFacade = new ServerFacade();
 
     private String helpString = """
                 (r)egister <username> <password> <email> - register
@@ -34,10 +39,14 @@ public class LoggedOutPresenter extends Presenter {
             return;
         }
 
-        // TODO: use ServerFacade to make register request to server
-        AuthData authData = new AuthData("some token", args[1]);
-        view.displayMessage("Registered and logged in successfully!");
-        view.navigateToPregame(authData);
+        try {
+            LoginResult result = serverFacade.register(new RegisterRequest(args[1], args[2], args[3]));
+            AuthData authData = new AuthData(result.authToken(), result.username());
+            view.displayMessage("Registered and logged in successfully!");
+            view.navigateToPregame(authData);
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
+        }
     }
 
     private void login(String[] args) {
