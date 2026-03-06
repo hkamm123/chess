@@ -30,10 +30,8 @@ public class HTTPCommunicator {
             if (response.statusCode() == 200) {
                 return new Gson().fromJson(response.body(), responseClass);
             } else {
-                String body = response.body();
-                var map = new Gson().fromJson(body, HashMap.class);
-                String message = map.get("message").toString();
-                throw new HttpResponseException(response.statusCode(), message);
+                handleErrorResponse(response);
+                return null;
             }
         } catch (IOException | InterruptedException | URISyntaxException ex) {
             throw new HttpResponseException(500, ex.getMessage());
@@ -52,10 +50,8 @@ public class HTTPCommunicator {
             if (response.statusCode() == 200) {
                 return new Gson().fromJson(response.body(), responseClass);
             } else {
-                String body = response.body();
-                var map = new Gson().fromJson(body, HashMap.class);
-                String message = map.get("message").toString();
-                throw new HttpResponseException(response.statusCode(), message);
+                handleErrorResponse(response);
+                return null;
             }
         } catch (IOException | InterruptedException | URISyntaxException ex) {
             throw new HttpResponseException(500, ex.getMessage());
@@ -72,13 +68,17 @@ public class HTTPCommunicator {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                String body = response.body();
-                var map = new Gson().fromJson(body, HashMap.class);
-                String message = map.get("message").toString();
-                throw new HttpResponseException(response.statusCode(), message);
+                handleErrorResponse(response);
             }
         } catch (IOException | InterruptedException | URISyntaxException ex) {
             throw new HttpResponseException(500, ex.getMessage());
         }
+    }
+
+    private void handleErrorResponse(HttpResponse response) throws HttpResponseException {
+        String body = (String) response.body();
+        var map = new Gson().fromJson(body, HashMap.class);
+        String message = map.get("message").toString();
+        throw new HttpResponseException(response.statusCode(), message);
     }
 }
