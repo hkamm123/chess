@@ -4,6 +4,7 @@ import model.request.CreateRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import model.result.CreateResult;
+import model.result.ListGamesResult;
 import model.result.LoginResult;
 
 public class ServerFacade {
@@ -24,5 +25,9 @@ public class ServerFacade {
 
     public CreateResult createGame(CreateRequest req, String authToken) throws HttpResponseException {
         return httpCommunicator.sendRequest(CreateResult.class, "POST", "/game", req, authToken);
+    }
+
+    public ListGamesResult listGames(String authToken) throws HttpResponseException {
+        return httpCommunicator.sendRequest(ListGamesResult.class, "GET", "/game", authToken);
     }
 }

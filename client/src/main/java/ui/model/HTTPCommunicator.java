@@ -38,6 +38,26 @@ public class HTTPCommunicator {
         }
     }
 
+    public <T> T sendRequest(Class<T> responseClass, String method, String path, String authToken) throws HttpResponseException {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(serverUrl + path))
+                    .method(method, HttpRequest.BodyPublishers.noBody())
+                    .header("Authorization", authToken)
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new Gson().fromJson(response.body(), responseClass);
+            } else {
+                handleErrorResponse(response);
+                return null;
+            }
+        } catch (IOException | InterruptedException | URISyntaxException ex) {
+            throw new HttpResponseException(500, ex.getMessage());
+        }
+    }
+
     public <T> T sendRequest(Class<T> responseClass, String method, String path, Object requestBody, String authToken) throws HttpResponseException {
         try {
             HttpRequest request = HttpRequest.newBuilder()

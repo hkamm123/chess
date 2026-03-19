@@ -1,14 +1,21 @@
 package ui.presenter;
 
+import model.GameData;
 import model.request.CreateRequest;
 import model.result.CreateResult;
+import model.result.ListGamesResult;
 import ui.model.HttpResponseException;
 import ui.model.ServerFacade;
 import ui.view.PregameView;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class PregamePresenter extends Presenter {
     private final ServerFacade serverFacade = new ServerFacade();
     private final PregameView view;
+    private Map<Integer, GameData> gamesList = new HashMap<>();
 
     public PregamePresenter(PregameView view) {
         this.view = view;
@@ -27,6 +34,7 @@ public class PregamePresenter extends Presenter {
                 """;
         switch (args[0]) {
             case "create", "c" -> createGame(args);
+            case "games", "g" -> listGames();
             case "logout", "l" -> logout();
             case "help", "h" -> view.displayMessage(helpString);
             case "quit", "q" -> quit();
@@ -44,6 +52,39 @@ public class PregamePresenter extends Presenter {
             view.displayMessage("Game created successfully!");
         } catch (HttpResponseException ex) {
             view.displayMessage(getErrorMessage(ex));
+        }
+    }
+
+    private void listGames() {
+        try {
+            ListGamesResult result = serverFacade.listGames(view.getAuthToken());
+            updateGamesList(result.games());
+            displayGamesList();
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
+        }
+    }
+
+    private void updateGamesList(List<GameData> games) {
+        gamesList.clear();
+        for (int i = 1; i <= games.size(); i++) {
+            gamesList.put(i, games.get(i - 1));
+        }
+    }
+
+    private void displayGamesList() {
+        if (gamesList.size() == 0) {
+            view.displayMessage("There are no games yet.");
+            return;
+        }
+
+        for (int i = 1; i <= gamesList.size(); i++) {
+            GameData game = gamesList.get(i);
+            String gameName = game.gameName();
+            String whiteUsername = (game.whiteUsername() != null ? game.whiteUsername() : "empty");
+            String blackUsername = (game.blackUsername() != null ? game.blackUsername() : "empty");
+            view.displayMessage(i + ": " + gameName);
+            view.displayMessage("\tWhite: " + whiteUsername + "\n\tBlack: " + blackUsername);
         }
     }
 
