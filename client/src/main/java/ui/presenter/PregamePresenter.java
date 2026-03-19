@@ -1,5 +1,6 @@
 package ui.presenter;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import model.GameData;
 import model.request.CreateRequest;
@@ -101,6 +102,7 @@ public class PregamePresenter extends Presenter {
 
         try {
             serverFacade.joinGame(new JoinRequest(parseTeamColor(args[2]), gamesList.get(parseGameNumber(args[1])).gameID()), view.getAuthToken());
+            view.printBoard(new ChessGame().getBoard(), parseTeamColor(args[2]));
         } catch (IllegalArgumentException ex) {
             view.displayMessage("Ope! Double check your input and try again.");
         } catch (HttpResponseException ex) {

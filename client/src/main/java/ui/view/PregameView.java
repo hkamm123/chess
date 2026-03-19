@@ -1,5 +1,7 @@
 package ui.view;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import model.AuthData;
 import ui.presenter.PregamePresenter;
 import ui.presenter.Presenter;
@@ -31,5 +33,9 @@ public class PregameView extends View {
     public void navigateToLoggedOut() {
         setRunning(false);
         new LoggedOutView().run();
+    }
+
+    public void printBoard(ChessBoard board, ChessGame.TeamColor perspective) {
+        new ChessBoardPrinter().printBoard(board, perspective);
     }
 }
