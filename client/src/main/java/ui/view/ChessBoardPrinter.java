@@ -10,26 +10,47 @@ import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
 
 public class ChessBoardPrinter {
-    public void printBoard(ChessBoard board) {
+    public void printBoard(ChessBoard board, ChessGame.TeamColor perspective) {
         print(ERASE_SCREEN);
-        for (int row = 1; row <= 8; row += 2) {
-            for (int col = 1; col <= 8; col++) {
-                printSquare(board.getPiece(new ChessPosition(row, col)), (col % 2 == 0 ? WHITE : BLACK));
+        if (perspective == BLACK) {
+            for (int row = 1; row <= 8; row += 2) {
+                for (int col = 8; col >= 1; col--) {
+                    printSquare(board.getPiece(new ChessPosition(row, col)), (col % 2 == 0 ? WHITE : BLACK));
+                }
+                print(SET_BG_COLOR_DARK_GREY);
+                print(" " + row + " \n");
+                for (int col = 8; col >= 1; col--) {
+                    printSquare(board.getPiece(new ChessPosition(row + 1, col)), (col % 2 == 0 ? BLACK : WHITE));
+                }
+                print(SET_BG_COLOR_DARK_GREY);
+                print(" " + (row + 1) + " \n");
             }
-            print(SET_BG_COLOR_DARK_GREY);
-            print(" " + row + " \n");
-            for (int col = 1; col <= 8; col++) {
-                printSquare(board.getPiece(new ChessPosition(row + 1, col)), (col % 2 == 0 ? BLACK : WHITE));
+            printHeaders(perspective);
+        } else {
+            for (int row = 8; row >= 1; row -= 2) {
+                for (int col = 1; col <= 8; col++) {
+                    printSquare(board.getPiece(new ChessPosition(row, col)), (col % 2 == 0 ? BLACK : WHITE));
+                }
+                print(SET_BG_COLOR_DARK_GREY);
+                print(" " + row + " \n");
+
+                for (int col = 1; col <= 8; col++) {
+                    printSquare(board.getPiece(new ChessPosition(row - 1, col)), (col % 2 == 0 ? WHITE : BLACK));
+                }
+                print(SET_BG_COLOR_DARK_GREY);
+                print(" " + (row - 1) + " \n");
             }
-            print(SET_BG_COLOR_DARK_GREY);
-            print(" " + (row + 1) + " \n");
+            printHeaders(perspective);
         }
-        printHeaders();
     }
 
-    private void printHeaders() {
+    private void printHeaders(ChessGame.TeamColor perspective) {
         print(SET_BG_COLOR_DARK_GREY);
-        print(" a  b  c  d  e  f  g  h \n");
+        if (perspective == WHITE) {
+            print(" a  b  c  d  e  f  g  h \n");
+        } else {
+            print(" h  g  f  e  d  c  b  a \n");
+        }
     }
 
     private void printSquare(ChessPiece piece, ChessGame.TeamColor backgroundColor) {
