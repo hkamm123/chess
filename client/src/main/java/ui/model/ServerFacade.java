@@ -1,6 +1,7 @@
 package ui.model;
 
 import model.request.CreateRequest;
+import model.request.JoinRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import model.result.CreateResult;
@@ -29,5 +30,9 @@ public class ServerFacade {
 
     public ListGamesResult listGames(String authToken) throws HttpResponseException {
         return httpCommunicator.sendRequest(ListGamesResult.class, "GET", "/game", authToken);
+    }
+
+    public void joinGame(JoinRequest req, String authToken) throws HttpResponseException {
+        httpCommunicator.sendRequest("PUT", "/game", req, authToken);
     }
 }

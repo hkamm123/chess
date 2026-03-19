@@ -1,7 +1,9 @@
 package ui.presenter;
 
+import chess.ChessGame;
 import model.GameData;
 import model.request.CreateRequest;
+import model.request.JoinRequest;
 import model.result.CreateResult;
 import model.result.ListGamesResult;
 import ui.model.HttpResponseException;
@@ -10,6 +12,7 @@ import ui.view.PregameView;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class PregamePresenter extends Presenter {
@@ -35,6 +38,7 @@ public class PregamePresenter extends Presenter {
         switch (args[0]) {
             case "create", "c" -> createGame(args);
             case "games", "g" -> listGames();
+            case "play", "p" -> joinGame(args);
             case "logout", "l" -> logout();
             case "help", "h" -> view.displayMessage(helpString);
             case "quit", "q" -> quit();
@@ -50,6 +54,7 @@ public class PregamePresenter extends Presenter {
         try {
             CreateResult result = serverFacade.createGame(new CreateRequest(args[1]), view.getAuthToken());
             view.displayMessage("Game created successfully!");
+            listGames();
         } catch (HttpResponseException ex) {
             view.displayMessage(getErrorMessage(ex));
         }
@@ -86,6 +91,40 @@ public class PregamePresenter extends Presenter {
             view.displayMessage(i + ": " + gameName);
             view.displayMessage("\tWhite: " + whiteUsername + "\n\tBlack: " + blackUsername);
         }
+    }
+
+    private void joinGame(String[] args) {
+        if (args.length != 3) {
+            view.displayMessage("input did not match expected format: (p)lay <game number> <color>");
+            return;
+        }
+
+        try {
+            serverFacade.joinGame(new JoinRequest(parseTeamColor(args[2]), gamesList.get(parseGameNumber(args[1])).gameID()), view.getAuthToken());
+        } catch (IllegalArgumentException ex) {
+            view.displayMessage("Ope! Double check your input and try again.");
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
+        }
+    }
+
+    private ChessGame.TeamColor parseTeamColor(String input) {
+        if (input.toLowerCase().equals("white") || input.toLowerCase().equals("w")) {
+            return ChessGame.TeamColor.WHITE;
+        }
+
+        if (input.toLowerCase().equals("black") || input.toLowerCase().equals("b")) {
+            return ChessGame.TeamColor.BLACK;
+        }
+
+        throw new IllegalArgumentException("team color input was invalid");
+    }
+
+    private int parseGameNumber(String input) {
+        if (Integer.parseInt(input) > gamesList.size()) {
+            throw new IllegalArgumentException("invalid game number");
+        }
+        return Integer.parseInt(input);
     }
 
     private void logout() {
