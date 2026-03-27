@@ -27,6 +27,7 @@ public class Server {
     private final AuthDao authDao;
     private final UserDao userDao;
     private final GameDao gameDao;
+    private final WebsocketHandler websocketHandler;
 
     public Server() {
         gson = new Gson();
@@ -39,6 +40,7 @@ public class Server {
         }
         userService = new UserService(userDao, authDao);
         gameService = new GameService(gameDao, authDao);
+        websocketHandler = new WebsocketHandler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -50,6 +52,14 @@ public class Server {
         javalin.post("/game", this::createGameHandler);
         javalin.put("/game", this::joinGameHandler);
         javalin.delete("/db", this::clearHandler);
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(ctx -> {
+                ctx.enableAutomaticPings();
+                System.out.println("Websocket Connected");
+            });
+            ws.onMessage(websocketHandler::handleMessage);
+            ws.onClose(_ -> System.out.println("Websocket closed"));
+        });
 
         javalin.exception(ServiceException.class, this::exceptionHandler);
     }
