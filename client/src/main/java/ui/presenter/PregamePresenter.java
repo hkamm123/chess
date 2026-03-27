@@ -40,6 +40,7 @@ public class PregamePresenter extends Presenter {
             case "create", "c" -> createGame(args);
             case "games", "g" -> listGames();
             case "play", "p" -> joinGame(args);
+            case "observe", "o" -> observeGame(args);
             case "logout", "l" -> logout();
             case "help", "h" -> view.displayMessage(helpString);
             case "quit", "q" -> quit();
@@ -110,6 +111,22 @@ public class PregamePresenter extends Presenter {
         }
     }
 
+    private void observeGame(String[] args) {
+        if (args.length != 2) {
+            view.displayMessage("input did not match expected format: (o)bserve <game number>");
+            return;
+        }
+
+        try {
+            serverFacade.observeGame(parseGameNumber(args[1]));
+            view.printBoard(new ChessGame().getBoard(), ChessGame.TeamColor.WHITE);
+        } catch (IllegalArgumentException ex) {
+            view.displayMessage("Ope! Double check your input and try again.");
+        } catch (HttpResponseException ex) {
+            view.displayMessage(getErrorMessage(ex));
+        }
+    }
+
     private ChessGame.TeamColor parseTeamColor(String input) {
         if (input.toLowerCase().equals("white") || input.toLowerCase().equals("w")) {
             return ChessGame.TeamColor.WHITE;
@@ -123,7 +140,7 @@ public class PregamePresenter extends Presenter {
     }
 
     private int parseGameNumber(String input) {
-        if (Integer.parseInt(input) > gamesList.size()) {
+        if (Integer.parseInt(input) > gamesList.size() || Integer.parseInt(input) < 1) {
             throw new IllegalArgumentException("invalid game number");
         }
         return Integer.parseInt(input);

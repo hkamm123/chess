@@ -32,6 +32,11 @@ public class ServerFacade {
         return httpCommunicator.sendRequest(ListGamesResult.class, "GET", "/game", authToken);
     }
 
+    public void observeGame(int gameID) throws HttpResponseException {
+        // TODO: in phase 6, implement websocket
+        return;
+    }
+
     public void joinGame(JoinRequest req, String authToken) throws HttpResponseException {
         httpCommunicator.sendRequest("PUT", "/game", req, authToken);
     }
