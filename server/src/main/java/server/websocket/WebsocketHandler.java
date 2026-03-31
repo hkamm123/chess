@@ -1,4 +1,4 @@
-package server;
+package server.websocket;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDao;
@@ -7,24 +7,17 @@ import dataaccess.GameDao;
 import io.javalin.websocket.WsMessageContext;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.ConnectCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class WebsocketHandler {
     private final Gson gson = new Gson();
     private final GameDao gameDao;
     private final AuthDao authDao;
-    private final Map<Integer, List<Session>> sessions = new ConcurrentHashMap<>();
+    private final ConnectionManager connMgr = new ConnectionManager();
+    private final WebsocketMessenger msgr = new WebsocketMessenger();
 
     public WebsocketHandler(GameDao gameDao, AuthDao authDao) {
         this.gameDao = gameDao;
@@ -44,24 +37,26 @@ public class WebsocketHandler {
     private void connect(WsMessageContext ctx, ConnectCommand cmd) {
         AuthData auth;
         GameData game;
+        // validate gameID and authToken
         try {
             auth = authDao.getAuth(cmd.getAuthToken());
             game = gameDao.getGame(cmd.getGameID());
-            if (game == null || auth == null) {
-                ctx.send(gson.toJson(new ErrorMessage("Error: bad request")));
-                return;
-            }
-            ctx.send(gson.toJson(new LoadGameMessage(gson.toJson(game.game()))));
         } catch (DataAccessException ex) {
             ctx.send(gson.toJson(new ErrorMessage("Error: unable to retrieve game from database")));
             return;
         }
-
-        if (!this.sessions.containsKey(cmd.getGameID())) {
-            this.sessions.put(cmd.getGameID(), new ArrayList());
+        if (game == null || auth == null) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: bad request")));
+            return;
         }
-        this.sessions.get(cmd.getGameID()).add(ctx.session);
 
+        // send load game message
+        msgr.sendGame(ctx.session, game.game());
+
+        // add session to game
+        connMgr.add(ctx.session, cmd.getGameID());
+
+        // get player role
         String role = "an observer";
         if (game.whiteUsername().equals(auth.username())) {
             role = "white";
@@ -69,14 +64,10 @@ public class WebsocketHandler {
             role = "black";
         }
 
-        for (Session s : this.sessions.get(cmd.getGameID())) {
-            if (s.isOpen() && s != ctx.session) {
-                try {
-                    s.getRemote().sendString(gson.toJson(new NotificationMessage(auth.username() + " has joined the game as " + role)));
-                } catch (IOException ex) {
-                    System.out.println("Something went wrong when notifying a player of a join.");
-                }
-            }
-        }
+        connMgr.notifyAll(
+                cmd.getGameID(),
+                ctx.session,
+                new NotificationMessage(auth.username() + " has joined the game as " + role)
+        );
     }
 }

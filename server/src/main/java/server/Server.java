@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import model.result.CreateResult;
 import model.result.ListGamesResult;
 import model.result.LoginResult;
+import server.websocket.WebsocketHandler;
 import service.GameService;
 import service.ServiceException;
 import service.UserService;
