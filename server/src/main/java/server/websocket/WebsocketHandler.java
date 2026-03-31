@@ -29,18 +29,10 @@ public class WebsocketHandler {
     public void handleMessage(WsMessageContext ctx) {
         UserGameCommand cmd = gson.fromJson(ctx.message(), UserGameCommand.class);
         switch (cmd.getCommandType()) {
-            case CONNECT -> {
-                connect(ctx, gson.fromJson(ctx.message(), ConnectCommand.class));
-            }
-            case MAKE_MOVE -> {
-                handleMakeMove(ctx, gson.fromJson(ctx.message(), MakeMoveCommand.class));
-            }
-            case RESIGN -> {
-                handleResign(ctx, gson.fromJson(ctx.message(), ResignCommand.class));
-            }
-            case LEAVE -> {
-                handleLeave(ctx, gson.fromJson(ctx.message(), LeaveCommand.class));
-            }
+            case CONNECT -> connect(ctx, gson.fromJson(ctx.message(), ConnectCommand.class));
+            case MAKE_MOVE -> handleMakeMove(ctx, gson.fromJson(ctx.message(), MakeMoveCommand.class));
+            case RESIGN -> handleResign(ctx, gson.fromJson(ctx.message(), ResignCommand.class));
+            case LEAVE -> handleLeave(ctx, gson.fromJson(ctx.message(), LeaveCommand.class));
             default -> ctx.send("Unknown ws message: " + ctx.message());
         }
     }
