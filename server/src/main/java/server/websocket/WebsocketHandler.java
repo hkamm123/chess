@@ -8,10 +8,7 @@ import dataaccess.GameDao;
 import io.javalin.websocket.WsMessageContext;
 import model.AuthData;
 import model.GameData;
-import websocket.commands.ConnectCommand;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.ResignCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import websocket.messages.ErrorMessage;
 
 import static chess.ChessGame.TeamColor.BLACK;
@@ -40,6 +37,9 @@ public class WebsocketHandler {
             }
             case RESIGN -> {
                 handleResign(ctx, gson.fromJson(ctx.message(), ResignCommand.class));
+            }
+            case LEAVE -> {
+                handleLeave(ctx, gson.fromJson(ctx.message(), LeaveCommand.class));
             }
             default -> ctx.send("Unknown ws message: " + ctx.message());
         }
@@ -156,5 +156,44 @@ public class WebsocketHandler {
         }
 
         connMgr.notifyAll(cmd.getGameID(), null, auth.username() + " has resigned.");
+    }
+
+    private void handleLeave(WsMessageContext ctx, LeaveCommand cmd) {
+        AuthData auth;
+        GameData game;
+        try {
+            auth = authDao.getAuth(cmd.getAuthToken());
+            game = gameDao.getGame(cmd.getGameID());
+            if (auth == null || game == null) {
+                msgr.sendError(ctx.session, "Error: bad request");
+                return;
+            }
+
+            if (auth.username().equals(game.whiteUsername())) {
+                GameData updatedGame = new GameData(
+                        game.gameID(),
+                        null,
+                        game.blackUsername(),
+                        game.gameName(),
+                        game.game()
+                );
+                gameDao.updateGame(updatedGame);
+            } else if (auth.username().equals(game.blackUsername())) {
+                GameData updatedGame = new GameData(
+                        game.gameID(),
+                        game.whiteUsername(),
+                        null,
+                        game.gameName(),
+                        game.game()
+                );
+                gameDao.updateGame(updatedGame);
+            }
+        } catch (DataAccessException ex) {
+            msgr.sendError(ctx.session, "An unexpected error occurred");
+            return;
+        }
+
+        connMgr.remove(ctx.session, cmd.getGameID());
+        connMgr.notifyAll(cmd.getGameID(), null, auth.username() + " has left the game.");
     }
 }
