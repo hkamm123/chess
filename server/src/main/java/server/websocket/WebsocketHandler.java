@@ -73,7 +73,7 @@ public class WebsocketHandler {
             role = "black";
         }
 
-        connMgr.notifyAll(cmd.getGameID(), ctx.session, new NotificationMessage(auth.username() + " has joined the game as " + role));
+        connMgr.notifyAll(cmd.getGameID(), ctx.session, auth.username() + " has joined the game as " + role);
     }
 
     private void handleMakeMove(WsMessageContext ctx, MakeMoveCommand cmd) {
@@ -108,7 +108,7 @@ public class WebsocketHandler {
 
         // notify all other clients of move made
         String msg = auth.username() + " made move: " + cmd.getMove().toString();
-        connMgr.notifyAll(cmd.getGameID(), ctx.session, new NotificationMessage(msg));
+        connMgr.notifyAll(cmd.getGameID(), ctx.session, msg);
 
         // send load_game to all clients, and notify all clients of check/checkmate/stalemate
         String gameStatusChangeMsg = "";
@@ -126,9 +126,9 @@ public class WebsocketHandler {
             gameStatusChangeMsg = "Stalemate!";
         }
 
-        connMgr.notifyAll(cmd.getGameID(), null, new LoadGameMessage(gson.toJson(game.game())));
+        connMgr.loadGameAll(cmd.getGameID(), null, game.game());
         if (!gameStatusChangeMsg.isEmpty()) {
-            connMgr.notifyAll(cmd.getGameID(), null, new NotificationMessage(gameStatusChangeMsg));
+            connMgr.notifyAll(cmd.getGameID(), null, gameStatusChangeMsg);
         }
     }
 }
